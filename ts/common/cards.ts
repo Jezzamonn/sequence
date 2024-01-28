@@ -1,4 +1,4 @@
-export type Suit = "Clubs" | "Diamonds" | "Spades" | "Hearts" | "Joker";
+export type Suit = "Spades" | "Diamonds" | "Clubs" | "Hearts" | "Joker";
 export type Rank = "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "J" | "Q" | "K" | "A" | "Joker";
 
 export interface Card {
@@ -6,7 +6,7 @@ export interface Card {
     rank: Rank;
 }
 
-export const allSuits: Suit[] = ["Clubs", "Diamonds", "Spades", "Hearts"];
+export const allSuits: Suit[] = ["Spades", "Diamonds", "Clubs", "Hearts"];
 export const allRanks: Rank[] = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 
 export const suitToSymbol: Map<Suit, string> = new Map([
@@ -22,3 +22,10 @@ export const suitToColor: Map<Suit, string> = new Map([
     ["Hearts", "red"],
     ["Spades", "black"],
 ]);
+
+export function cardToShortString(card: Card): string {
+    if (card.suit == "Joker") {
+        return "★";
+    }
+    return card.rank + suitToSymbol.get(card.suit);
+}

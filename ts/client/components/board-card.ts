@@ -1,6 +1,6 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { Rank, Suit, suitToSymbol } from "../../common/cards";
+import { cardToShortString, Rank, Suit, suitToSymbol } from "../../common/cards";
 
 @customElement("board-card")
 export class BoardCardElement extends LitElement {
@@ -12,11 +12,32 @@ export class BoardCardElement extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #eeeeee;
+        background: #ffffff;
         border: 1px solid black;
         border-radius: 3px;
         margin: 2px;
-      }`
+      }
+
+      .card-Spades {
+        color: black;
+      }
+
+      .card-Hearts {
+        color: red;
+      }
+
+      .card-Diamonds {
+        color: red;
+      }
+
+      .card-Clubs {
+        color: black;
+      }
+
+      .card-Joker {
+        color: #9bf;
+      }
+      `
     ];
 
   @property()
@@ -25,11 +46,12 @@ export class BoardCardElement extends LitElement {
   @property()
   accessor suit: Suit = "Spades";
 
-  get suitSymbol() {
-    return suitToSymbol.get(this.suit) ?? "";
+  get shortString() {
+    return cardToShortString({ rank: this.rank, suit: this.suit });
   }
 
   render() {
-    return html`<div class="card">${this.rank}${this.suitSymbol}</div>`;
+    // language=HTML
+    return html`<div class="card card-${this.suit}">${this.shortString}</div>`;
   }
 }

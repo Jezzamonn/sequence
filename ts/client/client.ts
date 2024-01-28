@@ -54,10 +54,9 @@ function createBoard(): (Card | undefined)[][]{
   }
 
   // Loop around in a spiral and add the cards in order.
-  // Start at the bottom for some reason
-  let p: Point = new Point(9, 9);
+  let p: Point = new Point(0, 0);
   // Moving left
-  let dir: Point = new Point(-1, 0);
+  let dir: Point = new Point(1, 0);
   let cardIndex = 0;
   const min = new Point(0, 0);
   const max = new Point(9, 9);
