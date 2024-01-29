@@ -15,10 +15,6 @@ export class BoardCardElement extends LitElement {
 
         max-width: 9.5cqw;
         max-height: 9.5cqh;
-
-        background-color: white;
-        border-radius: 1cqw;
-
         overflow: hidden;
       }
 
@@ -26,25 +22,6 @@ export class BoardCardElement extends LitElement {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
-        opacity: 0.5;
-      }
-
-      .card-image.card-Joker {
-        opacity: 1;
-      }
-
-      .card-label {
-        position: absolute;
-        background-color: white;
-        top: 0;
-        left: 0;
-        font-size: 20px;
-        text-align: center;
-        line-height: 1em;
-      }
-
-      .card-label.card-Joker {
-        display: none;
       }
 
       .card-Spades {
@@ -85,11 +62,8 @@ export class BoardCardElement extends LitElement {
 
   render() {
     // language=HTML
-    // return html``;
-    // language=HTML
     return html`
       <img class="card-image card-${this.suit}" src="${this.assetName}">
-      <div class="card-label card-${this.suit}">${this.rank}<br>${suitToSymbol.get(this.suit)}</div>
     `;
   }
 }
