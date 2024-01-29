@@ -29,6 +29,10 @@ export class BoardCardElement extends LitElement {
         opacity: 0.5;
       }
 
+      .card-image.card-Joker {
+        opacity: 1;
+      }
+
       .card-label {
         position: absolute;
         background-color: white;
@@ -37,6 +41,10 @@ export class BoardCardElement extends LitElement {
         font-size: 20px;
         text-align: center;
         line-height: 1em;
+      }
+
+      .card-label.card-Joker {
+        display: none;
       }
 
       .card-Spades {
@@ -53,10 +61,6 @@ export class BoardCardElement extends LitElement {
 
       .card-Diamonds {
         color: red;
-      }
-
-      .card-Joker {
-        display: none;
       }
       `
     ];
@@ -84,7 +88,7 @@ export class BoardCardElement extends LitElement {
     // return html``;
     // language=HTML
     return html`
-      <img class="card-image" src="${this.assetName}">
+      <img class="card-image card-${this.suit}" src="${this.assetName}">
       <div class="card-label card-${this.suit}">${this.rank}<br>${suitToSymbol.get(this.suit)}</div>
     `;
   }
