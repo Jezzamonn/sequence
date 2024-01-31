@@ -9,12 +9,6 @@ export class BoardCardElement extends LitElement {
     // language=CSS
     css`
       :host {
-        position: relative;
-
-        margin: 0.25cqw 0.25cqh;
-
-        max-width: 9.5cqw;
-        max-height: 9.5cqh;
         overflow: hidden;
       }
 
