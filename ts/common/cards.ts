@@ -1,55 +1,94 @@
-export type Suit = "Spades" | "Diamonds" | "Clubs" | "Hearts" | "Joker";
-export type Rank = "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "J" | "Q" | "K" | "A" | "Joker";
+export type Suit = 'Spades' | 'Diamonds' | 'Clubs' | 'Hearts' | 'Joker';
+export type Rank =
+    | '2'
+    | '3'
+    | '4'
+    | '5'
+    | '6'
+    | '7'
+    | '8'
+    | '9'
+    | '10'
+    | 'J'
+    | 'Q'
+    | 'K'
+    | 'A'
+    | 'Joker';
 
 export interface Card {
     suit: Suit;
     rank: Rank;
 }
 
-export const allSuits: Suit[] = ["Spades", "Diamonds", "Clubs", "Hearts"];
-export const allRanks: Rank[] = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+export function cardsAreEqual(card1: Card, card2: Card) {
+    return card1.suit == card2.suit && card1.rank == card2.rank;
+}
+
+export function isOneEyedJack(card: Card) {
+    return card.rank == 'J' && (card.suit == 'Hearts' || card.suit == 'Spades');
+}
+
+export const allSuits: Suit[] = ['Spades', 'Diamonds', 'Clubs', 'Hearts'];
+export const allRanks: Rank[] = [
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    'J',
+    'Q',
+    'K',
+    'A',
+];
+export const allCards: Card[] = allSuits.flatMap((suit) =>
+    allRanks.map((rank) => ({ suit, rank }))
+);
 
 export const rankToFullName: Map<Rank, string> = new Map([
-    ["2", "2"],
-    ["3", "3"],
-    ["4", "4"],
-    ["5", "5"],
-    ["6", "6"],
-    ["7", "7"],
-    ["8", "8"],
-    ["9", "9"],
-    ["10", "10"],
-    ["J", "Jack"],
-    ["Q", "Queen"],
-    ["K", "King"],
-    ["A", "Ace"],
-    ["Joker", "Joker"],
+    ['2', '2'],
+    ['3', '3'],
+    ['4', '4'],
+    ['5', '5'],
+    ['6', '6'],
+    ['7', '7'],
+    ['8', '8'],
+    ['9', '9'],
+    ['10', '10'],
+    ['J', 'Jack'],
+    ['Q', 'Queen'],
+    ['K', 'King'],
+    ['A', 'Ace'],
+    ['Joker', 'Joker'],
 ]);
 
 export const suitToSymbol: Map<Suit, string> = new Map([
-    ["Clubs", "♣"],
-    ["Diamonds", "♦"],
-    ["Hearts", "♥"],
-    ["Spades", "♠"],
+    ['Clubs', '♣'],
+    ['Diamonds', '♦'],
+    ['Hearts', '♥'],
+    ['Spades', '♠'],
 ]);
 
 export const suitToColor: Map<Suit, string> = new Map([
-    ["Clubs", "black"],
-    ["Diamonds", "red"],
-    ["Hearts", "red"],
-    ["Spades", "black"],
+    ['Clubs', 'black'],
+    ['Diamonds', 'red'],
+    ['Hearts', 'red'],
+    ['Spades', 'black'],
 ]);
 
 export function cardToShortString(card: Card): string {
-    if (card.suit == "Joker") {
-        return "★";
+    if (card.suit == 'Joker') {
+        return '★';
     }
     return card.rank + suitToSymbol.get(card.suit);
 }
 
 export function cardAssetName(card: Card): string {
-    if (card.suit == "Joker") {
-        return "img/English_pattern_card_back.svg";
+    if (card.suit == 'Joker') {
+        return 'img/English_pattern_card_back.svg';
     }
     const fullRank = rankToFullName.get(card.rank)!.toLowerCase();
     const suit = card.suit.toLowerCase();
