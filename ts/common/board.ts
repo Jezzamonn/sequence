@@ -14,6 +14,12 @@ export type Token = Color | undefined;
 
 export const boardSize = 10;
 
+const allPositions = Array(boardSize).fill(0).flatMap((_, y) =>
+    Array(boardSize).fill(0).map((_, x) =>
+        new Point(x, y)
+    )
+);
+
 function* positionsInSpiralOrder(
     size: number
 ): Generator<Point, void, undefined> {
@@ -94,7 +100,7 @@ export function createBoard(): Card[][] {
     return board;
 }
 
-export function isLegalMove(
+export function isValidPlacement(
     placedTokens: Token[][],
     playerColor: Color,
     card: Card,
@@ -106,6 +112,7 @@ export function isLegalMove(
     if (card.rank == 'J') {
         if (isOneEyedJack(card)) {
             // Can only remove opponent's tokens.
+            // TODO: Prevent removing from sequences.
             return (
                 tokenAtPosition != playerColor && tokenAtPosition != undefined
             );
@@ -119,6 +126,45 @@ export function isLegalMove(
     return (
         cardsAreEqual(boardLayout[position.y][position.x], card) &&
         tokenAtPosition == undefined
+    );
+}
+
+export function cardHasPossibleMove(
+    placedTokens: Token[][],
+    playerColor: Color,
+    card: Card
+) {
+    return allPositions.some((p) => isValidPlacement(placedTokens, playerColor, card, p));
+}
+
+export function playerHasPossibleMove(
+    placedTokens: Token[][],
+    playerColor: Color,
+    cards: Card[]
+) {
+    return cards.some((card) => cardHasPossibleMove(placedTokens, playerColor, card));
+}
+
+export function isValidDiscard(placedTokens: Token[][], playerColor: Color, card: Card) {
+    // For a discard to be valid, there must be no space on the board for this card.
+    return !cardHasPossibleMove(placedTokens, playerColor, card);
+}
+
+export function getMovesForCard(
+    placedTokens: Token[][],
+    playerColor: Color,
+    card: Card
+): Point[] {
+    return allPositions.filter((p) => isValidPlacement(placedTokens, playerColor, card, p));
+}
+
+export function getMovesForPlayer(
+    placedTokens: Token[][],
+    playerColor: Color,
+    cards: Card[]
+): Map<Card, Point[]> {
+    return new Map(
+        cards.map((card) => [card, getMovesForCard(placedTokens, playerColor, card)])
     );
 }
 

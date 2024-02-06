@@ -1,10 +1,11 @@
 // State of the game
 
-import { Color, Token, allColors, countSequences, isLegalMove } from './board';
+import { Color, Token, allColors, countSequences, isValidDiscard, isValidPlacement, playerHasPossibleMove } from './board';
 import {
     Card,
     allCards,
     cardToLabel,
+    cardsAreEqual,
     isOneEyedJack,
 } from './cards';
 import { Point } from './point';
@@ -41,6 +42,7 @@ interface GameState {
     discarded: Card[];
     placedTokens: Token[][];
     hands: Card[][];
+    lastActionWasDiscard: boolean;
 
     nextPlayerIndex: number;
     gameWinner: Token;
@@ -101,6 +103,7 @@ export class GameManager {
             discarded: [],
             placedTokens: [],
             hands,
+            lastActionWasDiscard: false,
 
             nextPlayerIndex: Math.floor(Math.random() * numPlayers),
             gameWinner: undefined,
@@ -126,12 +129,20 @@ export class GameManager {
         };
     }
 
+    // Possible moves:
+    // - Play a card
+    // - Discard a card
+    // - If no moves are possible, end your turn.
+    //
     // A secure system should use some secret that only the player has? Maybe later.
     // Or maybe that part will be handled somewhere else.
     //
     // Other small weirdness: If you have two of the same card, this might pull the
     // wrong card out of the player's hand.
-    makeMove(playerIndex: number, card: Card, position: Point) {
+    // TODO: Solution to that is to sort the cards.
+    //
+    // Other game logic to handle: You can't remove from sequences.
+    makeMove(playerIndex: number, card: Card, position: Point | undefined) {
         if (this.state.gameWinner !== undefined) {
             throw new Error('Game is already over');
         }
@@ -142,31 +153,46 @@ export class GameManager {
         const player = this.state.players[playerIndex];
         const hand = this.state.hands[playerIndex];
 
-        const index = hand.findIndex(
-            (c) => c.suit == card.suit && c.rank == card.rank
-        );
+        const index = hand.findIndex((c) => cardsAreEqual(c, card));
         if (index == -1) {
             throw new Error(
                 `Player ${player.name} does not have card ${card.rank} of ${card.suit}`
             );
         }
 
-        if (!isLegalMove(this.state.placedTokens, player.color, card, position)) {
-            throw new Error(
-                `Illegal move: ${cardToLabel(card)} at ${position.x}, ${
-                    position.y
-                }`
-            );
+        if (position === undefined) {
+            if (this.state.lastActionWasDiscard) {
+                throw new Error(
+                    `Cannot discard twice in a row.`
+                );
+            }
+            if (!isValidDiscard(this.state.placedTokens, player.color, card)) {
+                throw new Error(
+                    `Illegal discard: ${cardToLabel(card)}`
+                );
+            }
+        }
+        else {
+            if (!isValidPlacement(this.state.placedTokens, player.color, card, position)) {
+                throw new Error(
+                    `Illegal move: ${cardToLabel(card)} at ${position?.x}, ${
+                        position?.y
+                    }`
+                );
+            }
         }
 
         // Make the move!
         hand.splice(index, 1);
-        if (isOneEyedJack(card)) {
-            this.state.placedTokens[position.y][position.x] = undefined;
-        } else {
-            this.state.placedTokens[position.y][position.x] = player.color;
-        }
         this.state.discarded.push(card);
+
+        if (position !== undefined) {
+            if (isOneEyedJack(card)) {
+                this.state.placedTokens[position.y][position.x] = undefined;
+            } else {
+                this.state.placedTokens[position.y][position.x] = player.color;
+            }
+        }
 
         // Check if a player has won.
         const numTeams = new Set(this.state.players.map((p) => p.color)).size;
@@ -187,8 +213,16 @@ export class GameManager {
             this.state.discarded = [];
         }
 
-        // Now it's the next player's turn.
-        this.state.nextPlayerIndex =
-            (this.state.nextPlayerIndex + 1) % this.state.players.length;
+        this.state.lastActionWasDiscard = position === undefined;
+
+        // If this wasn't a discard, now it's the next player's turn.
+        if (position !== undefined) {
+            this.state.nextPlayerIndex =
+                (this.state.nextPlayerIndex + 1) % this.state.players.length;
+        } else if (!playerHasPossibleMove(this.state.placedTokens, player.color, hand)) {
+            console.log(`Player ${player.name} has no moves, ending turn.`);
+            this.state.nextPlayerIndex =
+                (this.state.nextPlayerIndex + 1) % this.state.players.length;
+        }
     }
 }
