@@ -38,7 +38,6 @@ function* positionsInSpiralOrder(
     const min = new Point(0, 0);
     const max = new Point(boardSize - 1, boardSize - 1);
     while (true) {
-        console.log(`p: ${p.x}, ${p.y}`);
         if (visited[p.y][p.x]) {
             break;
         }

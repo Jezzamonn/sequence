@@ -9,6 +9,7 @@ import {
     isOneEyedJack,
 } from './cards';
 import { Point } from './point';
+import { shuffle } from './util';
 
 const validPlayerCounts = [2, 3, 4, 6, 8, 9, 10, 12];
 const validTeamCounts = [2, 3];
@@ -41,6 +42,7 @@ interface GameState {
     deck: Card[];
     discarded: Card[];
     placedTokens: Token[][];
+    isInSequence: boolean[][];
     hands: Card[][];
     lastActionWasDiscard: boolean;
 
@@ -52,6 +54,7 @@ interface PlayerVisibleGameState {
     players: Player[];
 
     placedTokens: Token[][];
+    isInSequence: boolean[][];
     deckSize: number;
     lastCardPlayed: Card | undefined;
     hand: Card[];
@@ -62,8 +65,9 @@ interface PlayerVisibleGameState {
 
 export class GameManager {
     state: GameState;
+    random: () => number;
 
-    constructor(numPlayers: number, numTeams: number) {
+    constructor(numPlayers: number, numTeams: number, random: () => number) {
         if (!validPlayerCounts.includes(numPlayers)) {
             throw new Error(`Invalid number of players: ${numPlayers}`);
         }
@@ -75,8 +79,11 @@ export class GameManager {
                 `Number of players must be divisible by number of teams. Got ${numPlayers} players and ${numTeams} teams`
             );
         }
+
+        this.random = random;
+
         // Two decks.
-        const deck = shuffle(allCards.concat(allCards));
+        const deck = shuffle(allCards.concat(allCards), this.random);
 
         const hands: Card[][] = [];
         const handSize = handSizes.get(numPlayers)!;
@@ -102,10 +109,11 @@ export class GameManager {
             deck,
             discarded: [],
             placedTokens: [],
+            isInSequence: [],
             hands,
             lastActionWasDiscard: false,
 
-            nextPlayerIndex: Math.floor(Math.random() * numPlayers),
+            nextPlayerIndex: Math.floor(this.random() * numPlayers),
             gameWinner: undefined,
         };
     }
@@ -119,6 +127,7 @@ export class GameManager {
             players: this.state.players,
 
             placedTokens: this.state.placedTokens,
+            isInSequence: this.state.isInSequence,
             deckSize: this.state.deck.length,
             lastCardPlayed:
                 this.state.discarded[this.state.discarded.length - 1],
@@ -209,7 +218,7 @@ export class GameManager {
         hand.push(this.state.deck.pop()!);
         // If that was the last card, shuffle the discarded cards and use them as the new deck.
         if (this.state.deck.length == 0) {
-            this.state.deck = shuffle(this.state.discarded);
+            this.state.deck = shuffle(this.state.discarded, this.random);
             this.state.discarded = [];
         }
 
