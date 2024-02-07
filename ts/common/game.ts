@@ -1,6 +1,6 @@
 // State of the game
 
-import { Color, Token, allColors, countSequences, isValidDiscard, isValidPlacement, playerHasPossibleMove } from './board';
+import { Color, Token, allColors, boardSize, countSequences, isValidDiscard, isValidPlacement, playerHasPossibleMove } from './board';
 import {
     Card,
     allCards,
@@ -103,13 +103,21 @@ export class GameManager {
             hands.push(hand);
         }
 
+        const placedTokens: Token[][] = Array(boardSize).fill(0).map(() =>
+            Array(boardSize).fill(0).map(() => undefined)
+        );
+
+        const isInSequence: boolean[][] = Array(boardSize).fill(0).map(() =>
+            Array(boardSize).fill(0).map(() => false)
+        );
+
         this.state = {
             players,
 
             deck,
             discarded: [],
-            placedTokens: [],
-            isInSequence: [],
+            placedTokens,
+            isInSequence,
             hands,
             lastActionWasDiscard: false,
 

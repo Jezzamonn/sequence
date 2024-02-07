@@ -99,6 +99,8 @@ export function createBoard(): Card[][] {
     return board;
 }
 
+export const boardLayout = createBoard();
+
 export function isValidPlacement(
     placedTokens: Token[][],
     playerColor: Color,
@@ -269,5 +271,3 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
 
     return sequences;
 }
-
-export const boardLayout = createBoard();

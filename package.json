@@ -16,6 +16,9 @@
     "test": "jest",
     "clean": "rm -rf build/*"
   },
+  "jest": {
+    "setupFilesAfterEnv": ["./ts/common/test/test-setup.ts"]
+  },
   "watch": {
     "static": {
       "patterns": [
