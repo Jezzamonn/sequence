@@ -42,9 +42,10 @@ interface GameState {
     deck: Card[];
     discarded: Card[];
     placedTokens: Token[][];
-    isInSequence: boolean[][];
     hands: Card[][];
     lastActionWasDiscard: boolean;
+    // Used for stopping players from removing from sequences.
+    sequenceCount: number;
 
     nextPlayerIndex: number;
     gameWinner: Token;
@@ -54,7 +55,6 @@ interface PlayerVisibleGameState {
     players: Player[];
 
     placedTokens: Token[][];
-    isInSequence: boolean[][];
     deckSize: number;
     lastCardPlayed: Card | undefined;
     hand: Card[];
@@ -107,19 +107,15 @@ export class GameManager {
             Array(boardSize).fill(0).map(() => undefined)
         );
 
-        const isInSequence: boolean[][] = Array(boardSize).fill(0).map(() =>
-            Array(boardSize).fill(0).map(() => false)
-        );
-
         this.state = {
             players,
 
             deck,
             discarded: [],
             placedTokens,
-            isInSequence,
             hands,
             lastActionWasDiscard: false,
+            sequenceCount: 0,
 
             nextPlayerIndex: Math.floor(this.random() * numPlayers),
             gameWinner: undefined,
@@ -135,7 +131,6 @@ export class GameManager {
             players: this.state.players,
 
             placedTokens: this.state.placedTokens,
-            isInSequence: this.state.isInSequence,
             deckSize: this.state.deck.length,
             lastCardPlayed:
                 this.state.discarded[this.state.discarded.length - 1],
@@ -183,14 +178,14 @@ export class GameManager {
                     `Cannot discard twice in a row.`
                 );
             }
-            if (!isValidDiscard(this.state.placedTokens, player.color, card)) {
+            if (!isValidDiscard(this.state.placedTokens, this.state.sequenceCount, player.color, card)) {
                 throw new Error(
                     `Illegal discard: ${cardToLabel(card)}`
                 );
             }
         }
         else {
-            if (!isValidPlacement(this.state.placedTokens, player.color, card, position)) {
+            if (!isValidPlacement(this.state.placedTokens, this.state.sequenceCount, player.color, card, position)) {
                 throw new Error(
                     `Illegal move: ${cardToLabel(card)} at ${position?.x}, ${
                         position?.y
@@ -221,6 +216,7 @@ export class GameManager {
                 return;
             }
         }
+        this.state.sequenceCount = [...sequences.values()].reduce((a, b) => a + b, 0);
 
         // Add a new card to the player's hand.
         hand.push(this.state.deck.pop()!);
@@ -236,7 +232,7 @@ export class GameManager {
         if (position !== undefined) {
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;
-        } else if (!playerHasPossibleMove(this.state.placedTokens, player.color, hand)) {
+        } else if (!playerHasPossibleMove(this.state.placedTokens, this.state.sequenceCount, player.color, hand)) {
             console.log(`Player ${player.name} has no moves, ending turn.`);
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;

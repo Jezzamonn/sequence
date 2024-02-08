@@ -14,11 +14,13 @@ export type Token = Color | undefined;
 
 export const boardSize = 10;
 
-const allPositions = Array(boardSize).fill(0).flatMap((_, y) =>
-    Array(boardSize).fill(0).map((_, x) =>
-        new Point(x, y)
-    )
-);
+const allPositions = Array(boardSize)
+    .fill(0)
+    .flatMap((_, y) =>
+        Array(boardSize)
+            .fill(0)
+            .map((_, x) => new Point(x, y))
+    );
 
 function* positionsInSpiralOrder(
     size: number
@@ -103,6 +105,7 @@ export const boardLayout = createBoard();
 
 export function isValidPlacement(
     placedTokens: Token[][],
+    sequenceCount: number,
     playerColor: Color,
     card: Card,
     position: Point
@@ -113,10 +116,28 @@ export function isValidPlacement(
     if (card.rank == 'J') {
         if (isOneEyedJack(card)) {
             // Can only remove opponent's tokens.
-            // TODO: Prevent removing from sequences.
-            return (
-                tokenAtPosition != playerColor && tokenAtPosition != undefined
-            );
+            if (
+                tokenAtPosition == playerColor ||
+                tokenAtPosition == undefined
+            ) {
+                return false;
+            }
+            // Prevent removing sequences. Do this by removing the piece,
+            // counting sequences, and seeing if the number is different.
+
+            const prevValue = placedTokens[position.y][position.x];
+            placedTokens[position.y][position.x] = undefined;
+            // Note that this is a little inefficient as it scans the whole
+            // board. Particularly given that we call this function for each
+            // position on the board to see if there is a valid move, making
+            // this O(n^4) in that context. But I think the board size is small
+            // enough for that to be fine.
+            const newSequences = [
+                ...countSequences(placedTokens).values(),
+            ].reduce((a, b) => a + b, 0);
+            placedTokens[position.y][position.x] = prevValue;
+
+            return newSequences == sequenceCount;
         } else {
             // Only restriction is that the spot is free.
             return tokenAtPosition == undefined;
@@ -132,40 +153,58 @@ export function isValidPlacement(
 
 export function cardHasPossibleMove(
     placedTokens: Token[][],
+    sequenceCount: number,
     playerColor: Color,
     card: Card
 ) {
-    return allPositions.some((p) => isValidPlacement(placedTokens, playerColor, card, p));
+    return allPositions.some((p) =>
+        isValidPlacement(placedTokens, sequenceCount, playerColor, card, p)
+    );
 }
 
 export function playerHasPossibleMove(
     placedTokens: Token[][],
+    sequenceCount: number,
     playerColor: Color,
     cards: Card[]
 ) {
-    return cards.some((card) => cardHasPossibleMove(placedTokens, playerColor, card));
+    return cards.some((card) =>
+        cardHasPossibleMove(placedTokens, sequenceCount, playerColor, card)
+    );
 }
 
-export function isValidDiscard(placedTokens: Token[][], playerColor: Color, card: Card) {
+export function isValidDiscard(
+    placedTokens: Token[][],
+    sequenceCount: number,
+    playerColor: Color,
+    card: Card
+) {
     // For a discard to be valid, there must be no space on the board for this card.
-    return !cardHasPossibleMove(placedTokens, playerColor, card);
+    return !cardHasPossibleMove(placedTokens, sequenceCount, playerColor, card);
 }
 
 export function getMovesForCard(
     placedTokens: Token[][],
+    sequenceCount: number,
     playerColor: Color,
     card: Card
 ): Point[] {
-    return allPositions.filter((p) => isValidPlacement(placedTokens, playerColor, card, p));
+    return allPositions.filter((p) =>
+        isValidPlacement(placedTokens, sequenceCount, playerColor, card, p)
+    );
 }
 
 export function getMovesForPlayer(
     placedTokens: Token[][],
+    sequenceCount: number,
     playerColor: Color,
     cards: Card[]
 ): Map<Card, Point[]> {
     return new Map(
-        cards.map((card) => [card, getMovesForCard(placedTokens, playerColor, card)])
+        cards.map((card) => [
+            card,
+            getMovesForCard(placedTokens, sequenceCount, playerColor, card),
+        ])
     );
 }
 
@@ -201,7 +240,7 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
             if (color !== undefined && color == lastColor) {
                 count++;
                 if (count == 5) {
-                    sequences.set(color, sequences.get(color)! + 1);
+                    sequences.set(color, (sequences.get(color) ?? 0) + 1);
                     // We're allowed to start a new sequence from here,
                     // reusing only one token of the previous sequence.
                     count = 1;
@@ -228,7 +267,7 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
             if (color !== undefined && color == lastColor) {
                 count++;
                 if (count == 5) {
-                    sequences.set(color, sequences.get(color)! + 1);
+                    sequences.set(color, (sequences.get(color) ?? 0) + 1);
                     // We're allowed to start a new sequence from here,
                     // reusing only one token of the previous sequence.
                     count = 1;
@@ -251,13 +290,13 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
             x < boardSize && fy < boardSize;
             x++, fy++
         ) {
-            const y = (boardSize - 1) - fy;
+            const y = boardSize - 1 - fy;
 
             const color = placedTokens[y][x];
             if (color !== undefined && color == lastColor) {
                 count++;
                 if (count == 5) {
-                    sequences.set(color, sequences.get(color)! + 1);
+                    sequences.set(color, (sequences.get(color) ?? 0) + 1);
                     // We're allowed to start a new sequence from here,
                     // reusing only one token of the previous sequence.
                     count = 1;
