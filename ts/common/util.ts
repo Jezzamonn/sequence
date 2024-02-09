@@ -9,3 +9,7 @@ export function shuffle<T>(array: T[], random: () => number = Math.random): T[] 
     }
     return result;
 }
+
+export async function wait(delay: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, delay));
+}

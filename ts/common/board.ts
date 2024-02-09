@@ -5,6 +5,7 @@ import {
     cardToShortString,
     cardsAreEqual,
     isOneEyedJack,
+    suitToColor,
 } from './cards';
 import { Point } from './point';
 
@@ -114,21 +115,35 @@ export function boardToString(placedTokens: Token[][]): string {
             const card = boardLayout[y][x];
             const token = placedTokens[y][x];
             const cardString = cardToShortString(card);
-            let color = '';
+            let highlightColor = '';
             switch (token) {
-                case 'Red':
-                    color = '\x1b[31m';
+                case 'Blue':
+                    highlightColor = '\x1b[44m';
                     break;
                 case 'Green':
-                    color = '\x1b[32m';
+                    highlightColor = '\x1b[42m';
                     break;
-                case 'Blue':
-                    color = '\x1b[34m';
+                case 'Red':
+                    highlightColor = '\x1b[41m';
                     break;
-                default:
-                    color = '\x1b[0m';
             }
-            s += color + cardString.padStart(3, ' ') + '\x1b[0m';
+            // If there's no highlight, color the card by its suit.
+            let textColor = '';
+            if (highlightColor == '') {
+                if (card.suit == 'Hearts' || card.suit == 'Diamonds') {
+                    textColor = '\x1b[31m';
+                }
+                else if (card.suit == 'Spades' || card.suit == 'Clubs') {
+                    // Use a dark grey for black suits.
+                    textColor = '\x1b[90m';
+                }
+            }
+            else {
+                // If there is a highlight, color the text black so we can see it. ?
+                textColor = '\x1b[30m';
+            }
+            // s += color + cardString.padStart(3, ' ') + '\x1b[0m';
+            s += highlightColor + textColor + cardString.padEnd(2, ' ').padStart(3, ' ') + '\x1b[0m';
         }
         s += '\n';
     }
@@ -231,12 +246,14 @@ export function getMovesForPlayer(
     sequenceCount: number,
     playerColor: Color,
     cards: Card[]
-): Map<Card, Point[]> {
-    return new Map(
-        cards.map((card) => [
-            card,
-            getMovesForCard(placedTokens, sequenceCount, playerColor, card),
-        ])
+): [Card, Point | undefined][] {
+    return cards.flatMap((card) => {
+        const moves = getMovesForCard(placedTokens, sequenceCount, playerColor, card);
+        if (moves.length == 0) {
+            return [[card, undefined]] as [Card, Point | undefined][];
+        }
+        return moves.map((point) => [card, point]) as [Card, Point][];
+        }
     );
 }
 

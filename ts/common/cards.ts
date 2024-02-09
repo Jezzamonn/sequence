@@ -72,7 +72,7 @@ export const suitToSymbol: Map<Suit, string> = new Map([
     ['Spades', '♠'],
 ]);
 
-export const suitToColor: Map<Suit, string> = new Map([
+export const suitToColor: Map<Suit, 'black' | 'red'> = new Map([
     ['Clubs', 'black'],
     ['Diamonds', 'red'],
     ['Hearts', 'red'],

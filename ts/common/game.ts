@@ -1,6 +1,6 @@
 // State of the game
 
-import { Color, Token, allColors, boardSize, countSequences, isValidDiscard, isValidPlacement, playerHasPossibleMove } from './board';
+import { Color, Token, allColors, boardSize, countSequences, getMovesForPlayer, isValidDiscard, isValidPlacement, playerHasPossibleMove } from './board';
 import {
     Card,
     allCards,
@@ -139,6 +139,10 @@ export class GameManager {
             nextPlayerIndex: this.state.nextPlayerIndex,
             gameWinner: this.state.gameWinner,
         };
+    }
+
+    getMovesForPlayer(playerIndex: number): [Card, Point | undefined][] {
+        return getMovesForPlayer(this.state.placedTokens, this.state.sequenceCount, this.state.players[playerIndex].color, this.state.hands[playerIndex]);
     }
 
     // Possible moves:
