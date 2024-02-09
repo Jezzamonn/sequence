@@ -2,6 +2,7 @@ import {
     Card,
     allRanks,
     allSuits,
+    cardToShortString,
     cardsAreEqual,
     isOneEyedJack,
 } from './cards';
@@ -102,6 +103,37 @@ export function createBoard(): Card[][] {
 }
 
 export const boardLayout = createBoard();
+
+/**
+ * Returns a string with ansii color codes for the board.
+ */
+export function boardToString(placedTokens: Token[][]): string {
+    let s = '';
+    for (let y = 0; y < boardSize; y++) {
+        for (let x = 0; x < boardSize; x++) {
+            const card = boardLayout[y][x];
+            const token = placedTokens[y][x];
+            const cardString = cardToShortString(card);
+            let color = '';
+            switch (token) {
+                case 'Red':
+                    color = '\x1b[31m';
+                    break;
+                case 'Green':
+                    color = '\x1b[32m';
+                    break;
+                case 'Blue':
+                    color = '\x1b[34m';
+                    break;
+                default:
+                    color = '\x1b[0m';
+            }
+            s += color + cardString.padStart(3, ' ') + '\x1b[0m';
+        }
+        s += '\n';
+    }
+    return s;
+}
 
 export function isValidPlacement(
     placedTokens: Token[][],

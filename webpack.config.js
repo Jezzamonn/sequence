@@ -39,7 +39,11 @@ const server = {
         filename: 'server.bundle.js'
     },
     externalsPresets: { node: true },
-    externals: [nodeExternals()],
+    resolve: { extensions: ['.ts'] },
+    externals: [nodeExternals({
+        importType: 'module',
+    })],
+    target: "node",
 }
 
 export default [
