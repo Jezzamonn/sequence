@@ -18,4 +18,8 @@ export const Points = {
         return p.x >= min.x && p.y >= min.y && p.x <= max.x && p.y <= max.y;
     },
 
+    toString(p: Point): string {
+        return `(${p.x}, ${p.y})`;
+    }
+
 };

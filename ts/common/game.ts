@@ -9,12 +9,13 @@ import {
     getMovesForPlayer,
     isValidDiscard,
     isValidPlacement,
+    makeEmptyPlacedTokens,
     playerHasPossibleMove,
 } from './board';
 import {
     Card,
     allCards,
-    cardToLabel,
+    cardToDescription,
     cardsAreEqual,
     isOneEyedJack,
 } from './cards';
@@ -113,20 +114,12 @@ export class GameManager {
             hands.push(hand);
         }
 
-        const placedTokens: Token[][] = Array(boardSize)
-            .fill(0)
-            .map(() =>
-                Array(boardSize)
-                    .fill(0)
-                    .map(() => undefined)
-            );
-
         this.state = {
             players,
 
             deck,
             discarded: [],
-            placedTokens,
+            placedTokens: makeEmptyPlacedTokens(),
             hands,
             lastActionWasDiscard: false,
             sequenceCount: 0,
@@ -208,7 +201,7 @@ export class GameManager {
                     card
                 )
             ) {
-                throw new Error(`Illegal discard: ${cardToLabel(card)}`);
+                throw new Error(`Illegal discard: ${cardToDescription(card)}`);
             }
         } else {
             if (
@@ -221,7 +214,7 @@ export class GameManager {
                 )
             ) {
                 throw new Error(
-                    `Illegal move: ${cardToLabel(card)} at ${position?.x}, ${
+                    `Illegal move: ${cardToDescription(card)} at ${position?.x}, ${
                         position?.y
                     }`
                 );

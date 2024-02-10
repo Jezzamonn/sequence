@@ -21,8 +21,18 @@ const allPositions = Array(boardSize)
     .flatMap((_, y) =>
         Array(boardSize)
             .fill(0)
-            .map((_, x) => ({x, y}))
+            .map((_, x) => ({ x, y }))
     );
+
+export function makeEmptyPlacedTokens(): Token[][] {
+    return Array(boardSize)
+        .fill(0)
+        .map(() =>
+            Array(boardSize)
+                .fill(0)
+                .map(() => undefined)
+        );
+}
 
 function* positionsInSpiralOrder(
     size: number
@@ -36,11 +46,11 @@ function* positionsInSpiralOrder(
     }
 
     // Start at the top left
-    let p: Point = {x: 0, y: 0};
+    let p: Point = { x: 0, y: 0 };
     // Moving right
-    let dir: Point = {x: 1, y: 0};
-    const min = {x: 0, y: 0};
-    const max = {x: boardSize - 1, y: boardSize - 1};
+    let dir: Point = { x: 1, y: 0 };
+    const min = { x: 0, y: 0 };
+    const max = { x: boardSize - 1, y: boardSize - 1 };
     while (true) {
         if (visited[p.y][p.x]) {
             break;
@@ -160,6 +170,12 @@ export function isValidPlacement(
     position: Point
 ) {
     const tokenAtPosition = placedTokens[position.y][position.x];
+    const cardAtPosition = boardLayout[position.y][position.x];
+
+    // Can't place tokens on the wild spaces.
+    if (cardAtPosition.rank == 'Joker') {
+        return false;
+    }
 
     // Jacks, as wilds, have their own rules.
     if (card.rank == 'J') {
@@ -195,7 +211,7 @@ export function isValidPlacement(
 
     // Otherwise, the cards need to match, and the spot must be free.
     return (
-        cardsAreEqual(boardLayout[position.y][position.x], card) &&
+        cardsAreEqual(cardAtPosition, card) &&
         tokenAtPosition == undefined
     );
 }
@@ -264,54 +280,30 @@ export function getMovesForPlayer(
     });
 }
 
-export function countSequences(placedTokens: Token[][]): Map<Color, number> {
-    // Loop through rows, columns, and diagonals for lines of 5.
-    const sequences: Map<Color, number> = new Map();
-
+function* horizontalRows(): Generator<Point[], void, undefined> {
     for (let y = 0; y < boardSize; y++) {
-        let count = 0;
-        let lastColor: Token = undefined;
+        const row: Point[] = [];
         for (let x = 0; x < boardSize; x++) {
-            const color = placedTokens[y][x];
-            if (color !== undefined && color == lastColor) {
-                count++;
-                if (count == 5) {
-                    sequences.set(color, (sequences.get(color) ?? 0) + 1);
-                    // We're allowed to start a new sequence from here,
-                    // reusing only one token of the previous sequence.
-                    count = 1;
-                }
-            } else {
-                count = 1;
-                lastColor = color;
-            }
+            row.push({ x, y });
         }
+        yield row;
     }
+}
 
+function* verticalRows(): Generator<Point[], void, undefined> {
     for (let x = 0; x < boardSize; x++) {
-        let count = 0;
-        let lastColor: Token = undefined;
+        const row: Point[] = [];
         for (let y = 0; y < boardSize; y++) {
-            const color = placedTokens[y][x];
-            if (color !== undefined && color == lastColor) {
-                count++;
-                if (count == 5) {
-                    sequences.set(color, (sequences.get(color) ?? 0) + 1);
-                    // We're allowed to start a new sequence from here,
-                    // reusing only one token of the previous sequence.
-                    count = 1;
-                }
-            } else {
-                count = 1;
-                lastColor = color;
-            }
+            row.push({ x, y });
         }
+        yield row;
     }
+}
 
+function* increasingDiagonalRows(): Generator<Point[], void, undefined> {
     // Diagonals where x and y both increase (diagonally down and to the right).
     for (let diag = -boardSize + 1; diag < boardSize; diag++) {
-        let count = 0;
-        let lastColor: Token = undefined;
+        const row: Point[] = [];
         // x - y is constant for each diagonal.
         // x - y = diag
         for (
@@ -319,26 +311,16 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
             x < boardSize && y < boardSize;
             x++, y++
         ) {
-            const color = placedTokens[y][x];
-            if (color !== undefined && color == lastColor) {
-                count++;
-                if (count == 5) {
-                    sequences.set(color, (sequences.get(color) ?? 0) + 1);
-                    // We're allowed to start a new sequence from here,
-                    // reusing only one token of the previous sequence.
-                    count = 1;
-                }
-            } else {
-                count = 1;
-                lastColor = color;
-            }
+            row.push({ x, y });
         }
+        yield row;
     }
+}
 
+function* decreasingDiagonalRows(): Generator<Point[], void, undefined> {
     // Diagonals where x increases and y decreases (diagonally up and to the right).
     for (let diag = -boardSize + 1; diag < boardSize; diag++) {
-        let count = 0;
-        let lastColor: Token = undefined;
+        const row: Point[] = [];
         // Just do what we did above, and then flip the y coordinate.
         // fy is the flipped y coordinate.
         for (
@@ -347,20 +329,51 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
             x++, fy++
         ) {
             const y = boardSize - 1 - fy;
+            row.push({ x, y });
+        }
+        yield row;
+    }
+}
 
+function* allRows(): Generator<Point[], void, undefined> {
+    yield* horizontalRows();
+    yield* verticalRows();
+    yield* increasingDiagonalRows();
+    yield* decreasingDiagonalRows();
+}
+
+export function countSequences(placedTokens: Token[][]): Map<Color, number> {
+    // Loop through rows, columns, and diagonals for lines of 5.
+    const sequences: Map<Color, number> = new Map();
+
+    for (const row of allRows()) {
+        let count = 0;
+        let lastWasJoker = false;
+        let lastColor: Token = undefined;
+        for (const { x, y } of row) {
+            const card = boardLayout[y][x];
             const color = placedTokens[y][x];
-            if (color !== undefined && color == lastColor) {
+            if (color !== undefined && (color == lastColor || lastWasJoker)) {
                 count++;
+                // Update this variable in case the last card was a joker.
+                lastColor = color;
+
                 if (count == 5) {
-                    sequences.set(color, (sequences.get(color) ?? 0) + 1);
+                    sequences.set(
+                        lastColor,
+                        (sequences.get(lastColor) ?? 0) + 1
+                    );
                     // We're allowed to start a new sequence from here,
                     // reusing only one token of the previous sequence.
                     count = 1;
                 }
             } else {
+                // This also runs when we encounter a joker, treating it as the
+                // start of a sequence as desired.
                 count = 1;
                 lastColor = color;
             }
+            lastWasJoker = card.rank === 'Joker';
         }
     }
 

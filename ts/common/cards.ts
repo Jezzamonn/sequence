@@ -95,6 +95,6 @@ export function cardAssetName(card: Card): string {
     return `img/English_pattern_${fullRank}_of_${suit}.svg`;
 }
 
-export function cardToLabel(card: Card): string {
+export function cardToDescription(card: Card): string {
     return `${rankToFullName.get(card.rank)} of ${card.suit}`;
 }

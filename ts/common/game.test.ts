@@ -1,5 +1,4 @@
 import { GameManager } from './game';
-import { Point } from './point';
 
 describe('GameManager', function () {
     describe('4 player game', function () {
