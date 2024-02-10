@@ -132,18 +132,20 @@ export function boardToString(placedTokens: Token[][]): string {
             if (highlightColor == '') {
                 if (card.suit == 'Hearts' || card.suit == 'Diamonds') {
                     textColor = '\x1b[31m';
-                }
-                else if (card.suit == 'Spades' || card.suit == 'Clubs') {
+                } else if (card.suit == 'Spades' || card.suit == 'Clubs') {
                     // Use a dark grey for black suits.
                     textColor = '\x1b[90m';
                 }
-            }
-            else {
+            } else {
                 // If there is a highlight, color the text black so we can see it. ?
                 textColor = '\x1b[30m';
             }
             // s += color + cardString.padStart(3, ' ') + '\x1b[0m';
-            s += highlightColor + textColor + cardString.padEnd(2, ' ').padStart(3, ' ') + '\x1b[0m';
+            s +=
+                highlightColor +
+                textColor +
+                cardString.padEnd(2, ' ').padStart(3, ' ') +
+                '\x1b[0m';
         }
         s += '\n';
     }
@@ -245,16 +247,21 @@ export function getMovesForPlayer(
     placedTokens: Token[][],
     sequenceCount: number,
     playerColor: Color,
-    cards: Card[]
+    cards: Card[],
+    canDiscard: boolean
 ): [Card, Point | undefined][] {
     return cards.flatMap((card) => {
-        const moves = getMovesForCard(placedTokens, sequenceCount, playerColor, card);
-        if (moves.length == 0) {
+        const moves = getMovesForCard(
+            placedTokens,
+            sequenceCount,
+            playerColor,
+            card
+        );
+        if (moves.length == 0 && canDiscard) {
             return [[card, undefined]] as [Card, Point | undefined][];
         }
         return moves.map((point) => [card, point]) as [Card, Point][];
-        }
-    );
+    });
 }
 
 export function countSequences(placedTokens: Token[][]): Map<Color, number> {

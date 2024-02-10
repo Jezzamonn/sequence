@@ -1,6 +1,16 @@
 // State of the game
 
-import { Color, Token, allColors, boardSize, countSequences, getMovesForPlayer, isValidDiscard, isValidPlacement, playerHasPossibleMove } from './board';
+import {
+    Color,
+    Token,
+    allColors,
+    boardSize,
+    countSequences,
+    getMovesForPlayer,
+    isValidDiscard,
+    isValidPlacement,
+    playerHasPossibleMove,
+} from './board';
 import {
     Card,
     allCards,
@@ -103,9 +113,13 @@ export class GameManager {
             hands.push(hand);
         }
 
-        const placedTokens: Token[][] = Array(boardSize).fill(0).map(() =>
-            Array(boardSize).fill(0).map(() => undefined)
-        );
+        const placedTokens: Token[][] = Array(boardSize)
+            .fill(0)
+            .map(() =>
+                Array(boardSize)
+                    .fill(0)
+                    .map(() => undefined)
+            );
 
         this.state = {
             players,
@@ -142,7 +156,13 @@ export class GameManager {
     }
 
     getMovesForPlayer(playerIndex: number): [Card, Point | undefined][] {
-        return getMovesForPlayer(this.state.placedTokens, this.state.sequenceCount, this.state.players[playerIndex].color, this.state.hands[playerIndex]);
+        return getMovesForPlayer(
+            this.state.placedTokens,
+            this.state.sequenceCount,
+            this.state.players[playerIndex].color,
+            this.state.hands[playerIndex],
+            !this.state.lastActionWasDiscard
+        );
     }
 
     // Possible moves:
@@ -178,18 +198,28 @@ export class GameManager {
 
         if (position === undefined) {
             if (this.state.lastActionWasDiscard) {
-                throw new Error(
-                    `Cannot discard twice in a row.`
-                );
+                throw new Error(`Cannot discard twice in a row.`);
             }
-            if (!isValidDiscard(this.state.placedTokens, this.state.sequenceCount, player.color, card)) {
-                throw new Error(
-                    `Illegal discard: ${cardToLabel(card)}`
-                );
+            if (
+                !isValidDiscard(
+                    this.state.placedTokens,
+                    this.state.sequenceCount,
+                    player.color,
+                    card
+                )
+            ) {
+                throw new Error(`Illegal discard: ${cardToLabel(card)}`);
             }
-        }
-        else {
-            if (!isValidPlacement(this.state.placedTokens, this.state.sequenceCount, player.color, card, position)) {
+        } else {
+            if (
+                !isValidPlacement(
+                    this.state.placedTokens,
+                    this.state.sequenceCount,
+                    player.color,
+                    card,
+                    position
+                )
+            ) {
                 throw new Error(
                     `Illegal move: ${cardToLabel(card)} at ${position?.x}, ${
                         position?.y
@@ -220,12 +250,16 @@ export class GameManager {
                 return;
             }
         }
-        this.state.sequenceCount = [...sequences.values()].reduce((a, b) => a + b, 0);
+        this.state.sequenceCount = [...sequences.values()].reduce(
+            (a, b) => a + b,
+            0
+        );
 
         // Add a new card to the player's hand.
         hand.push(this.state.deck.pop()!);
         // If that was the last card, shuffle the discarded cards and use them as the new deck.
         if (this.state.deck.length == 0) {
+            console.log('Shuffling discards.')
             this.state.deck = shuffle(this.state.discarded, this.random);
             this.state.discarded = [];
         }
@@ -236,7 +270,14 @@ export class GameManager {
         if (position !== undefined) {
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;
-        } else if (!playerHasPossibleMove(this.state.placedTokens, this.state.sequenceCount, player.color, hand)) {
+        } else if (
+            !playerHasPossibleMove(
+                this.state.placedTokens,
+                this.state.sequenceCount,
+                player.color,
+                hand
+            )
+        ) {
             console.log(`Player ${player.name} has no moves, ending turn.`);
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;
