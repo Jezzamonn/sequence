@@ -51,7 +51,7 @@ describe('GameManager', function () {
             gameManager.makeMove(
                 0,
                 { suit: 'Hearts', rank: 'A' },
-                new Point(5, 1)
+                { x: 5, y: 1 }
             );
         });
 
@@ -60,7 +60,7 @@ describe('GameManager', function () {
                 gameManager.makeMove(
                     0,
                     { suit: 'Hearts', rank: 'A' },
-                    new Point(5, 2)
+                    { x: 5, y: 2 }
                 )
             ).toThrow(Error);
         });
@@ -70,7 +70,7 @@ describe('GameManager', function () {
                 gameManager.makeMove(
                     0,
                     { suit: 'Clubs', rank: 'A' },
-                    new Point(0, 8)
+                    { x: 0, y: 8 }
                 )
             ).toThrow(Error);
         });

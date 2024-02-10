@@ -7,7 +7,7 @@ import {
     isOneEyedJack,
     suitToColor,
 } from './cards';
-import { Point } from './point';
+import { Point, Points } from './point';
 
 // TODO: Deal with color blindness.
 export type Color = 'Blue' | 'Green' | 'Red';
@@ -21,7 +21,7 @@ const allPositions = Array(boardSize)
     .flatMap((_, y) =>
         Array(boardSize)
             .fill(0)
-            .map((_, x) => new Point(x, y))
+            .map((_, x) => ({x, y}))
     );
 
 function* positionsInSpiralOrder(
@@ -36,11 +36,11 @@ function* positionsInSpiralOrder(
     }
 
     // Start at the top left
-    let p: Point = new Point(0, 0);
+    let p: Point = {x: 0, y: 0};
     // Moving right
-    let dir: Point = new Point(1, 0);
-    const min = new Point(0, 0);
-    const max = new Point(boardSize - 1, boardSize - 1);
+    let dir: Point = {x: 1, y: 0};
+    const min = {x: 0, y: 0};
+    const max = {x: boardSize - 1, y: boardSize - 1};
     while (true) {
         if (visited[p.y][p.x]) {
             break;
@@ -50,15 +50,15 @@ function* positionsInSpiralOrder(
 
         visited[p.y][p.x] = true;
 
-        const nextForward = p.add(dir);
+        const nextForward = Points.add(p, dir);
         if (
-            nextForward.inRange(min, max) &&
+            Points.inRange(nextForward, min, max) &&
             !visited[nextForward.y][nextForward.x]
         ) {
             p = nextForward;
         } else {
-            dir = dir.rotateRight();
-            p = p.add(dir);
+            dir = Points.rotateRight(dir);
+            p = Points.add(p, dir);
         }
     }
 }
