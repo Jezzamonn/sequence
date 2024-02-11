@@ -1,9 +1,12 @@
 import './components/game-board';
 import './components/board-card';
+import './components/player-hand';
+
 import { GameManager } from '../common/game';
 import { allPositions } from '../common/board';
 import { choose } from '../common/util';
 import { GameBoardElement } from './components/game-board';
+import { PlayerHandElement } from './components/player-hand';
 
 console.log("Client <( Hello World! )");
 
@@ -15,3 +18,6 @@ for (const {x, y} of allPositions) {
 
 const boardElem = document.querySelector('game-board') as GameBoardElement;
 boardElem.placedTokens = gameManager.state.placedTokens;
+
+const handElem = document.querySelector('player-hand') as PlayerHandElement;
+handElem.hand = gameManager.getStateForPlayer(0).hand;

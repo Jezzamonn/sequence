@@ -9,9 +9,6 @@ export class GameBoardElement extends LitElement {
         // language=CSS
         css`
             :host {
-                max-width: 100%;
-                max-height: 100%;
-
                 display: grid;
                 grid-template-columns: repeat(10, auto);
             }

@@ -142,7 +142,7 @@ export function shuffle<T>(array: T[], random: () => number = Math.random): T[] 
     return result;
 }
 
-export function choose<T>(arr: Array<T>, rng: () => number): T {
+export function choose<T>(arr: Array<T>, rng: () => number = Math.random): T {
     const index = Math.floor(rng() * arr.length);
     return arr[index];
 }

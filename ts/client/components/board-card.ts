@@ -46,11 +46,16 @@ export class BoardCardElement extends LitElement {
                 position: absolute;
                 pointer-events: none;
                 text-shadow: 0 2px 4px black;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
             }
 
             .token-blue {
                 color: blue;
-                font-size: 4cqw;
+                font-size: 4cqmin;
             }
 
             .token-blue:after {
@@ -59,7 +64,7 @@ export class BoardCardElement extends LitElement {
 
             .token-green {
                 color: #1a3;
-                font-size: 7cqw;
+                font-size: 7cqmin;
             }
 
             .token-green:after {
@@ -68,7 +73,7 @@ export class BoardCardElement extends LitElement {
 
             .token-red {
                 color: #b11;
-                font-size: 7cqw;
+                font-size: 7cqmin;
             }
 
             .token-red:after {
