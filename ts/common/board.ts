@@ -16,7 +16,7 @@ export type Token = Color | undefined;
 
 export const boardSize = 10;
 
-const allPositions = Array(boardSize)
+export const allPositions = Array(boardSize)
     .fill(0)
     .flatMap((_, y) =>
         Array(boardSize)

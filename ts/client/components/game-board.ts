@@ -1,6 +1,6 @@
-import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { boardLayout } from '../../common/board';
+import { css, html, LitElement, nothing } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { allPositions, boardLayout, makeEmptyPlacedTokens } from '../../common/board';
 
 @customElement('game-board')
 export class GameBoardElement extends LitElement {
@@ -27,16 +27,19 @@ export class GameBoardElement extends LitElement {
         `,
     ];
 
+    @property({ type: Array })
+    accessor placedTokens: (string | undefined)[][] = makeEmptyPlacedTokens();
+
     render() {
-        return boardLayout
-            .flat()
-            .map(
-                (c) =>
-                    html`<board-card
-                        class="card"
-                        rank="${c.rank}"
-                        suit="${c.suit}"
-                    ></board-card>`
-            );
+        return allPositions.map((position) => {
+            const {x, y} = position;
+            const card = boardLayout[y][x];
+            const token = this.placedTokens[y][x];
+            return html`<board-card
+                class="card"
+                rank="${card.rank}"
+                suit="${card.suit}"
+                token="${token || nothing}"></board-card>`;
+        });
     }
 }

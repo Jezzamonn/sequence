@@ -15,6 +15,9 @@ export class BoardCardElement extends LitElement {
         css`
             :host {
                 overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .card-image {
@@ -38,14 +41,51 @@ export class BoardCardElement extends LitElement {
             .card-Diamonds {
                 color: red;
             }
+
+            .token {
+                position: absolute;
+                pointer-events: none;
+                text-shadow: 0 2px 4px black;
+            }
+
+            .token-blue {
+                color: blue;
+                font-size: 4cqw;
+            }
+
+            .token-blue:after {
+                content: '⬤';
+            }
+
+            .token-green {
+                color: #1a3;
+                font-size: 7cqw;
+            }
+
+            .token-green:after {
+                content: '✖';
+            }
+
+            .token-red {
+                color: #b11;
+                font-size: 7cqw;
+            }
+
+            .token-red:after {
+                content: '▲';
+            }
+
         `,
     ];
 
-    @property()
+    @property({ type: String })
     accessor rank: Rank = 'A';
 
-    @property()
+    @property({ type: String })
     accessor suit: Suit = 'Spades';
+
+    @property({ type: String })
+    accessor token: string | undefined;
 
     get shortString() {
         return cardToShortString({ rank: this.rank, suit: this.suit });
@@ -61,8 +101,13 @@ export class BoardCardElement extends LitElement {
 
     render() {
         // language=HTML
+        let tokenElem;
+        if (this.token !== undefined && this.token !== '') {
+            tokenElem = html`<div class="token token-${this.token.toLowerCase()}"></div>`
+        }
         return html`
             <img class="card-image card-${this.suit}" src="${this.assetName}" />
+            ${tokenElem}
         `;
     }
 }
