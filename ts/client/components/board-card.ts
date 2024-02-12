@@ -5,6 +5,7 @@ import {
     cardToShortString,
     Rank,
     Suit,
+    suitToSymbol,
 } from '../../common/cards';
 
 @customElement('board-card')
@@ -19,12 +20,34 @@ export class BoardCardElement extends LitElement {
                 align-items: center;
                 justify-content: center;
                 aspect-ratio: 360 / 540;
+
+                background-color: white;
+                border-radius: 0.5cqw;
             }
 
             .card-image {
                 max-width: 100%;
                 max-height: 100%;
                 object-fit: contain;
+                opacity: 0;
+            }
+
+            .card-image.card-Joker {
+                opacity: 1;
+            }
+
+            .card-label {
+                position: absolute;
+                background-color: white;
+                top: 0;
+                left: 0;
+                font-size: 20px;
+                text-align: center;
+                line-height: 1em;
+            }
+
+            .card-label.card-Joker {
+                display: none;
             }
 
             .card-Spades {
@@ -80,7 +103,6 @@ export class BoardCardElement extends LitElement {
             .token-red:after {
                 content: '▲';
             }
-
         `,
     ];
 
@@ -107,13 +129,9 @@ export class BoardCardElement extends LitElement {
 
     render() {
         // language=HTML
-        let tokenElem;
-        if (this.token !== undefined && this.token !== '') {
-            tokenElem = html`<div class="token token-${this.token.toLowerCase()}"></div>`
-        }
         return html`
             <img class="card-image card-${this.suit}" src="${this.assetName}" />
-            ${tokenElem}
+            <div class="card-label card-${this.suit}">${this.rank}<br>${suitToSymbol.get(this.suit)}</div>
         `;
     }
 }

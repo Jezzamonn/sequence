@@ -3,8 +3,6 @@ import './components/board-card';
 import './components/player-hand';
 
 import { GameManager } from '../common/game';
-import { allPositions } from '../common/board';
-import { choose } from '../common/util';
 import { GameBoardElement } from './components/game-board';
 import { PlayerHandElement } from './components/player-hand';
 import { Card } from '../common/cards';
