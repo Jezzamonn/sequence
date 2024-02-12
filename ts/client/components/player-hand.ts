@@ -35,20 +35,23 @@ export class PlayerHandElement extends LitElement {
     accessor hand: Card[] = [];
 
     render() {
-
         const maxAngle = 2;
-        const cardSpacing = 13;
 
         // language=HTML
         return this.hand.map((card, i) => {
             const amt = i / (this.hand.length - 1);
             const angleDeg = lerp(-maxAngle, maxAngle, amt);
-            const x = (i - (this.hand.length - 1) / 2) * cardSpacing;
             return html`<img
+                @click="${() => this.handleCardClick(card)}"
                 class="card-image card-${card.suit}"
                 style="transform: rotate(${angleDeg}deg)"
                 src="${cardAssetName(card)}" />`
             }
         );
+    }
+
+    handleCardClick(card: Card) {
+        // Dispatch an event to notify the parent component that a card was clicked.
+        this.dispatchEvent(new CustomEvent('card-click', { detail: card }));
     }
 }

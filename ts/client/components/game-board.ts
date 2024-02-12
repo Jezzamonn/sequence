@@ -39,6 +39,7 @@ export class GameBoardElement extends LitElement {
                 const card = boardLayout[y][x];
                 const token = this.placedTokens[y][x];
                 rowCards.push(html`<board-card
+                    @click="${() => this.handleCardClick(x, y)}"
                     class="card"
                     rank="${card.rank}"
                     suit="${card.suit}"
@@ -47,5 +48,11 @@ export class GameBoardElement extends LitElement {
             cards.push(html`<div class="row">${rowCards}</div>`);
         }
         return cards;
+    }
+
+    handleCardClick(x: number, y: number) {
+        console.log('Card clicked:', x, y);
+        // Dispatch an event to notify the parent component that a card was clicked.
+        this.dispatchEvent(new CustomEvent('board-position-click', { detail: {x, y} }));
     }
 }
