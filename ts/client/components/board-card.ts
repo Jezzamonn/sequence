@@ -18,6 +18,7 @@ export class BoardCardElement extends LitElement {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                aspect-ratio: 360 / 540;
             }
 
             .card-image {

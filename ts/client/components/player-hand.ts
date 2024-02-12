@@ -16,13 +16,17 @@ export class PlayerHandElement extends LitElement {
         // language=CSS
         css`
             :host {
-                height: 20vmin;
+                container-type: size;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .card-image {
-                max-height: 20vmin;
+                max-height: 100%;
                 object-fit: contain;
-                position: absolute;
+                transform-origin: 50% 50%;
+                flex-shrink: 1;
             }
         `,
     ];
@@ -42,7 +46,7 @@ export class PlayerHandElement extends LitElement {
             const x = (i - (this.hand.length - 1) / 2) * cardSpacing;
             return html`<img
                 class="card-image card-${card.suit}"
-                style="transform: translate(-50%, -50%) rotate(${angleDeg}deg) translate(${x}vmin, 0) "
+                style="transform: rotate(${angleDeg}deg)"
                 src="${cardAssetName(card)}" />`
             }
         );
