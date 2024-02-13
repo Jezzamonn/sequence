@@ -48,6 +48,14 @@ export const allCards: Card[] = allSuits.flatMap((suit) =>
     allRanks.map((rank) => ({ suit, rank }))
 );
 
+export function compareCards(card1: Card, card2: Card): number {
+    // Doesn't handle jokers but those aren't actual cards.
+    if (card1.suit != card2.suit) {
+        return allSuits.indexOf(card1.suit) - allSuits.indexOf(card2.suit);
+    }
+    return allRanks.indexOf(card1.rank) - allRanks.indexOf(card2.rank);
+}
+
 export const rankToFullName: Map<Rank, string> = new Map([
     ['2', '2'],
     ['3', '3'],

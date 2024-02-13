@@ -17,6 +17,7 @@ import {
     allCards,
     cardToDescription,
     cardsAreEqual,
+    compareCards,
     isOneEyedJack,
 } from './cards';
 import { Point } from './point';
@@ -110,6 +111,7 @@ export class GameManager {
                 name: `Player ${i + 1}`,
                 color,
             };
+            hand.sort(compareCards);
             players.push(player);
             hands.push(hand);
         }
@@ -250,6 +252,8 @@ export class GameManager {
 
         // Add a new card to the player's hand.
         hand.push(this.state.deck.pop()!);
+        hand.sort(compareCards);
+
         // If that was the last card, shuffle the discarded cards and use them as the new deck.
         if (this.state.deck.length == 0) {
             console.log('Shuffling discards.')

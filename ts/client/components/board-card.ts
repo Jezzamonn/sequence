@@ -129,9 +129,16 @@ export class BoardCardElement extends LitElement {
 
     render() {
         // language=HTML
+        let tokenElem;
+        if (this.token != undefined && this.token !== '') {
+            tokenElem = html`<div class="token token-${this.token.toLowerCase()}"></div>`
+        }
+
+        // language=HTML
         return html`
             <img class="card-image card-${this.suit}" src="${this.assetName}" />
             <div class="card-label card-${this.suit}">${this.rank}<br>${suitToSymbol.get(this.suit)}</div>
+            ${tokenElem}
         `;
     }
 }
