@@ -1,5 +1,8 @@
+/**
+ * @param delay Delay, in seconds.
+ */
 export async function wait(delay: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, delay));
+    return new Promise((resolve) => setTimeout(resolve, 1000 * delay));
 }
 
 export function easeInOut(t: number, amt=2) {
