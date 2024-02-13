@@ -94,9 +94,11 @@ export function cardToShortString(card: Card): string {
     return card.rank + suitToSymbol.get(card.suit);
 }
 
+export const cardBackAssetName = 'img/English_pattern_card_back.svg';
+
 export function cardAssetName(card: Card): string {
     if (card.suit == 'Joker') {
-        return 'img/English_pattern_card_back.svg';
+        return cardBackAssetName;
     }
     const fullRank = rankToFullName.get(card.rank)!.toLowerCase();
     const suit = card.suit.toLowerCase();

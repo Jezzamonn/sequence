@@ -10,6 +10,9 @@ export class GameBoardElement extends LitElement {
         css`
             :host {
                 container-type: size;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
             }
 
             .row {

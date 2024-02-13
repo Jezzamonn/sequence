@@ -1,6 +1,7 @@
 import './components/game-board';
 import './components/board-card';
 import './components/player-hand';
+import './components/deck-discard';
 
 import { GameManager } from '../common/game';
 import { GameBoardElement } from './components/game-board';
@@ -9,6 +10,7 @@ import { Card } from '../common/cards';
 import { Point } from '../common/point';
 import { RandomAI } from '../common/ai/random';
 import { wait } from '../common/util';
+import { DeckAndDiscardElement } from './components/deck-discard';
 
 console.log("Client <( Hello World! )");
 
@@ -21,6 +23,8 @@ boardElem.placedTokens = gameManager.state.placedTokens;
 
 const handElem = document.querySelector('player-hand') as PlayerHandElement;
 handElem.hand = gameManager.getStateForPlayer(playerIndex).hand;
+
+const deckDiscardElem = document.querySelector('deck-discard') as DeckAndDiscardElement;
 
 let selectedCard: Card | undefined = undefined;
 
@@ -39,8 +43,13 @@ boardElem.addEventListener('board-position-click', (e: CustomEvent<Point>) => {
 });
 
 function updateUI() {
-    boardElem.placedTokens = gameManager.state.placedTokens.slice();
-    handElem.hand = gameManager.getStateForPlayer(playerIndex).hand.slice();
+    const gameState = gameManager.getStateForPlayer(playerIndex);
+
+    boardElem.placedTokens = gameState.placedTokens.slice();
+    handElem.hand = gameState.hand.slice();
+    deckDiscardElem.deckSize = gameState.deckSize;
+    deckDiscardElem.rank = gameState.lastCardPlayed?.rank || 'Joker';
+    deckDiscardElem.suit = gameState.lastCardPlayed?.suit || 'Joker'
 }
 
 async function makeMove(card: Card, position: Point) {
