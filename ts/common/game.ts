@@ -42,7 +42,7 @@ const numSequencesToWin: Map<number, number> = new Map([
     [3, 1],
 ]);
 
-interface Player {
+export interface Player {
     index: number;
     name: String;
     color: Color;
@@ -63,7 +63,7 @@ interface GameState {
     gameWinner: Token;
 }
 
-interface PlayerVisibleGameState {
+export interface PlayerVisibleGameState {
     players: Player[];
 
     placedTokens: Token[][];
