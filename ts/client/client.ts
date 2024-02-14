@@ -27,10 +27,14 @@ handElem.hand = gameManager.getStateForPlayer(playerIndex).hand;
 const deckDiscardElem = document.querySelector('deck-discard') as DeckAndDiscardElement;
 
 let selectedCard: Card | undefined = undefined;
+let selectedCardIndex: number | undefined = undefined;
 
-handElem.addEventListener('card-click', (e: CustomEvent<Card>) => {
+handElem.addEventListener('card-click', (e: CustomEvent<[Card, number]>) => {
     console.log('Card clicked:', e.detail);
-    selectedCard = e.detail;
+    selectedCard = e.detail[0];
+    selectedCardIndex = e.detail[1];
+
+    updateUI();
 });
 
 boardElem.addEventListener('board-position-click', (e: CustomEvent<Point>) => {
@@ -56,6 +60,8 @@ function updateUI() {
 
     boardElem.placedTokens = gameState.placedTokens.slice();
     handElem.hand = gameState.hand.slice();
+    handElem.selectedCardIndex = selectedCardIndex;
+
     deckDiscardElem.deckSize = gameState.deckSize;
     deckDiscardElem.rank = gameState.lastCardPlayed?.rank || 'Joker';
     deckDiscardElem.suit = gameState.lastCardPlayed?.suit || 'Joker'
@@ -65,6 +71,7 @@ async function makeMove(card: Card, position: Point | undefined) {
     // Will throw if the move is invalid.
     gameManager.makeMove(gameManager.state.nextPlayerIndex, card, position);
     selectedCard = undefined;
+    selectedCardIndex = undefined;
     updateUI();
 
     simulateOtherPlayers();

@@ -7,7 +7,7 @@ export {};
 // Following https://github.com/microsoft/TypeScript/issues/28357
 declare global {
     interface HTMLElementEventMap {
-        'card-click': CustomEvent<Card>;
+        'card-click': CustomEvent<[Card, number]>;
         'board-position-click': CustomEvent<Point>;
     }
 }

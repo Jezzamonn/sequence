@@ -27,6 +27,8 @@ export class PlayerHandElement extends LitElement {
                 object-fit: contain;
                 transform-origin: 50% 50%;
                 flex-shrink: 1;
+                transition: transform 0.2s;
+                margin: 0 -2cqh;
             }
         `,
     ];
@@ -34,24 +36,33 @@ export class PlayerHandElement extends LitElement {
     @property({ type: Array })
     accessor hand: Card[] = [];
 
+    @property({ type: Number })
+    accessor selectedCardIndex: number | undefined = undefined;
+
     render() {
-        const maxAngle = 2;
+        const maxAngle = 4;
 
         // language=HTML
         return this.hand.map((card, i) => {
             const amt = i / (this.hand.length - 1);
             const angleDeg = lerp(-maxAngle, maxAngle, amt);
+            const isSelected = i === this.selectedCardIndex;
+            const transform = `rotate(${angleDeg}deg) translateY(${isSelected ? '-10%' : '0'})`;
             return html`<img
-                @click="${() => this.handleCardClick(card)}"
-                class="card-image card-${card.suit}"
-                style="transform: rotate(${angleDeg}deg)"
-                src="${cardAssetName(card)}" />`
-            }
-        );
+                @click="${() => this.handleCardClick(card, i)}"
+                class="card-image card-${card.suit} ${isSelected
+                    ? 'card-selected'
+                    : ''}"
+                style="transform: ${transform};"
+                src="${cardAssetName(card)}"
+            />`;
+        });
     }
 
-    handleCardClick(card: Card) {
+    handleCardClick(card: Card, index: number) {
         // Dispatch an event to notify the parent component that a card was clicked.
-        this.dispatchEvent(new CustomEvent('card-click', { detail: card }));
+        this.dispatchEvent(
+            new CustomEvent('card-click', { detail: [card, index] })
+        );
     }
 }
