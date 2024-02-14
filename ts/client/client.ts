@@ -42,6 +42,15 @@ boardElem.addEventListener('board-position-click', (e: CustomEvent<Point>) => {
     }
 });
 
+deckDiscardElem.addEventListener('click', () => {
+    console.log('Deck clicked');
+    if (selectedCard !== undefined) {
+        console.log('Making move:', selectedCard, undefined);
+
+        makeMove(selectedCard, undefined);
+    }
+});
+
 function updateUI() {
     const gameState = gameManager.getStateForPlayer(playerIndex);
 
@@ -52,7 +61,7 @@ function updateUI() {
     deckDiscardElem.suit = gameState.lastCardPlayed?.suit || 'Joker'
 }
 
-async function makeMove(card: Card, position: Point) {
+async function makeMove(card: Card, position: Point | undefined) {
     // Will throw if the move is invalid.
     gameManager.makeMove(gameManager.state.nextPlayerIndex, card, position);
     selectedCard = undefined;
