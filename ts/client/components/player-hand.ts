@@ -8,6 +8,7 @@ import {
     Suit,
 } from '../../common/cards';
 import { lerp } from '../../common/util';
+import { HandClickEventParams } from './events';
 
 @customElement('player-hand')
 export class PlayerHandElement extends LitElement {
@@ -49,7 +50,7 @@ export class PlayerHandElement extends LitElement {
             const isSelected = i === this.selectedCardIndex;
             const transform = `rotate(${angleDeg}deg) translateY(${isSelected ? '-10%' : '0'})`;
             return html`<img
-                @click="${() => this.handleCardClick(card, i)}"
+                @click="${(e: MouseEvent) => this.handleCardClick(e, card, i)}"
                 class="card-image card-${card.suit} ${isSelected
                     ? 'card-selected'
                     : ''}"
@@ -59,10 +60,15 @@ export class PlayerHandElement extends LitElement {
         });
     }
 
-    handleCardClick(card: Card, index: number) {
+    handleCardClick(e: MouseEvent, card: Card, index: number) {
         // Dispatch an event to notify the parent component that a card was clicked.
+        const eventParams: HandClickEventParams = {
+            card,
+            index,
+            sourceEvent: e,
+        }
         this.dispatchEvent(
-            new CustomEvent('card-click', { detail: [card, index] })
+            new CustomEvent('card-click', { detail: eventParams })
         );
     }
 }

@@ -70,6 +70,7 @@ export interface PlayerVisibleGameState {
     deckSize: number;
     lastCardPlayed: Card | undefined;
     hand: Card[];
+    lastActionWasDiscard: boolean;
 
     nextPlayerIndex: number;
     gameWinner: Token;
@@ -144,6 +145,7 @@ export class GameManager {
             lastCardPlayed:
                 this.state.discarded[this.state.discarded.length - 1],
             hand: this.state.hands[playerIndex],
+            lastActionWasDiscard: this.state.lastActionWasDiscard,
 
             nextPlayerIndex: this.state.nextPlayerIndex,
             gameWinner: this.state.gameWinner,
@@ -278,6 +280,7 @@ export class GameManager {
             console.log(`Player ${player.name} has no moves, ending turn.`);
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;
+            this.state.lastActionWasDiscard = false;
         }
     }
 }
