@@ -125,7 +125,7 @@ async function makeMove(card: Card, position: Point | undefined) {
 async function simulateOtherPlayers() {
     const randomAI = new RandomAI();
     while (gameManager.state.nextPlayerIndex != playerIndex) {
-        await wait(0.1);
+        await wait(1);
 
         const move = randomAI.makeMove(
             gameManager.getMovesForPlayer(gameManager.state.nextPlayerIndex),
@@ -137,7 +137,7 @@ async function simulateOtherPlayers() {
 }
 
 function startGame() {
-    gameManager = new GameManager(12, 3, Math.random);
+    gameManager = new GameManager(2, 2, Math.random);
     updateUI();
     simulateOtherPlayers();
 }
