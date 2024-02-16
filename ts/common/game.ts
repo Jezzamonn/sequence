@@ -177,10 +177,10 @@ export class GameManager {
     // Other game logic to handle: You can't remove from sequences.
     makeMove(playerIndex: number, card: Card, position: Point | undefined) {
         if (this.state.gameWinner !== undefined) {
-            throw new Error('Game is already over');
+            throw new Error(`Cannot make a move, the game is over. ${this.state.gameWinner} has won.`);
         }
         if (playerIndex != this.state.nextPlayerIndex) {
-            throw new Error(`Invalid player index: ${playerIndex}`);
+            throw new Error(`It's not your turn yet.`);
         }
 
         const player = this.state.players[playerIndex];
@@ -189,13 +189,13 @@ export class GameManager {
         const index = hand.findIndex((c) => cardsAreEqual(c, card));
         if (index == -1) {
             throw new Error(
-                `Player ${player.name} does not have card ${card.rank} of ${card.suit}`
+                `You do not have the card ${cardToDescription(card)}.`
             );
         }
 
         if (position === undefined) {
             if (this.state.lastActionWasDiscard) {
-                throw new Error(`Cannot discard twice in a row.`);
+                throw new Error(`You can't discard twice in a row.`);
             }
             if (
                 !isValidDiscard(
@@ -205,7 +205,7 @@ export class GameManager {
                     card
                 )
             ) {
-                throw new Error(`Illegal discard: ${cardToDescription(card)}`);
+                throw new Error(`You can't discard ${cardToDescription(card)} as there are possible moves for it.`);
             }
         } else {
             if (
@@ -218,9 +218,7 @@ export class GameManager {
                 )
             ) {
                 throw new Error(
-                    `Illegal move: ${cardToDescription(card)} at ${position?.x}, ${
-                        position?.y
-                    }`
+                    `You can't place ${cardToDescription(card)} there.`
                 );
             }
         }
