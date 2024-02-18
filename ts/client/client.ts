@@ -4,7 +4,7 @@ import './components/player-hand';
 import './components/deck-discard';
 import './components/game-notification';
 
-import { GameManager } from '../common/game';
+import { GameManager, PlayerVisibleGameState } from '../common/game';
 import { GameBoardElement } from './components/game-board';
 import { PlayerHandElement } from './components/player-hand';
 import { Card } from '../common/cards';
@@ -17,12 +17,9 @@ import {
     BoardClickEventParams,
     HandClickEventParams,
 } from './components/events';
+import { Connection } from './connection';
 
 console.log('Client <( Hello World! )');
-
-const playerIndex = 0;
-
-let gameManager: GameManager;
 
 const boardElem = document.querySelector('game-board') as GameBoardElement;
 const handElem = document.querySelector('player-hand') as PlayerHandElement;
@@ -32,6 +29,15 @@ const deckDiscardElem = document.querySelector(
 const notificationContainer = document.querySelector(
     '.notification-container'
 ) as HTMLElement;
+
+// Just start up the connection straight away.
+const connection = new Connection();
+let gameState: PlayerVisibleGameState | undefined = undefined;
+
+connection.onGameState = (state) => {
+    gameState = state;
+    updateUI();
+}
 
 let selectedCard: Card | undefined = undefined;
 let selectedCardIndex: number | undefined = undefined;
@@ -84,28 +90,30 @@ window.addEventListener('click', () => {
     updateUI();
 });
 
-window.addEventListener('keydown', (e: KeyboardEvent) => {
-    switch (e.key) {
-        // Restart
-        case 'r':
-            startGame();
-            break;
-        // Make a random move on space
-        case ' ':
-            if (gameManager.state.nextPlayerIndex == playerIndex) {
-                const moves = gameManager.getMovesForPlayer(playerIndex);
-                if (moves.length > 0) {
-                    const move =
-                        moves[Math.floor(Math.random() * moves.length)];
-                    makeMove(move[0], move[1]);
-                }
-            }
-            break;
-    }
-});
+// window.addEventListener('keydown', (e: KeyboardEvent) => {
+//     switch (e.key) {
+//         // Restart
+//         case 'r':
+//             startGame();
+//             break;
+//         // Make a random move on space
+//         case ' ':
+//             if (gameManager.state.nextPlayerIndex == playerIndex) {
+//                 const moves = gameManager.getMovesForPlayer(playerIndex);
+//                 if (moves.length > 0) {
+//                     const move =
+//                         moves[Math.floor(Math.random() * moves.length)];
+//                     makeMove(move[0], move[1]);
+//                 }
+//             }
+//             break;
+//     }
+// });
 
 function updateUI() {
-    const gameState = gameManager.getStateForPlayer(playerIndex);
+    if (gameState === undefined) {
+        return;
+    }
 
     if (gameState.gameWinner != undefined) {
         notify(`${gameState.gameWinner} wins!`);
@@ -122,7 +130,7 @@ function updateUI() {
         const validPositions = getMovesForCard(
             gameState.placedTokens,
             sequenceCount,
-            gameState.players[playerIndex].color,
+            gameState.players[gameState.playerIndex].color,
             selectedCard
         );
         boardElem.validPositions = validPositions;
@@ -148,53 +156,18 @@ function notify(message: string) {
 }
 
 async function makeMove(card: Card, position: Point | undefined) {
-    // Will throw if the move is invalid.
-    try {
-        gameManager.makeMove(playerIndex, card, position);
-    } catch (e) {
-        if (e instanceof Error) {
-            notify(e.message);
-        }
+    if (connection.requestInProgress) {
         return;
     }
+
+    const moveResult = await connection.makeMove(card, position);
+
+    if (moveResult.error != undefined) {
+        notify(moveResult.error);
+        return;
+    }
+
     selectedCard = undefined;
     selectedCardIndex = undefined;
     updateUI();
-
-    simulateOtherPlayers();
 }
-
-async function simulateOtherPlayers() {
-    const randomAI = new RandomAI();
-    while (
-        gameManager.state.gameWinner == undefined &&
-        gameManager.state.nextPlayerIndex != playerIndex
-    ) {
-        await wait(1);
-
-        const move = randomAI.makeMove(
-            gameManager.getMovesForPlayer(gameManager.state.nextPlayerIndex),
-            gameManager.getStateForPlayer(gameManager.state.nextPlayerIndex)
-        );
-        gameManager.makeMove(
-            gameManager.state.nextPlayerIndex,
-            move[0],
-            move[1]
-        );
-        updateUI();
-    }
-}
-
-function startGame() {
-    gameManager = new GameManager(2, 2, Math.random);
-    updateUI();
-    simulateOtherPlayers();
-
-    notify('Welcome to Sequence!');
-}
-
-function init() {
-    startGame();
-}
-
-window.onload = init;

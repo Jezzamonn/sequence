@@ -1,10 +1,8 @@
 // State of the game
 
 import {
-    Color,
     Token,
     allColors,
-    boardSize,
     countSequences,
     getMovesForPlayer,
     isValidDiscard,
@@ -20,33 +18,14 @@ import {
     compareCards,
     isOneEyedJack,
 } from './cards';
+import {
+    handSizes,
+    validatePlayers,
+    numSequencesToWin,
+    Player,
+} from './players';
 import { Point } from './point';
 import { shuffle } from './util';
-
-const validPlayerCounts = [2, 3, 4, 6, 8, 9, 10, 12];
-const validTeamCounts = [2, 3];
-
-const handSizes: Map<number, number> = new Map([
-    [2, 7],
-    [3, 6],
-    [4, 6],
-    [6, 5],
-    [8, 4],
-    [9, 4],
-    [10, 3],
-    [12, 3],
-]);
-
-const numSequencesToWin: Map<number, number> = new Map([
-    [2, 2],
-    [3, 1],
-]);
-
-export interface Player {
-    index: number;
-    name: String;
-    color: Color;
-}
 
 interface GameState {
     players: Player[];
@@ -65,6 +44,8 @@ interface GameState {
 
 export interface PlayerVisibleGameState {
     players: Player[];
+    // Index of this player.
+    playerIndex: number;
 
     placedTokens: Token[][];
     deckSize: number;
@@ -81,17 +62,7 @@ export class GameManager {
     random: () => number;
 
     constructor(numPlayers: number, numTeams: number, random: () => number) {
-        if (!validPlayerCounts.includes(numPlayers)) {
-            throw new Error(`Invalid number of players: ${numPlayers}`);
-        }
-        if (!validTeamCounts.includes(numTeams)) {
-            throw new Error(`Invalid number of teams: ${numTeams}`);
-        }
-        if (numPlayers % numTeams != 0) {
-            throw new Error(
-                `Number of players must be divisible by number of teams. Got ${numPlayers} players and ${numTeams} teams`
-            );
-        }
+        validatePlayers(numPlayers, numTeams);
 
         this.random = random;
 
@@ -139,6 +110,7 @@ export class GameManager {
 
         return {
             players: this.state.players,
+            playerIndex,
 
             placedTokens: this.state.placedTokens,
             deckSize: this.state.deck.length,
@@ -172,12 +144,11 @@ export class GameManager {
     //
     // Other small weirdness: If you have two of the same card, this might pull the
     // wrong card out of the player's hand.
-    // TODO: Solution to that is to sort the cards.
-    //
-    // Other game logic to handle: You can't remove from sequences.
     makeMove(playerIndex: number, card: Card, position: Point | undefined) {
         if (this.state.gameWinner !== undefined) {
-            throw new Error(`Cannot make a move, the game is over. ${this.state.gameWinner} has won.`);
+            throw new Error(
+                `Cannot make a move, the game is over. ${this.state.gameWinner} has won.`
+            );
         }
         if (playerIndex != this.state.nextPlayerIndex) {
             throw new Error(`It's not your turn yet.`);
@@ -205,7 +176,11 @@ export class GameManager {
                     card
                 )
             ) {
-                throw new Error(`You can't discard ${cardToDescription(card)} as there are possible moves for it.`);
+                throw new Error(
+                    `You can't discard ${cardToDescription(
+                        card
+                    )} as there are possible moves for it.`
+                );
             }
         } else {
             if (
@@ -256,7 +231,7 @@ export class GameManager {
 
         // If that was the last card, shuffle the discarded cards and use them as the new deck.
         if (this.state.deck.length == 0) {
-            console.log('Shuffling discards.')
+            console.log('Shuffling discards.');
             this.state.deck = shuffle(this.state.discarded, this.random);
             this.state.discarded = [];
         }
