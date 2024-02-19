@@ -1,13 +1,13 @@
-import { boardToString, getMovesForPlayer } from "../common/board";
-import { Card, cardToDescription } from "../common/cards";
-import { GameManager } from "../common/game";
+import { boardToString, getMovesForPlayer } from "../common/ts/board";
+import { Card, cardToDescription } from "../common/ts/cards";
+import { GameManager } from "../common/ts/game";
 import { Server, Socket } from "socket.io";
-import { Point, Points } from "../common/point";
-import { MoveResult } from "../common/move-result";
-import { validatePlayers } from "../common/players";
-import { AIInterface } from "../common/ai/ai-interface";
-import { RandomAI } from "../common/ai/random";
-import { wait } from "../common/util";
+import { Point, Points } from "../common/ts/point";
+import { MoveResult } from "../common/ts/move-result";
+import { validatePlayers } from "../common/ts/players";
+import { AIInterface } from "../common/ts/ai/ai-interface";
+import { RandomAI } from "../common/ts/ai/random";
+import { wait } from "../common/ts/util";
 
 console.log('Server <( Hello World! )');
 

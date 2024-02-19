@@ -1,16 +1,7 @@
 /promo/*
 !promo/publish/
 
-/build/
-*.zip
+node_modules/
 
 .vscode/
-node_modules
 profiles/
-
-*.ttf
-
-/music/
-!music/*.mp3
-
-/level/

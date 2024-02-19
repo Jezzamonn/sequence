@@ -6,8 +6,8 @@ import {
     cardToShortString,
     Rank,
     Suit,
-} from '../../common/cards';
-import { lerp } from '../../common/util';
+} from '../../../common/ts/cards';
+import { lerp } from '../../../common/ts/util';
 import { HandClickEventParams } from './events';
 
 @customElement('player-hand')

@@ -4,9 +4,9 @@ import {
     boardLayout,
     boardSize,
     makeEmptyPlacedTokens,
-} from '../../common/board';
-import { Rank, Suit } from '../../common/cards';
-import { Point } from '../../common/point';
+} from '../../../common/ts/board';
+import { Rank, Suit } from '../../../common/ts/cards';
+import { Point } from '../../../common/ts/point';
 import { BoardClickEventParams } from './events';
 
 @customElement('game-board')

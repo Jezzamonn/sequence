@@ -1,0 +1,16 @@
+{
+  "name": "sequence-server",
+  "version": "0.0.1",
+  "description": "Sequence Server",
+  "scripts": {
+    "start": "ts-node server.ts"
+  },
+  "author": "Jezzamon",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@tsconfig/recommended": "^1.0.3",
+    "socket.io": "^4.7.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

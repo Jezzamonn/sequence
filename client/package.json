@@ -1,24 +1,22 @@
 {
-  "name": "ld50",
+  "name": "sequence-client",
   "version": "0.0.1",
-  "description": "Ludum Dare 50",
+  "description": "Sequence Client",
   "type": "module",
   "scripts": {
     "watch": "npm-watch",
-    "reload": "reload -b -d build/client",
-    "static": "mkdir -p build/client/ && rsync -a --delete --exclude js/ --exclude css/ static/ build/client/",
-    "sass": "mkdir -p build/client/css && sass scss/styles.scss build/client/css/styles.css",
-    "webpack": "webpack",
+    "reload": "reload -b -d build",
+    "static": "mkdir -p build/ && rsync -a --delete --exclude js/ --exclude css/ static/ build/",
+    "sass": "mkdir -p build/css && sass scss/styles.scss build/css/styles.css",
+    "webpack": "webpack --config webpack.config.js",
     "webpack-prod": "webpack --mode production",
     "build": "npm-run-all --parallel webpack sass static",
     "build-prod": "npm-run-all --parallel webpack-prod sass static",
-    "server": "node build/server/server.bundle.js",
-    "watch-server": "nodemon build/server/server.bundle.js",
     "test": "jest",
     "clean": "rm -rf build/*"
   },
   "jest": {
-    "setupFilesAfterEnv": ["./ts/common/test/test-setup.ts"]
+    "setupFilesAfterEnv": ["../common/ts/test/test-setup.ts"]
   },
   "watch": {
     "static": {
@@ -40,10 +38,6 @@
       "extensions": "js,jsx,ts,tsx"
     }
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Jezzamonn/ld50.git"
-  },
   "author": "Jezzamon",
   "license": "UNLICENSED",
   "devDependencies": {
@@ -58,22 +52,18 @@
     "@types/node-localstorage": "^1.3.3",
     "@types/uuid": "^9.0.7",
     "babel-loader": "^9.1.3",
-    "express": "^4.18.2",
     "jest": "^29.7.0",
     "jest-extended": "^4.0.2",
     "node-localstorage": "^3.0.5",
-    "nodemon": "^3.0.3",
     "npm-run-all": "^4.1.5",
     "npm-watch": "^0.11.0",
     "reload": "^3.2.1",
     "sass": "^1.70.0",
-    "socket.io": "^4.7.4",
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
     "webpack": "^5.90.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-node-externals": "^3.0.0"
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@babel/runtime": "^7.23.8",

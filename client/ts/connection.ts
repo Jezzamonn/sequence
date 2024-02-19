@@ -1,8 +1,8 @@
 import { Socket, io } from 'socket.io-client';
-import { Card } from '../common/cards';
-import { Point } from '../common/point';
-import { MoveResult } from '../common/move-result';
-import { PlayerVisibleGameState } from '../common/game';
+import { Card } from '../../common/ts/cards';
+import { Point } from '../../common/ts/point';
+import { MoveResult } from '../../common/ts/move-result';
+import { PlayerVisibleGameState } from '../../common/ts/game';
 
 export class Connection {
     private socket: Socket;

@@ -4,15 +4,15 @@ import './components/player-hand';
 import './components/deck-discard';
 import './components/game-notification';
 
-import { GameManager, PlayerVisibleGameState } from '../common/game';
+import { GameManager, PlayerVisibleGameState } from '../../common/ts/game';
 import { GameBoardElement } from './components/game-board';
 import { PlayerHandElement } from './components/player-hand';
-import { Card } from '../common/cards';
-import { Point } from '../common/point';
-import { RandomAI } from '../common/ai/random';
-import { wait } from '../common/util';
+import { Card } from '../../common/ts/cards';
+import { Point } from '../../common/ts/point';
+import { RandomAI } from '../../common/ts/ai/random';
+import { wait } from '../../common/ts/util';
 import { DeckAndDiscardElement } from './components/deck-discard';
-import { countSequences, getMovesForCard } from '../common/board';
+import { countSequences, getMovesForCard } from '../../common/ts/board';
 import {
     BoardClickEventParams,
     HandClickEventParams,
@@ -20,6 +20,8 @@ import {
 import { Connection } from './connection';
 
 console.log('Client <( Hello World! )');
+
+const thing: number = 0;
 
 const boardElem = document.querySelector('game-board') as GameBoardElement;
 const handElem = document.querySelector('player-hand') as PlayerHandElement;
