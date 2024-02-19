@@ -8,7 +8,7 @@
     "reload": "reload -b -d build",
     "static": "mkdir -p build/ && rsync -a --delete --exclude js/ --exclude css/ static/ build/",
     "sass": "mkdir -p build/css && sass scss/styles.scss build/css/styles.css",
-    "webpack": "webpack --config webpack.config.js",
+    "webpack": "webpack",
     "webpack-prod": "webpack --mode production",
     "build": "npm-run-all --parallel webpack sass static",
     "build-prod": "npm-run-all --parallel webpack-prod sass static",
@@ -16,7 +16,9 @@
     "clean": "rm -rf build/*"
   },
   "jest": {
-    "setupFilesAfterEnv": ["../common/ts/test/test-setup.ts"]
+    "setupFilesAfterEnv": [
+      "../common/ts/test/test-setup.ts"
+    ]
   },
   "watch": {
     "static": {

@@ -11,12 +11,7 @@ export default {
     module: {
         rules: [{
             test: /\.(ts|js)x?$/,
-            exclude: /node_modules/,
-            include: [
-                path.join(__dirname, 'ts'),
-                path.join(__dirname, '../common/ts'),
-            ],
-            loader: 'babel-loader',
+            loader: 'ts-loader',
         }]
     },
     stats: {

@@ -1,0 +1,10 @@
+{
+  "name": "sequence-common",
+  "version": "0.0.1",
+  "description": "Sequence common files",
+  "author": "Jezzamon",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "jest-extended": "^4.0.2"
+  }
+}
