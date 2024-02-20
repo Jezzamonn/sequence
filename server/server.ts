@@ -11,7 +11,11 @@ import { wait } from "../common/ts/util";
 
 console.log('Server <( Hello World! )');
 
-const io = new Server();
+const io = new Server({
+    cors: {
+        origin: "http://localhost:8080"
+    }
+});
 
 type GameState = "joining" | "game";
 
