@@ -7,6 +7,8 @@
         "strictNullChecks": true,
         "allowJs": true,
         "experimentalDecorators": true,
+        "moduleResolution": "node",
+        "module": "es6",
     },
 
     "include": [
