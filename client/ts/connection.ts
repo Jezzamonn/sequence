@@ -1,7 +1,7 @@
 import { Socket, io } from 'socket.io-client';
-import { Card } from '../../common/ts/cards';
-import { Point } from '../../common/ts/point';
-import { MoveResult } from '../../common/ts/move-result';
+import { Card, cardToDescription } from '../../common/ts/cards';
+import { Point, Points } from '../../common/ts/point';
+import { Command, MoveResult } from '../../common/ts/interface/interface';
 import { PlayerVisibleGameState } from '../../common/ts/game';
 
 export class Connection {
@@ -22,10 +22,13 @@ export class Connection {
             console.log('Disconnected from server');
         });
 
-        this.socket.on('gameState', this.onGameState);
+        this.socket.on(Command.gameState, (state: PlayerVisibleGameState) => {
+            this.onGameState(state);
+        });
     }
 
     async startGame(numPlayers: number, numTeams: number): Promise<MoveResult> {
+        console.log(`Starting game with ${numPlayers} players and ${numTeams} teams`);
         if (this.requestInProgress) {
             return { error: 'Request already in progress' };
         }
@@ -33,7 +36,7 @@ export class Connection {
         this.requestInProgress = true;
 
         try {
-            const result = await this.socket.emitWithAck('start', numPlayers, numTeams);
+            const result = await this.socket.emitWithAck(Command.startGame, numPlayers, numTeams);
             return result;
         } finally {
             this.requestInProgress = false;
@@ -41,6 +44,7 @@ export class Connection {
     }
 
     async makeMove(card: Card, position: Point | undefined): Promise<MoveResult> {
+        console.log(`Making move: ${cardToDescription(card)} to ${Points.toString(position)}`);
         if (this.requestInProgress) {
             return { error: 'Request already in progress' };
         }
@@ -48,33 +52,10 @@ export class Connection {
         this.requestInProgress = true;
 
         try {
-            const result = await this.socket.emitWithAck('move', card, position);
+            const result = await this.socket.emitWithAck(Command.makeMove, card, position);
             return result;
         } finally {
             this.requestInProgress = false;
         }
     }
 }
-
-// Connect to the server
-const socket = io('http://localhost:3000');
-
-// Function to connect to the server
-function connectToServer() {
-    socket.on('connect', () => {
-        console.log('Connected to server');
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server');
-    });
-}
-
-// Function to make a move
-function makeMove(move: string) {
-    socket.emit('move', move);
-}
-
-// Example usage
-connectToServer();
-makeMove('left');

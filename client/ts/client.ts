@@ -21,8 +21,6 @@ import { Connection } from './connection';
 
 console.log('Client <( Hello World! )');
 
-const thing: number = 0;
-
 const boardElem = document.querySelector('game-board') as GameBoardElement;
 const handElem = document.querySelector('player-hand') as PlayerHandElement;
 const deckDiscardElem = document.querySelector(
@@ -37,6 +35,7 @@ const connection = new Connection();
 let gameState: PlayerVisibleGameState | undefined = undefined;
 
 connection.onGameState = (state) => {
+    console.log('Received game state:', state);
     gameState = state;
     updateUI();
 }
@@ -173,3 +172,7 @@ async function makeMove(card: Card, position: Point | undefined) {
     selectedCardIndex = undefined;
     updateUI();
 }
+
+wait(1).then(() => {
+    connection.startGame(4, 2);
+});
