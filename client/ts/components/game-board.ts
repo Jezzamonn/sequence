@@ -51,7 +51,7 @@ export class GameBoardElement extends LitElement {
     ];
 
     @property({ type: Array })
-    accessor placedTokens: (string | undefined)[][] = makeEmptyPlacedTokens();
+    accessor placedTokens: ((string | undefined)[][]) | undefined = undefined;
 
     @property({ type: Array })
     accessor validPositions: Point[] | undefined;
@@ -62,7 +62,7 @@ export class GameBoardElement extends LitElement {
             let rowCards = [];
             for (let x = 0; x < boardSize; x++) {
                 const card = boardLayout[y][x];
-                const token = this.placedTokens[y][x];
+                const token = this.placedTokens?.[y]?.[x];
                 const valid = this.validPositions?.some(
                     (p) => p.x === x && p.y === y
                 );

@@ -15,11 +15,17 @@ export interface BoardClickEventParams {
     sourceEvent: MouseEvent;
 }
 
+export interface MakeMoveEventParams {
+    card: Card;
+    position: Point | undefined;
+}
+
 // Following https://github.com/microsoft/TypeScript/issues/28357
 declare global {
     interface HTMLElementEventMap {
         'card-click': CustomEvent<HandClickEventParams>;
         'board-position-click': CustomEvent<BoardClickEventParams>;
         'discard-click': CustomEvent<MouseEvent>;
+        'make-move': CustomEvent<MakeMoveEventParams>;
     }
 }

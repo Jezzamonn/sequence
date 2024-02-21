@@ -42,10 +42,10 @@ io.on('connection', async (socket: Socket) => {
 
     function start(numPlayers: number, numTeams: number): MoveResult {
         console.log(`Start: ${numPlayers} players, ${numTeams} teams`);
-        if (gameState !== 'joining') {
-            console.error('Received start command when game already started');
-            return { error: 'Game already started' };
-        }
+        // if (gameState !== 'joining') {
+        //     console.error('Received start command when game already started');
+        //     return { error: 'Game already started' };
+        // }
         try {
             validatePlayers(numPlayers, numTeams);
             while (aiPlayers.length < numPlayers) {

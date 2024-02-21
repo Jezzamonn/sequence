@@ -35,7 +35,7 @@ export class PlayerHandElement extends LitElement {
     ];
 
     @property({ type: Array })
-    accessor hand: Card[] = [];
+    accessor hand: Card[] | undefined = undefined;
 
     @property({ type: Number })
     accessor selectedCardIndex: number | undefined = undefined;
@@ -44,8 +44,8 @@ export class PlayerHandElement extends LitElement {
         const maxAngle = 4;
 
         // language=HTML
-        return this.hand.map((card, i) => {
-            const amt = i / (this.hand.length - 1);
+        return this.hand?.map((card, i) => {
+            const amt = i / (this.hand!.length - 1);
             const angleDeg = lerp(-maxAngle, maxAngle, amt);
             const isSelected = i === this.selectedCardIndex;
             const transform = `rotate(${angleDeg}deg) translateY(${isSelected ? '-10%' : '0'})`;

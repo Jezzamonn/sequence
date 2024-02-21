@@ -17,11 +17,12 @@ export class DeckAndDiscardElement extends LitElement {
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+                container-type: size;
             }
 
             .card-image {
                 max-height: 100%;
-                max-width: 100%;
+                max-height: 20cqh;
                 object-fit: contain;
             }
 
