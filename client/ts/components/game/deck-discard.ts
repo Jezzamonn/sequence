@@ -5,7 +5,7 @@ import {
     Suit,
     cardAssetName,
     cardBackAssetName,
-} from '../../../common/ts/cards';
+} from '../../../../common/ts/cards';
 
 @customElement('deck-discard')
 export class DeckAndDiscardElement extends LitElement {

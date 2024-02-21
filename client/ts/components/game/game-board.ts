@@ -4,10 +4,10 @@ import {
     boardLayout,
     boardSize,
     makeEmptyPlacedTokens,
-} from '../../../common/ts/board';
-import { Rank, Suit } from '../../../common/ts/cards';
-import { Point } from '../../../common/ts/point';
-import { BoardClickEventParams } from './events';
+} from '../../../../common/ts/board';
+import { Rank, Suit } from '../../../../common/ts/cards';
+import { Point } from '../../../../common/ts/point';
+import { BoardClickEventParams } from '../events';
 
 @customElement('game-board')
 export class GameBoardElement extends LitElement {

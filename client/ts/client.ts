@@ -1,16 +1,16 @@
-import './components/game-board';
-import './components/board-card';
-import './components/player-hand';
-import './components/deck-discard';
+import './components/game/game-board';
+import './components/game/board-card';
+import './components/game/player-hand';
+import './components/game/deck-discard';
 import './components/game-notification';
-import './components/game-display';
+import './components/game/game-display';
 
 import { PlayerVisibleGameState } from '../../common/ts/game';
 import { Card } from '../../common/ts/cards';
 import { Point } from '../../common/ts/point';
 import { wait } from '../../common/ts/util';
 import { Connection } from './connection';
-import { GameDisplay } from './components/game-display';
+import { GameDisplay } from './components/game/game-display';
 import { MakeMoveEventParams } from './components/events';
 
 console.log('Client <( Hello World! )');

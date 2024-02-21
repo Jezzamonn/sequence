@@ -6,11 +6,11 @@ import {
     countSequences,
     getMovesForCard,
     makeEmptyPlacedTokens,
-} from '../../../common/ts/board';
-import { Point } from '../../../common/ts/point';
-import { BoardClickEventParams, HandClickEventParams, MakeMoveEventParams } from './events';
-import { Card } from '../../../common/ts/cards';
-import { PlayerVisibleGameState } from '../../../common/ts/game';
+} from '../../../../common/ts/board';
+import { Point } from '../../../../common/ts/point';
+import { BoardClickEventParams, HandClickEventParams, MakeMoveEventParams } from '../events';
+import { Card } from '../../../../common/ts/cards';
+import { PlayerVisibleGameState } from '../../../../common/ts/game';
 
 // The board, player hand and discard pile.
 @customElement('game-display')

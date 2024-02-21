@@ -6,9 +6,9 @@ import {
     cardToShortString,
     Rank,
     Suit,
-} from '../../../common/ts/cards';
-import { lerp } from '../../../common/ts/util';
-import { HandClickEventParams } from './events';
+} from '../../../../common/ts/cards';
+import { lerp } from '../../../../common/ts/util';
+import { HandClickEventParams } from '../events';
 
 @customElement('player-hand')
 export class PlayerHandElement extends LitElement {

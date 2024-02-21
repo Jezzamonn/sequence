@@ -6,7 +6,7 @@ import {
     Rank,
     Suit,
     suitToSymbol,
-} from '../../../common/ts/cards';
+} from '../../../../common/ts/cards';
 
 @customElement('board-card')
 export class BoardCardElement extends LitElement {
