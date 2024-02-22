@@ -1,10 +1,17 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('name-entry')
 export class NameEntry extends LitElement {
-    @property({ type: String }) name = '';
-    @property({ type: String }) color = '';
+    @property({ type: String })
+    accessor name = '';
+    @property({ type: String })
+    accessor color = '';
+
+    @state()
+    private _nameValid = true;
+    @state()
+    private _colorValid = true;
 
     static styles = css`
         :host {
@@ -41,6 +48,10 @@ export class NameEntry extends LitElement {
             margin-bottom: 7px;
         }
 
+        .label.invalid {
+            color: red;
+        }
+
         .input {
             display: block;
             margin: auto;
@@ -64,7 +75,11 @@ export class NameEntry extends LitElement {
     render() {
         return html`
             <h1>Online Sequence</h1>
-            <label class="label" for="name-input">What is your name:</label>
+            <label
+                class="label ${this._nameValid ? '' : 'invalid'}"
+                for="name-input"
+                >What is your name:</label
+            >
             <input
                 id="name-input"
                 class="input"
@@ -79,7 +94,7 @@ export class NameEntry extends LitElement {
                 type="text"
                 placeholder="To play sequence"
             />
-            <label class="label" for="color-select"
+            <label class="label ${this._colorValid ? '' : 'invalid'}"
                 >What is your favourite color:</label
             >
             <div class="color-row">
@@ -89,17 +104,21 @@ export class NameEntry extends LitElement {
                     @click=${() => this.handleColorChange('red')}
                 ></button>
                 <button
-                    class="color-icon ${this.color === 'green' ? 'selected' : ''}"
+                    class="color-icon ${this.color === 'green'
+                        ? 'selected'
+                        : ''}"
                     style="background-color: green"
                     @click=${() => this.handleColorChange('green')}
                 ></button>
                 <button
-                    class="color-icon ${this.color === 'blue' ? 'selected' : ''}"
+                    class="color-icon ${this.color === 'blue'
+                        ? 'selected'
+                        : ''}"
                     style="background-color: blue"
                     @click=${() => this.handleColorChange('blue')}
                 ></button>
             </div>
-            <hr>
+            <hr />
             <button class="start-button" @click=${this.handleStartGame}>
                 Start Game
             </button>
@@ -121,7 +140,29 @@ export class NameEntry extends LitElement {
         );
     }
 
-    handleStartGame() {
-        this.dispatchEvent(new CustomEvent('start-game'));
+    validateInput() {
+        this._nameValid = this.name.trim() !== '';
+        this._colorValid = this.color.trim() !== '';
     }
+
+    handleStartGame() {
+        this.validateInput();
+        if (!this._nameValid || !this._colorValid) {
+            return;
+        }
+
+        this.dispatchEvent(
+            new CustomEvent<StartGameEventParams>('start-game', {
+                detail: {
+                    name: this.name,
+                    color: this.color,
+                },
+            })
+        );
+    }
+}
+
+export interface StartGameEventParams {
+    name: string;
+    color: string;
 }
