@@ -4,63 +4,66 @@ import './components/game/player-hand';
 import './components/game/deck-discard';
 import './components/game-notification';
 import './components/game/game-display';
+import './components/name-entry';
 
-import { PlayerVisibleGameState } from '../../common/ts/game';
 import { Card } from '../../common/ts/cards';
 import { Point } from '../../common/ts/point';
 import { wait } from '../../common/ts/util';
 import { Connection } from './connection';
 import { GameDisplay } from './components/game/game-display';
 import { MakeMoveEventParams } from './components/events';
+import { NameEntry } from './components/name-entry';
 
 console.log('Client <( Hello World! )');
 
-const gameElem = document.querySelector('game-display') as GameDisplay;
-const notificationContainer = document.querySelector(
-    '.notification-container'
-)!;
+const nameEntry = document.querySelector('name-entry') as NameEntry;
 
-// Just start up the connection straight away.
-const connection = new Connection();
+// const gameElem = document.querySelector('game-display') as GameDisplay;
+// const notificationContainer = document.querySelector(
+//     '.notification-container'
+// )!;
 
-connection.onGameState = (state) => {
-    console.log('Received game state:', state);
-    gameElem.gameState = state;
+// // Just start up the connection straight away.
+// const connection = new Connection();
 
-    if (state.gameWinner != undefined) {
-        console.log('Game winner:', state.gameWinner);
-        notify(`${state.gameWinner} wins!`);
-    }
-};
+// connection.onGameState = (state) => {
+//     console.log('Received game state:', state);
+//     gameElem.gameState = state;
 
-gameElem.addEventListener(
-    'make-move',
-    (event: CustomEvent<MakeMoveEventParams>) => {
-        makeMove(event.detail.card, event.detail.position);
-    }
-);
+//     if (state.gameWinner != undefined) {
+//         console.log('Game winner:', state.gameWinner);
+//         notify(`${state.gameWinner} wins!`);
+//     }
+// };
 
-function notify(message: string) {
-    const notification = document.createElement('game-notification');
-    notification.innerText = message;
-    notificationContainer.appendChild(notification);
-}
+// gameElem.addEventListener(
+//     'make-move',
+//     (event: CustomEvent<MakeMoveEventParams>) => {
+//         makeMove(event.detail.card, event.detail.position);
+//     }
+// );
 
-async function makeMove(card: Card, position: Point | undefined) {
-    if (connection.requestInProgress) {
-        return;
-    }
+// function notify(message: string) {
+//     const notification = document.createElement('game-notification');
+//     notification.innerText = message;
+//     notificationContainer.appendChild(notification);
+// }
 
-    const moveResult = await connection.makeMove(card, position);
-    gameElem.selectedCard = undefined;
-    gameElem.selectedCardIndex = undefined;
+// async function makeMove(card: Card, position: Point | undefined) {
+//     if (connection.requestInProgress) {
+//         return;
+//     }
 
-    if (moveResult.error != undefined) {
-        notify(moveResult.error);
-        return;
-    }
-}
+//     const moveResult = await connection.makeMove(card, position);
+//     gameElem.selectedCard = undefined;
+//     gameElem.selectedCardIndex = undefined;
 
-wait(1).then(() => {
-    connection.startGame(4, 2);
-});
+//     if (moveResult.error != undefined) {
+//         notify(moveResult.error);
+//         return;
+//     }
+// }
+
+// wait(1).then(() => {
+//     connection.startGame(4, 2);
+// });
