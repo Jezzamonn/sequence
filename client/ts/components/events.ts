@@ -27,5 +27,7 @@ declare global {
         'board-position-click': CustomEvent<BoardClickEventParams>;
         'discard-click': CustomEvent<MouseEvent>;
         'make-move': CustomEvent<MakeMoveEventParams>;
+        'notify': CustomEvent<string>;
     }
 }
+

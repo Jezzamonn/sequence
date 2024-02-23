@@ -8,9 +8,14 @@ import {
     makeEmptyPlacedTokens,
 } from '../../../../common/ts/board';
 import { Point } from '../../../../common/ts/point';
-import { BoardClickEventParams, HandClickEventParams, MakeMoveEventParams } from '../events';
+import {
+    BoardClickEventParams,
+    HandClickEventParams,
+    MakeMoveEventParams,
+} from '../events';
 import { Card } from '../../../../common/ts/cards';
 import { PlayerVisibleGameState } from '../../../../common/ts/game';
+import { connection } from '../../connection';
 
 // The board, player hand and discard pile.
 @customElement('game-display')
@@ -49,10 +54,10 @@ export class GameDisplay extends LitElement {
     @property({ type: Object })
     accessor gameState: PlayerVisibleGameState | undefined = undefined;
 
-    @property({ type: String})
+    @property({ type: String })
     accessor selectedCard: Card | undefined = undefined;
 
-    @property({ type: String})
+    @property({ type: String })
     accessor selectedCardIndex: number | undefined = undefined;
 
     constructor() {
@@ -63,11 +68,15 @@ export class GameDisplay extends LitElement {
     connectedCallback() {
         super.connectedCallback();
         window.addEventListener('click', this.handleWindowClick);
+        connection.onGameState = (state) => {
+            this.gameState = state;
+        };
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
         window.removeEventListener('click', this.handleWindowClick);
+        connection.onGameState = undefined;
     }
 
     private handleWindowClick() {
@@ -91,21 +100,18 @@ export class GameDisplay extends LitElement {
                 this.gameState.players[this.gameState.playerIndex].color,
                 this.selectedCard
             );
-            canDiscard = validPositions.length === 0 && !this.gameState.lastActionWasDiscard;
+            canDiscard =
+                validPositions.length === 0 &&
+                !this.gameState.lastActionWasDiscard;
         }
 
         return html`
             <game-board
-                @board-position-click=${(e: CustomEvent<BoardClickEventParams>) => {
+                @board-position-click=${(
+                    e: CustomEvent<BoardClickEventParams>
+                ) => {
                     if (this.selectedCard != undefined) {
-                        this.dispatchEvent(
-                            new CustomEvent<MakeMoveEventParams>('make-move', {
-                                detail: {
-                                    card: this.selectedCard,
-                                    position: e.detail.position,
-                                },
-                            })
-                        );
+                        this.makeMove(this.selectedCard, e.detail.position);
                     }
                     e.detail.sourceEvent.stopPropagation();
                 }}
@@ -125,11 +131,7 @@ export class GameDisplay extends LitElement {
             <deck-discard
                 @discard-click=${(e: CustomEvent<MouseEvent>) => {
                     if (this.selectedCard != undefined) {
-                        this.dispatchEvent(
-                            new CustomEvent<MakeMoveEventParams>('make-move', {
-                                detail: { card: this.selectedCard, position: undefined },
-                            })
-                        );
+                        this.makeMove(this.selectedCard, undefined);
                     }
                     e.detail.stopPropagation();
                 }}
@@ -139,5 +141,24 @@ export class GameDisplay extends LitElement {
                 .suit=${this.gameState?.lastCardPlayed?.suit ?? 'Joker'}
             ></deck-discard>
         `;
+    }
+
+    async makeMove(card: Card, position: Point | undefined) {
+        if (connection.requestInProgress) {
+            return;
+        }
+
+        const moveResult = await connection.makeMove(card, position);
+        if (moveResult.error != undefined) {
+            this.dispatchEvent(
+                new CustomEvent<string>('notify', {
+                    detail: moveResult.error,
+                })
+            );
+            return;
+        }
+
+        this.selectedCard = undefined;
+        this.selectedCardIndex = undefined;
     }
 }
