@@ -27,12 +27,6 @@ let aiPlayers: (AIInterface | undefined)[] = [];
 io.on('connection', async (socket: Socket) => {
     console.log('A client has connected');
 
-    if (gameState !== 'joining') {
-        socket.emit('error', 'Game already started');
-        socket.disconnect();
-        return;
-    }
-
     // For the moment, just have one player.
     const playerIndex = 0;
     players[0] = socket;

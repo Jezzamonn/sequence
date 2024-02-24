@@ -1,6 +1,6 @@
 import { LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { StartGameEventParams } from './name-entry';
+import { StartGameEventParams } from './joining/name-entry';
 import { connection } from '../connection';
 
 @customElement('root-component')

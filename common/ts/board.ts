@@ -10,8 +10,8 @@ import {
 import { Point, Points } from './point';
 
 // TODO: Deal with color blindness.
-export type Color = 'Blue' | 'Green' | 'Red';
-export const allColors: Color[] = ['Blue', 'Green', 'Red'];
+export type Color = 'blue' | 'green' | 'red';
+export const allColors: Color[] = ['blue', 'green', 'red'];
 export type Token = Color | undefined;
 
 export const boardSize = 10;
@@ -127,13 +127,13 @@ export function boardToString(placedTokens: Token[][]): string {
             const cardString = cardToShortString(card);
             let highlightColor = '';
             switch (token) {
-                case 'Blue':
+                case 'blue':
                     highlightColor = '\x1b[44m';
                     break;
-                case 'Green':
+                case 'green':
                     highlightColor = '\x1b[42m';
                     break;
-                case 'Red':
+                case 'red':
                     highlightColor = '\x1b[41m';
                     break;
             }

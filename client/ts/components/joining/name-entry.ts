@@ -20,24 +20,24 @@ export class NameEntry extends LitElement {
             padding: 20px 50px;
         }
 
-        .color-row {
+        .token-row {
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .color-icon {
+        .token-button {
             width: 50px;
             height: 50px;
-            border-radius: 50%;
-            display: inline-block;
             cursor: pointer;
             border: none;
             margin: 0 5px;
+            padding: 0;
+            background: none;
         }
 
-        .color-icon.selected {
-            border: 3px solid black;
+        .token-button.selected {
+            outline: 3px solid black;
             transform: scale(1.1);
         }
 
@@ -97,26 +97,30 @@ export class NameEntry extends LitElement {
             <label class="label ${this._colorValid ? '' : 'invalid'}"
                 >What is your favourite color:</label
             >
-            <div class="color-row">
+            <div class="token-row">
                 <button
-                    class="color-icon ${this.color === 'red' ? 'selected' : ''}"
-                    style="background-color: red"
-                    @click=${() => this.handleColorChange('red')}
-                ></button>
-                <button
-                    class="color-icon ${this.color === 'green'
+                    class="token-button ${this.color === 'blue'
                         ? 'selected'
                         : ''}"
-                    style="background-color: green"
-                    @click=${() => this.handleColorChange('green')}
-                ></button>
-                <button
-                    class="color-icon ${this.color === 'blue'
-                        ? 'selected'
-                        : ''}"
-                    style="background-color: blue"
                     @click=${() => this.handleColorChange('blue')}
-                ></button>
+                >
+                    <token-marker color="blue"></token-marker>
+                </button>
+
+                <button
+                    class="token-button ${this.color === 'green'
+                        ? 'selected'
+                        : ''}"
+                    @click=${() => this.handleColorChange('green')}
+                >
+                    <token-marker color="green"></token-marker>
+                </button>
+                <button
+                    class="token-button ${this.color === 'red' ? 'selected' : ''}"
+                    @click=${() => this.handleColorChange('red')}
+                >
+                    <token-marker color="red"></token-marker>
+                </button>
             </div>
             <hr />
             <button class="start-button" @click=${this.handleStartGame}>
