@@ -1,21 +1,17 @@
-import { css, html, LitElement, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, LitElement } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import {
-    boardLayout,
-    boardSize,
     countSequences,
-    getMovesForCard,
-    makeEmptyPlacedTokens,
+    getMovesForCard
 } from '../../../../common/ts/board';
-import { Point } from '../../../../common/ts/point';
-import {
-    BoardClickEventParams,
-    HandClickEventParams,
-    MakeMoveEventParams,
-} from '../events';
 import { Card } from '../../../../common/ts/cards';
 import { PlayerVisibleGameState } from '../../../../common/ts/game';
+import { Point } from '../../../../common/ts/point';
 import { connection } from '../../connection';
+import {
+    BoardClickEventParams,
+    HandClickEventParams
+} from '../events';
 
 // The board, player hand and discard pile.
 @customElement('game-display')
@@ -63,20 +59,6 @@ export class GameDisplay extends LitElement {
     constructor() {
         super();
         this.handleWindowClick = this.handleWindowClick.bind(this);
-    }
-
-    connectedCallback() {
-        super.connectedCallback();
-        window.addEventListener('click', this.handleWindowClick);
-        connection.onGameState = (state) => {
-            this.gameState = state;
-        };
-    }
-
-    disconnectedCallback() {
-        super.disconnectedCallback();
-        window.removeEventListener('click', this.handleWindowClick);
-        connection.onGameState = undefined;
     }
 
     private handleWindowClick() {

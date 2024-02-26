@@ -20,7 +20,7 @@ import {
 } from './cards';
 import {
     handSizes,
-    validatePlayers,
+    validateNumPlayers,
     numSequencesToWin,
     Player,
 } from './players';
@@ -62,7 +62,7 @@ export class GameManager {
     random: () => number;
 
     constructor(numPlayers: number, numTeams: number, random: () => number) {
-        validatePlayers(numPlayers, numTeams);
+        validateNumPlayers(numPlayers, numTeams);
 
         this.random = random;
 
@@ -72,7 +72,7 @@ export class GameManager {
         const hands: Card[][] = [];
         const handSize = handSizes.get(numPlayers)!;
 
-        const players = [];
+        const players: Player[] = [];
 
         for (let i = 0; i < numPlayers; i++) {
             // To be consistent, we use the end of the deck for each player.

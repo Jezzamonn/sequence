@@ -1,12 +1,21 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { connection } from '../../connection';
+import { Color } from '../../../../common/ts/board';
 
 @customElement('name-entry')
 export class NameEntry extends LitElement {
     @property({ type: String })
     accessor name = '';
+
     @property({ type: String })
-    accessor color = '';
+    accessor quest = '';
+
+    @property({ type: String })
+    accessor color: Color | undefined;
+
+    @state()
+    private _joined = false;
 
     @state()
     private _nameValid = true;
@@ -64,7 +73,7 @@ export class NameEntry extends LitElement {
             background: #00000033;
         }
 
-        .start-button {
+        .large-button {
             display: block;
             margin: 20px auto;
             padding: 10px 20px;
@@ -85,7 +94,10 @@ export class NameEntry extends LitElement {
                 class="input"
                 type="text"
                 .value=${this.name}
-                @input=${this.handleNameChange}
+                @input=${(event: Event) => {
+                    const input = event.target as HTMLInputElement;
+                    this.name = input.value;
+                }}
             />
             <label class="label" for="quest-input">What is your quest:</label>
             <input
@@ -93,6 +105,11 @@ export class NameEntry extends LitElement {
                 class="input"
                 type="text"
                 placeholder="To play sequence"
+                .value=${this.quest}
+                @input=${(event: Event) => {
+                    const input = event.target as HTMLInputElement;
+                    this.quest = input.value;
+                }}
             />
             <label class="label ${this._colorValid ? '' : 'invalid'}"
                 >What is your favourite color:</label
@@ -102,7 +119,7 @@ export class NameEntry extends LitElement {
                     class="token-button ${this.color === 'blue'
                         ? 'selected'
                         : ''}"
-                    @click=${() => this.handleColorChange('blue')}
+                    @click=${() => (this.color = 'blue')}
                 >
                     <token-marker color="blue"></token-marker>
                 </button>
@@ -111,58 +128,82 @@ export class NameEntry extends LitElement {
                     class="token-button ${this.color === 'green'
                         ? 'selected'
                         : ''}"
-                    @click=${() => this.handleColorChange('green')}
+                    @click=${() => (this.color = 'green')}
                 >
                     <token-marker color="green"></token-marker>
                 </button>
                 <button
-                    class="token-button ${this.color === 'red' ? 'selected' : ''}"
-                    @click=${() => this.handleColorChange('red')}
+                    class="token-button ${this.color === 'red'
+                        ? 'selected'
+                        : ''}"
+                    @click=${() => (this.color = 'red')}
                 >
                     <token-marker color="red"></token-marker>
                 </button>
             </div>
             <hr />
-            <button class="start-button" @click=${this.handleStartGame}>
-                Start Game
+            <button
+                class="large-button"
+                .disabled=${this._joined}
+                @click=${this.handleJoinGame}
+            >
+                Join
+            </button>
+            <button
+                class="large-button"
+                .disabled=${!this._joined}
+                @click=${this.handleStartGame}>
+                Start
             </button>
         `;
     }
 
-    handleNameChange(event: Event) {
-        const input = event.target as HTMLInputElement;
-        this.name = input.value;
-        this.dispatchEvent(
-            new CustomEvent('name-change', { detail: this.name })
-        );
-    }
-
-    handleColorChange(color: string) {
-        this.color = color;
-        this.dispatchEvent(
-            new CustomEvent('color-change', { detail: this.color })
-        );
-    }
-
     validateInput() {
         this._nameValid = this.name.trim() !== '';
-        this._colorValid = this.color.trim() !== '';
+        this._colorValid = this.color !== undefined;
     }
 
-    handleStartGame() {
-        this.validateInput();
-        if (!this._nameValid || !this._colorValid) {
+    async handleJoinGame() {
+        if (this._joined) {
             return;
         }
 
-        this.dispatchEvent(
-            new CustomEvent<StartGameEventParams>('start-game', {
-                detail: {
-                    name: this.name,
-                    color: this.color,
-                },
-            })
-        );
+        this.validateInput();
+        if (this.name.trim() === '' || this.color === undefined) {
+            return;
+        }
+
+        const result = await connection.join({
+            name: this.name,
+            quest: this.quest.trim() == '' ? undefined : this.quest.trim(),
+            color: this.color,
+        });
+        if (result.error != undefined) {
+            this.dispatchEvent(
+                new CustomEvent<string>('notify', {
+                    detail: result.error,
+                })
+            );
+            return;
+        }
+
+        this._joined = true;
+    }
+
+    async handleStartGame() {
+        if (!this._joined) {
+            return;
+        }
+
+        const result = await connection.startGame();
+        if (result.error != undefined) {
+            this.dispatchEvent(
+                new CustomEvent<string>('notify', {
+                    detail: result.error,
+                })
+            );
+            return;
+        }
     }
 }
 

@@ -1,9 +1,12 @@
-export interface MoveResult {
+export interface CommandResult {
     error?: string;
 }
 
 export const Command = {
-    startGame: 'startGame',
+    join: 'join',
+    start: 'start',
     makeMove: 'makeMove',
     gameState: 'gameState',
 };
+
+export type CommandCallback = (result: CommandResult) => void;
