@@ -19,10 +19,10 @@ import {
     isOneEyedJack,
 } from './cards';
 import {
-    handSizes,
-    validateNumPlayers,
-    numSequencesToWin,
     Player,
+    handSizes,
+    numSequencesToWin,
+    validateNumPlayers,
 } from './players';
 import { Point } from './point';
 import { shuffle } from './util';

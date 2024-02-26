@@ -1,7 +1,7 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { connection } from '../../connection';
 import { Color } from '../../../../common/ts/board';
+import { connection } from '../../connection';
 
 @customElement('name-entry')
 export class NameEntry extends LitElement {

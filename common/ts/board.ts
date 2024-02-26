@@ -4,8 +4,7 @@ import {
     allSuits,
     cardToShortString,
     cardsAreEqual,
-    isOneEyedJack,
-    suitToColor,
+    isOneEyedJack
 } from './cards';
 import { Point, Points } from './point';
 

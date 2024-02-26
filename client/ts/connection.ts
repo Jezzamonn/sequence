@@ -1,9 +1,9 @@
 import { Socket, io } from 'socket.io-client';
 import { Card, cardToDescription } from '../../common/ts/cards';
-import { Point, Points } from '../../common/ts/point';
-import { Command, CommandResult } from '../../common/ts/interface/interface';
 import { PlayerVisibleGameState } from '../../common/ts/game';
+import { Command, CommandResult } from '../../common/ts/interface/interface';
 import { Player } from '../../common/ts/players';
+import { Point, Points } from '../../common/ts/point';
 
 export class Connection {
     private socket: Socket;

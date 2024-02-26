@@ -1,5 +1,5 @@
+import { LitElement, css, html } from "lit";
 import { customElement } from "lit/decorators.js";
-import { html, LitElement, css } from "lit";
 
 @customElement("game-notification")
 export class GameNotification extends LitElement {

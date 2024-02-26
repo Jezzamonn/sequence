@@ -2,10 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
     Card,
-    cardAssetName,
-    cardToShortString,
-    Rank,
-    Suit,
+    cardAssetName
 } from '../../../../common/ts/cards';
 import { lerp } from '../../../../common/ts/util';
 import { HandClickEventParams } from '../events';

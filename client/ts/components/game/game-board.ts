@@ -2,10 +2,8 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
     boardLayout,
-    boardSize,
-    makeEmptyPlacedTokens,
+    boardSize
 } from '../../../../common/ts/board';
-import { Rank, Suit } from '../../../../common/ts/cards';
 import { Point } from '../../../../common/ts/point';
 import { BoardClickEventParams } from '../events';
 

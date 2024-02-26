@@ -1,13 +1,13 @@
 import { Socket } from 'socket.io';
-import { Player, validatePlayerColors } from '../common/ts/players';
+import { Card } from '../common/ts/cards';
 import {
     Command,
     CommandCallback,
     CommandResult,
 } from '../common/ts/interface/interface';
-import { logIfError } from './server-common';
-import { Card } from '../common/ts/cards';
+import { Player, validatePlayerColors } from '../common/ts/players';
 import { Point } from '../common/ts/point';
+import { logIfError } from './server-common';
 
 export class ServerPlayerManager {
     // Map of player name to player.

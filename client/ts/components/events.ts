@@ -2,7 +2,7 @@ import { Card } from '../../../common/ts/cards';
 import { Point } from '../../../common/ts/point';
 
 // Make this a module, needed for the global augmentation to work.
-export {};
+export { };
 
 export interface HandClickEventParams {
     card: Card;
