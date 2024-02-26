@@ -37,19 +37,19 @@ describe('isValidPlacement', function () {
         const pointDesc = Points.toString(position);
         it(`with empty board, should allow ${cardDesc} at (${pointDesc})`, function () {
             expect(
-                isValidPlacement(emptyPlacedTokens, 0, 'Red', card, position)
+                isValidPlacement(emptyPlacedTokens, 0, 'red', card, position)
             ).toBe(true);
         });
     }
 
     it('should not allow placement on top of existing token', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[4][4] = 'Red';
+        placedTokens[4][4] = 'red';
         expect(
             isValidPlacement(
                 placedTokens,
                 0,
-                'Red',
+                'red',
                 { rank: '5', suit: 'Hearts' },
                 { x: 4, y: 4 }
             )
@@ -72,7 +72,7 @@ describe('isValidPlacement', function () {
                 isValidPlacement(
                     emptyPlacedTokens,
                     0,
-                    'Red',
+                    'red',
                     { rank: 'J', suit: 'Diamonds' },
                     position
                 )
@@ -82,12 +82,12 @@ describe('isValidPlacement', function () {
 
     it('should not allow a two-eyed jack to be placed on top of an existing token', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[4][4] = 'Red';
+        placedTokens[4][4] = 'red';
         expect(
             isValidPlacement(
                 placedTokens,
                 0,
-                'Red',
+                'red',
                 { rank: 'J', suit: 'Diamonds' },
                 { x: 4, y: 4 }
             )
@@ -108,7 +108,7 @@ describe('isValidPlacement', function () {
                 isValidPlacement(
                     emptyPlacedTokens,
                     0,
-                    'Red',
+                    'red',
                     { rank: 'J', suit: 'Diamonds' },
                     position
                 )
@@ -121,7 +121,7 @@ describe('isValidPlacement', function () {
             isValidPlacement(
                 emptyPlacedTokens,
                 0,
-                'Red',
+                'red',
                 { rank: 'J', suit: 'Diamonds' },
                 { x: 0, y: 0 }
             )
@@ -133,7 +133,7 @@ describe('isValidPlacement', function () {
             isValidPlacement(
                 emptyPlacedTokens,
                 0,
-                'Red',
+                'red',
                 { rank: 'J', suit: 'Hearts' },
                 { x: 4, y: 4 }
             )
@@ -142,12 +142,12 @@ describe('isValidPlacement', function () {
 
     it('should allow a one-eyed jack to remove a token of another color', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[4][4] = 'Green';
+        placedTokens[4][4] = 'green';
         expect(
             isValidPlacement(
                 placedTokens,
                 0,
-                'Red',
+                'red',
                 { rank: 'J', suit: 'Hearts' },
                 { x: 4, y: 4 }
             )
@@ -156,12 +156,12 @@ describe('isValidPlacement', function () {
 
     it('should not allow a one-eyed jack to remove a token of the same color', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[4][4] = 'Red';
+        placedTokens[4][4] = 'red';
         expect(
             isValidPlacement(
                 placedTokens,
                 0,
-                'Red',
+                'red',
                 { rank: 'J', suit: 'Hearts' },
                 { x: 4, y: 4 }
             )
@@ -177,140 +177,140 @@ describe('countSequences', function () {
 
     it('should count a horizontal sequence', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[0][1] = 'Red';
-        placedTokens[1][1] = 'Red';
-        placedTokens[2][1] = 'Red';
-        placedTokens[3][1] = 'Red';
-        placedTokens[4][1] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1]]));
+        placedTokens[0][1] = 'red';
+        placedTokens[1][1] = 'red';
+        placedTokens[2][1] = 'red';
+        placedTokens[3][1] = 'red';
+        placedTokens[4][1] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
     it('should count a vertical sequence', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[1][0] = 'Red';
-        placedTokens[1][1] = 'Red';
-        placedTokens[1][2] = 'Red';
-        placedTokens[1][3] = 'Red';
-        placedTokens[1][4] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1]]));
+        placedTokens[1][0] = 'red';
+        placedTokens[1][1] = 'red';
+        placedTokens[1][2] = 'red';
+        placedTokens[1][3] = 'red';
+        placedTokens[1][4] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
     it('should count an increasing diagonal sequence', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[2][2] = 'Red';
-        placedTokens[3][3] = 'Red';
-        placedTokens[4][4] = 'Red';
-        placedTokens[5][5] = 'Red';
-        placedTokens[6][6] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1]]));
+        placedTokens[2][2] = 'red';
+        placedTokens[3][3] = 'red';
+        placedTokens[4][4] = 'red';
+        placedTokens[5][5] = 'red';
+        placedTokens[6][6] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
     it('should count a decreasing diagonal sequence', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[6][2] = 'Red';
-        placedTokens[5][3] = 'Red';
-        placedTokens[4][4] = 'Red';
-        placedTokens[3][5] = 'Red';
-        placedTokens[2][6] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1]]));
+        placedTokens[6][2] = 'red';
+        placedTokens[5][3] = 'red';
+        placedTokens[4][4] = 'red';
+        placedTokens[3][5] = 'red';
+        placedTokens[2][6] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
     it('should count multiple sequences of the same color', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[0][1] = 'Red';
-        placedTokens[1][1] = 'Red';
-        placedTokens[2][1] = 'Red';
-        placedTokens[3][1] = 'Red';
-        placedTokens[4][1] = 'Red';
+        placedTokens[0][1] = 'red';
+        placedTokens[1][1] = 'red';
+        placedTokens[2][1] = 'red';
+        placedTokens[3][1] = 'red';
+        placedTokens[4][1] = 'red';
 
-        placedTokens[0][3] = 'Red';
-        placedTokens[1][3] = 'Red';
-        placedTokens[2][3] = 'Red';
-        placedTokens[3][3] = 'Red';
-        placedTokens[4][3] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 2]]));
+        placedTokens[0][3] = 'red';
+        placedTokens[1][3] = 'red';
+        placedTokens[2][3] = 'red';
+        placedTokens[3][3] = 'red';
+        placedTokens[4][3] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 2]]));
     });
 
     it('should count multiple sequences of different colors', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[0][1] = 'Red';
-        placedTokens[1][1] = 'Red';
-        placedTokens[2][1] = 'Red';
-        placedTokens[3][1] = 'Red';
-        placedTokens[4][1] = 'Red';
+        placedTokens[0][1] = 'red';
+        placedTokens[1][1] = 'red';
+        placedTokens[2][1] = 'red';
+        placedTokens[3][1] = 'red';
+        placedTokens[4][1] = 'red';
 
-        placedTokens[0][3] = 'Green';
-        placedTokens[1][3] = 'Green';
-        placedTokens[2][3] = 'Green';
-        placedTokens[3][3] = 'Green';
-        placedTokens[4][3] = 'Green';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1], ['Green', 1]]));
+        placedTokens[0][3] = 'green';
+        placedTokens[1][3] = 'green';
+        placedTokens[2][3] = 'green';
+        placedTokens[3][3] = 'green';
+        placedTokens[4][3] = 'green';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1], ['green', 1]]));
     });
 
     it('should count a horizontal sequence that uses wilds', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[1][0] = 'Red';
-        placedTokens[2][0] = 'Red';
-        placedTokens[3][0] = 'Red';
-        placedTokens[4][0] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1]]));
+        placedTokens[1][0] = 'red';
+        placedTokens[2][0] = 'red';
+        placedTokens[3][0] = 'red';
+        placedTokens[4][0] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
     it('should count a vertical sequence that uses wilds', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[0][1] = 'Red';
-        placedTokens[0][2] = 'Red';
-        placedTokens[0][3] = 'Red';
-        placedTokens[0][4] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1]]));
+        placedTokens[0][1] = 'red';
+        placedTokens[0][2] = 'red';
+        placedTokens[0][3] = 'red';
+        placedTokens[0][4] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
     it('should count an increasing diagonal sequence that uses wilds', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[1][1] = 'Red';
-        placedTokens[2][2] = 'Red';
-        placedTokens[3][3] = 'Red';
-        placedTokens[4][4] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1]]));
+        placedTokens[1][1] = 'red';
+        placedTokens[2][2] = 'red';
+        placedTokens[3][3] = 'red';
+        placedTokens[4][4] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
     it('should count a decreasing diagonal sequence that uses wilds', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[8][1] = 'Red';
-        placedTokens[7][2] = 'Red';
-        placedTokens[6][3] = 'Red';
-        placedTokens[5][4] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 1]]));
+        placedTokens[8][1] = 'red';
+        placedTokens[7][2] = 'red';
+        placedTokens[6][3] = 'red';
+        placedTokens[5][4] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
     it('should count sequences that intersect', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[2][1] = 'Red';
-        placedTokens[3][2] = 'Red';
-        placedTokens[4][3] = 'Red';
-        placedTokens[5][4] = 'Red';
-        placedTokens[6][5] = 'Red';
+        placedTokens[2][1] = 'red';
+        placedTokens[3][2] = 'red';
+        placedTokens[4][3] = 'red';
+        placedTokens[5][4] = 'red';
+        placedTokens[6][5] = 'red';
 
-        placedTokens[2][4] = 'Red';
-        placedTokens[3][4] = 'Red';
-        placedTokens[4][4] = 'Red';
+        placedTokens[2][4] = 'red';
+        placedTokens[3][4] = 'red';
+        placedTokens[4][4] = 'red';
         // 5, 4 handled above
-        placedTokens[6][4] = 'Red';
+        placedTokens[6][4] = 'red';
 
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 2]]));
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 2]]));
     });
 
     it('should count the line 9 tile sequence as two', function () {
         const placedTokens = makeEmptyPlacedTokens();
-        placedTokens[0][2] = 'Red';
-        placedTokens[1][2] = 'Red';
-        placedTokens[2][2] = 'Red';
-        placedTokens[3][2] = 'Red';
-        placedTokens[4][2] = 'Red';
-        placedTokens[5][2] = 'Red';
-        placedTokens[6][2] = 'Red';
-        placedTokens[7][2] = 'Red';
-        placedTokens[8][2] = 'Red';
-        expect(countSequences(placedTokens)).toEqual(new Map([['Red', 2]]));
+        placedTokens[0][2] = 'red';
+        placedTokens[1][2] = 'red';
+        placedTokens[2][2] = 'red';
+        placedTokens[3][2] = 'red';
+        placedTokens[4][2] = 'red';
+        placedTokens[5][2] = 'red';
+        placedTokens[6][2] = 'red';
+        placedTokens[7][2] = 'red';
+        placedTokens[8][2] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 2]]));
     });
 });
