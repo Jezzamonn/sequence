@@ -1,17 +1,11 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import {
-    countSequences,
-    getMovesForCard
-} from '../../../../common/ts/board';
+import { countSequences, getMovesForCard } from '../../../../common/ts/board';
 import { Card } from '../../../../common/ts/cards';
 import { PlayerVisibleGameState } from '../../../../common/ts/game';
 import { Point } from '../../../../common/ts/point';
 import { connection } from '../../connection';
-import {
-    BoardClickEventParams,
-    HandClickEventParams
-} from '../events';
+import { BoardClickEventParams, HandClickEventParams } from '../events';
 
 // The board, player hand and discard pile.
 @customElement('game-display')
@@ -23,26 +17,43 @@ export class GameDisplay extends LitElement {
             :host {
                 display: grid;
                 grid-template-columns: 1fr 5fr 1fr;
-                grid-template-rows: 5fr 1fr;
+                grid-template-rows: 1fr 5fr 1fr;
                 height: 100vh;
                 width: 100vw;
+            }
+
+            .players {
+                grid-row: 1;
+                grid-column: 1 / span 3;
+
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+            }
+
+            .player {
+                min-width: 200px;
+            }
+
+            .player.active {
+                outline: 2px solid black;
             }
 
             game-board {
                 max-width: 100%;
                 max-height: 100%;
-                grid-row: 1;
+                grid-row: 2;
                 grid-column: 2;
             }
 
-            player-hand {
+            deck-and-discard {
                 grid-row: 2;
-                grid-column: 1 / span 3;
+                grid-column: 3;
             }
 
-            deck-and-discard {
-                grid-row: 1;
-                grid-column: 3;
+            player-hand {
+                grid-row: 3;
+                grid-column: 1 / span 3;
             }
         `,
     ];
@@ -87,7 +98,19 @@ export class GameDisplay extends LitElement {
                 !this.gameState.lastActionWasDiscard;
         }
 
+        const players = this.gameState?.players.map((p, i) => {
+            return html`<joined-player
+                class="player ${i === this.gameState?.nextPlayerIndex
+                    ? 'active'
+                    : ''}"
+                .name=${p.name}
+                .quest=${p.quest}
+                .color=${p.color}
+            ></joined-player>`;
+        });
+
         return html`
+            <div class="players">${players}</div>
             <game-board
                 @board-position-click=${(
                     e: CustomEvent<BoardClickEventParams>
