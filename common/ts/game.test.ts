@@ -5,23 +5,28 @@ describe('GameManager', function () {
         let gameManager: GameManager;
 
         beforeEach(function () {
-            gameManager = new GameManager(4, 2, () => 0);
+            gameManager = new GameManager([
+                {
+                    name: "Player 1",
+                    color: "red"
+                },
+                {
+                    name: "Player 2",
+                    color: "blue"
+                },
+                {
+                    name: "Player 3",
+                    color: "red"
+                },
+                {
+                    name: "Player 4",
+                    color: "blue"
+                }
+            ], () => 0);
         });
 
         it('should have 4 players', function () {
             expect(gameManager.state.players.length).toBe(4);
-        });
-
-        it('should have 2 teams', function () {
-            expect(gameManager.state.players[0].color).toBe(
-                gameManager.state.players[2].color
-            );
-            expect(gameManager.state.players[1].color).toBe(
-                gameManager.state.players[3].color
-            );
-            expect(gameManager.state.players[0].color).not.toBe(
-                gameManager.state.players[1].color
-            );
         });
 
         it('should have player 1 go first', function () {

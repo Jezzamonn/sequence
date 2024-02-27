@@ -2,13 +2,12 @@
 
 import {
     Token,
-    allColors,
     countSequences,
     getMovesForPlayer,
     isValidDiscard,
     isValidPlacement,
     makeEmptyPlacedTokens,
-    playerHasPossibleMove,
+    playerHasPossibleMove
 } from './board';
 import {
     Card,
@@ -22,7 +21,7 @@ import {
     Player,
     handSizes,
     numSequencesToWin,
-    validateNumPlayers,
+    validatePlayerColors
 } from './players';
 import { Point } from './point';
 import { shuffle } from './util';
@@ -61,8 +60,9 @@ export class GameManager {
     state: GameState;
     random: () => number;
 
-    constructor(numPlayers: number, numTeams: number, random: () => number) {
-        validateNumPlayers(numPlayers, numTeams);
+    constructor(players: Player[], random: () => number) {
+        validatePlayerColors(players.map((p) => p.color));
+        const numPlayers = players.length;
 
         this.random = random;
 
@@ -72,20 +72,10 @@ export class GameManager {
         const hands: Card[][] = [];
         const handSize = handSizes.get(numPlayers)!;
 
-        // TODO: Change this to use the passed in players.
-        const players: Player[] = [];
-
         for (let i = 0; i < numPlayers; i++) {
             // To be consistent, we use the end of the deck for each player.
             const hand = deck.splice(deck.length - handSize, handSize);
-            const color = allColors[i % numTeams];
-            const player = {
-                index: i,
-                name: `Player ${i + 1}`,
-                color,
-            };
             hand.sort(compareCards);
-            players.push(player);
             hands.push(hand);
         }
 

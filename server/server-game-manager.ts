@@ -17,8 +17,7 @@ export class ServerGameManager {
         this.io = io;
         this.players = players;
 
-        const numColors = new Set(players.map((p) => p.color)).size;
-        this.gameManager = new GameManager(players.length, numColors, Math.random);
+        this.gameManager = new GameManager(players, Math.random);
     }
 
     static fromPartialPlayers(io: Server, players: Player[], allowAI = false): ServerGameManager {
