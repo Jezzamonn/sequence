@@ -1,8 +1,10 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Color } from '../../../../common/ts/board';
+import { Color, allColors } from '../../../../common/ts/board';
 import { Player } from '../../../../common/ts/players';
 import { connection } from '../../connection';
+
+const localStoragePrefix = 'sequence';
 
 @customElement('name-entry')
 export class NameEntry extends LitElement {
@@ -86,6 +88,12 @@ export class NameEntry extends LitElement {
         }
     `;
 
+    constructor() {
+        super();
+
+        this.loadFromLocalStorage();
+    }
+
     render() {
         const joinedPlayers = this.joinedPlayers.map(
             (player) => html`
@@ -113,6 +121,7 @@ export class NameEntry extends LitElement {
                 @input=${(event: Event) => {
                     const input = event.target as HTMLInputElement;
                     this.name = input.value;
+                    this.saveToLocalStorage();
                 }}
             />
             <label class="label" for="quest-input">What is your quest:</label>
@@ -125,6 +134,7 @@ export class NameEntry extends LitElement {
                 @input=${(event: Event) => {
                     const input = event.target as HTMLInputElement;
                     this.quest = input.value;
+                    this.saveToLocalStorage();
                 }}
             />
             <label class="label ${this._colorValid ? '' : 'invalid'}"
@@ -135,7 +145,10 @@ export class NameEntry extends LitElement {
                     class="token-button ${this.color === 'blue'
                         ? 'selected'
                         : ''}"
-                    @click=${() => (this.color = 'blue')}
+                    @click=${() => {
+                        this.color = 'blue'
+                        this.saveToLocalStorage();
+                    }}
                 >
                     <token-marker color="blue"></token-marker>
                 </button>
@@ -144,7 +157,10 @@ export class NameEntry extends LitElement {
                     class="token-button ${this.color === 'green'
                         ? 'selected'
                         : ''}"
-                    @click=${() => (this.color = 'green')}
+                        @click=${() => {
+                            this.color = 'green'
+                            this.saveToLocalStorage();
+                        }}
                 >
                     <token-marker color="green"></token-marker>
                 </button>
@@ -152,7 +168,10 @@ export class NameEntry extends LitElement {
                     class="token-button ${this.color === 'red'
                         ? 'selected'
                         : ''}"
-                    @click=${() => (this.color = 'red')}
+                        @click=${() => {
+                            this.color = 'red'
+                            this.saveToLocalStorage();
+                        }}
                 >
                     <token-marker color="red"></token-marker>
                 </button>
@@ -176,6 +195,24 @@ export class NameEntry extends LitElement {
                 Start
             </button>
         `;
+    }
+
+    saveToLocalStorage() {
+        localStorage.setItem(`${localStoragePrefix}-name`, this.name);
+        localStorage.setItem(`${localStoragePrefix}-quest`, this.quest);
+        localStorage.setItem(`${localStoragePrefix}-color`, this.color ?? '');
+    }
+
+    loadFromLocalStorage() {
+        this.name = localStorage.getItem(`${localStoragePrefix}-name`) ?? '';
+        this.quest = localStorage.getItem(`${localStoragePrefix}-quest`) ?? '';
+        const savedColor = localStorage.getItem(`${localStoragePrefix}-color`);
+        if (allColors.includes(savedColor as any)) {
+            this.color = savedColor as Color;
+        }
+        else {
+            this.color = undefined;
+        }
     }
 
     validateInput() {

@@ -72,6 +72,7 @@ export class GameManager {
         const hands: Card[][] = [];
         const handSize = handSizes.get(numPlayers)!;
 
+        // TODO: Change this to use the passed in players.
         const players: Player[] = [];
 
         for (let i = 0; i < numPlayers; i++) {
