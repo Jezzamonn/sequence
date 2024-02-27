@@ -21,7 +21,7 @@ export class DeckAndDiscardElement extends LitElement {
             }
 
             .card-image {
-                max-height: 100%;
+                max-width: 100%;
                 max-height: 20cqh;
                 object-fit: contain;
             }
