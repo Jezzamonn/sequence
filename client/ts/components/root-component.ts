@@ -1,6 +1,7 @@
 import { LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { PlayerVisibleGameState } from '../../../common/ts/game';
+import { Player } from '../../../common/ts/players';
 import { connection } from '../connection';
 
 @customElement('root-component')
@@ -21,6 +22,9 @@ export class RootComponent extends LitElement {
     @state()
     private _gameState: PlayerVisibleGameState | undefined;
 
+    @state()
+    private _players: Player[] = [];
+
     constructor() {
         super();
     }
@@ -30,6 +34,9 @@ export class RootComponent extends LitElement {
         connection.onGameState = (state: PlayerVisibleGameState) => {
             this._gameState = state;
             this._state = 'game';
+        };
+        connection.onPlayersState = (players: Player[]) => {
+            this._players = players;
         };
     }
 
@@ -42,6 +49,7 @@ export class RootComponent extends LitElement {
         let mainElem: TemplateResult;
         if (this._state === 'nameEntry') {
             mainElem = html`<name-entry
+                .joinedPlayers=${this._players}
                 @notify=${(event: CustomEvent<string>) =>
                     this.notify(event.detail)}
             >

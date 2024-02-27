@@ -1,6 +1,7 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Color } from '../../../../common/ts/board';
+import { Player } from '../../../../common/ts/players';
 import { connection } from '../../connection';
 
 @customElement('name-entry')
@@ -13,6 +14,9 @@ export class NameEntry extends LitElement {
 
     @property({ type: String })
     accessor color: Color | undefined;
+
+    @property({ type: Array })
+    accessor joinedPlayers: Player[] = [];
 
     @state()
     private _joined = false;
@@ -83,6 +87,16 @@ export class NameEntry extends LitElement {
     `;
 
     render() {
+        const joinedPlayers = this.joinedPlayers.map(
+            (player) => html`
+                <joined-player
+                    name=${player.name}
+                    quest=${player.quest}
+                    color=${player.color}
+                ></joined-player>
+            `
+        );
+
         return html`
             <h1>Online Sequence</h1>
             <label
@@ -94,6 +108,7 @@ export class NameEntry extends LitElement {
                 id="name-input"
                 class="input"
                 type="text"
+                .disabled=${this._joined}
                 .value=${this.name}
                 @input=${(event: Event) => {
                     const input = event.target as HTMLInputElement;
@@ -145,7 +160,6 @@ export class NameEntry extends LitElement {
             <hr />
             <button
                 class="large-button"
-                .disabled=${this._joined}
                 @click=${this.handleJoinGame}
             >
                 Join
@@ -153,10 +167,7 @@ export class NameEntry extends LitElement {
             <hr />
             <h2>Joined players:</h2>
             <div class="joined-players">
-                <joined-player name="Arthur" quest="To seek the Holy Grail" color="green"></joined-player>
-                <joined-player name="Lancelot" quest="To seek the Holy Grail" color="blue"></joined-player>
-                <joined-player name="Galahad" quest="To seek the Holy Grail" color="red"></joined-player>
-
+                ${joinedPlayers}
             </div>
             <button
                 class="large-button"
@@ -173,10 +184,6 @@ export class NameEntry extends LitElement {
     }
 
     async handleJoinGame() {
-        if (this._joined) {
-            return;
-        }
-
         this.validateInput();
         if (this.name.trim() === '' || this.color === undefined) {
             return;

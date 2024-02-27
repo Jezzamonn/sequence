@@ -1,8 +1,5 @@
-import { Server, Socket } from 'socket.io';
-import { Command, CommandCallback } from '../common/ts/interface/interface';
-import { Player } from '../common/ts/players';
+import { Server } from 'socket.io';
 import { wait } from '../common/ts/util';
-import { logIfError } from './server-common';
 import { ServerGameManager } from './server-game-manager';
 import { ServerPlayerManager } from './server-player-manager';
 
@@ -14,27 +11,12 @@ const io = new Server({
     },
 });
 
-const playerManager = new ServerPlayerManager();
+const playerManager = new ServerPlayerManager(io);
 let gameManager: ServerGameManager | undefined;
 
-io.on('connection', (socket: Socket) => {
-    console.log('A client has connected');
-
-    // When a client connects, wait for it to send a join command with the player information.
-    // The player manager will add events to the socket to handle the rest of the game.
-    socket.on(
-        Command.join,
-        (player: Player, callback: CommandCallback) => {
-            callback(
-                logIfError(playerManager.addOrUpdatePlayer(player, socket))
-            );
-
-            if (gameManager !== undefined) {
-                gameManager.sendGameState();
-            }
-        }
-    );
-});
+playerManager.onJoin = () => {
+    gameManager?.sendGameState();
+}
 
 playerManager.onStart = () => {
     const allowAI = true;

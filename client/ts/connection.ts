@@ -11,6 +11,7 @@ export class Connection {
     requestInProgress = false;
 
     onGameState: ((state: PlayerVisibleGameState) => void) | undefined;
+    onPlayersState: ((players: Player[]) => void) | undefined;
 
     constructor() {
         this.socket = io('http://localhost:3000');
@@ -25,6 +26,10 @@ export class Connection {
 
         this.socket.on(Command.gameState, (state: PlayerVisibleGameState) => {
             this.onGameState?.(state);
+        });
+
+        this.socket.on(Command.playersState, (players: Player[]) => {
+            this.onPlayersState?.(players);
         });
     }
 

@@ -7,6 +7,7 @@ export const Command = {
     start: 'start',
     makeMove: 'makeMove',
     gameState: 'gameState',
+    playersState: 'playersState',
 };
 
 export type CommandCallback = (result: CommandResult) => void;
