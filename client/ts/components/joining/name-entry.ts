@@ -27,6 +27,7 @@ export class NameEntry extends LitElement {
             background: #ffffff99;
             border-radius: 20px;
             padding: 20px 50px;
+            margin: 20px;
         }
 
         .token-row {
@@ -149,6 +150,14 @@ export class NameEntry extends LitElement {
             >
                 Join
             </button>
+            <hr />
+            <h2>Joined players:</h2>
+            <div class="joined-players">
+                <joined-player name="Arthur" quest="To seek the Holy Grail" color="green"></joined-player>
+                <joined-player name="Lancelot" quest="To seek the Holy Grail" color="blue"></joined-player>
+                <joined-player name="Galahad" quest="To seek the Holy Grail" color="red"></joined-player>
+
+            </div>
             <button
                 class="large-button"
                 .disabled=${!this._joined}
