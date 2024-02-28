@@ -22,6 +22,7 @@ export class JoinedPlayer extends LitElement {
         .player-text {
             display: flex;
             flex-direction: column;
+            margin-right: 8px;
         }
 
         h3 {
