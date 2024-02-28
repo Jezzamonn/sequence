@@ -35,8 +35,15 @@ export class GameDisplay extends LitElement {
                 min-width: 200px;
             }
 
+            @keyframes glow {
+                0%   { outline-color: #000; }
+                50%  { outline-color: #999; }
+                100%   { outline-color: #000; }
+            }
+
             .player.active {
-                outline: 2px solid black;
+                outline: 5px solid black;
+                animation: glow 1s infinite;
             }
 
             game-board {
