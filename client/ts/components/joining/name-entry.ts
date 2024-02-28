@@ -135,6 +135,7 @@ export class NameEntry extends LitElement {
                     const input = event.target as HTMLInputElement;
                     this.quest = input.value;
                     this.saveToLocalStorage();
+                    this.updateIfJoined();
                 }}
             />
             <label class="label ${this._colorValid ? '' : 'invalid'}"
@@ -148,6 +149,7 @@ export class NameEntry extends LitElement {
                     @click=${() => {
                         this.color = 'blue'
                         this.saveToLocalStorage();
+                        this.updateIfJoined();
                     }}
                 >
                     <token-marker color="blue"></token-marker>
@@ -160,6 +162,7 @@ export class NameEntry extends LitElement {
                         @click=${() => {
                             this.color = 'green'
                             this.saveToLocalStorage();
+                            this.updateIfJoined();
                         }}
                 >
                     <token-marker color="green"></token-marker>
@@ -171,6 +174,7 @@ export class NameEntry extends LitElement {
                         @click=${() => {
                             this.color = 'red'
                             this.saveToLocalStorage();
+                            this.updateIfJoined();
                         }}
                 >
                     <token-marker color="red"></token-marker>
@@ -241,6 +245,13 @@ export class NameEntry extends LitElement {
         }
 
         this._joined = true;
+    }
+
+    async updateIfJoined() {
+        if (!this._joined) {
+            return;
+        }
+        await this.handleJoinGame();
     }
 
     async handleStartGame() {
