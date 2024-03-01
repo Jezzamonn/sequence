@@ -26,6 +26,10 @@ export class DeckAndDiscardElement extends LitElement {
                 object-fit: contain;
             }
 
+            .card-face {
+                filter: brightness(0.6) contrast(1.5) brightness(2) saturate(0.5);
+            }
+
             .card-valid {
                 outline: 0.3cqh solid black;
                 z-index: 1;
@@ -63,7 +67,7 @@ export class DeckAndDiscardElement extends LitElement {
             <img class="card-image" src="${cardBackAssetName}" />
             <img
                 @click="${(e: MouseEvent) => this.handleDiscardClick(e)}"
-                class="card-image ${validityClass}"
+                class="card-image card-face ${validityClass}"
                 src="${cardAssetName({ rank: this.rank, suit: this.suit })}"
             />
         `;

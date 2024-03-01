@@ -27,6 +27,7 @@ export class PlayerHandElement extends LitElement {
                 flex-shrink: 1;
                 transition: transform 0.2s;
                 margin: 0 -2cqh;
+                filter: brightness(0.6) contrast(1.5) brightness(2) saturate(0.5);
             }
         `,
     ];
