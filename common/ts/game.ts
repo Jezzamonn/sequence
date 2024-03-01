@@ -7,7 +7,7 @@ import {
     isValidDiscard,
     isValidPlacement,
     makeEmptyPlacedTokens,
-    playerHasPossibleMove
+    playerHasPossibleMove,
 } from './board';
 import {
     Card,
@@ -21,7 +21,7 @@ import {
     Player,
     handSizes,
     numSequencesToWin,
-    validatePlayerColors
+    validatePlayerColors,
 } from './players';
 import { Point } from './point';
 import { shuffle } from './util';
@@ -43,13 +43,14 @@ interface GameState {
 
 export interface PlayerVisibleGameState {
     players: Player[];
-    // Index of this player.
-    playerIndex: number;
+    // Index of this player, undefined if this is a spectator or the player hasn't joined.
+    playerIndex?: number;
 
     placedTokens: Token[][];
     deckSize: number;
     lastCardPlayed: Card | undefined;
-    hand: Card[];
+    // Undefined if this is a spectator.
+    hand?: Card[];
     lastActionWasDiscard: boolean;
 
     nextPlayerIndex: number;
@@ -94,25 +95,33 @@ export class GameManager {
         };
     }
 
-    getStateForPlayer(playerIndex: number): PlayerVisibleGameState {
-        if (playerIndex < 0 || playerIndex >= this.state.players.length) {
+    getStateForPlayer(playerIndex: number | undefined = undefined): PlayerVisibleGameState {
+        if (
+            playerIndex != undefined &&
+            (playerIndex < 0 || playerIndex >= this.state.players.length)
+        ) {
             throw new Error(`Invalid player index: ${playerIndex}`);
         }
 
-        return {
+        const state: PlayerVisibleGameState = {
             players: this.state.players,
-            playerIndex,
 
             placedTokens: this.state.placedTokens,
             deckSize: this.state.deck.length,
             lastCardPlayed:
                 this.state.discarded[this.state.discarded.length - 1],
-            hand: this.state.hands[playerIndex],
             lastActionWasDiscard: this.state.lastActionWasDiscard,
 
             nextPlayerIndex: this.state.nextPlayerIndex,
             gameWinner: this.state.gameWinner,
         };
+
+        if (playerIndex != undefined) {
+            state.playerIndex = playerIndex;
+            state.hand = this.state.hands[playerIndex];
+        }
+
+        return state;
     }
 
     getMovesForPlayer(playerIndex: number): [Card, Point | undefined][] {

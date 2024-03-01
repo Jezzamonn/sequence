@@ -3,6 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { PlayerVisibleGameState } from '../../../common/ts/game';
 import { Player } from '../../../common/ts/players';
 import { connection } from '../connection';
+import { NameEntry } from './joining/name-entry';
 
 @customElement('root-component')
 export class RootComponent extends LitElement {
@@ -33,8 +34,12 @@ export class RootComponent extends LitElement {
     connectedCallback() {
         super.connectedCallback();
         connection.onGameState = (state: PlayerVisibleGameState) => {
+            console.log('Game state:', state);
             this._gameState = state;
-            this._state = 'game';
+            const nameEntry = this.shadowRoot?.querySelector('name-entry') as NameEntry | undefined;
+            if (nameEntry && nameEntry.joined) {
+                this._state = 'game';
+            }
         };
         connection.onPlayersState = (players: Player[]) => {
             this._players = players;
@@ -51,6 +56,7 @@ export class RootComponent extends LitElement {
         if (this._state === 'nameEntry') {
             mainElem = html`<name-entry
                 .joinedPlayers=${this._players}
+                .autoJoin=${this._gameState != undefined}
                 @notify=${(event: CustomEvent<string>) =>
                     this.notify(event.detail)}
             >

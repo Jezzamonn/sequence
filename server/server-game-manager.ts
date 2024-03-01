@@ -1,30 +1,28 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { PlayerOrAI } from "../common/ts/ai/ai-interface";
 import { RandomAI } from "../common/ts/ai/random";
 import { Card, cardToDescription } from "../common/ts/cards";
 import { GameManager } from "../common/ts/game";
-import { Command, CommandResult } from "../common/ts/interface/interface";
+import { Command } from "../common/ts/interface/interface";
 import { Player } from "../common/ts/players";
 import { Point } from "../common/ts/point";
 import { choose, wait } from "../common/ts/util";
 
 export class ServerGameManager {
-    io: Server;
     players: PlayerOrAI[] = [];
     gameManager: GameManager;
 
-    constructor(io: Server, players: PlayerOrAI[]) {
-        this.io = io;
+    constructor(players: PlayerOrAI[]) {
         this.players = players;
 
         this.gameManager = new GameManager(players, Math.random);
     }
 
-    static fromPartialPlayers(io: Server, players: Player[], allowAI = false): ServerGameManager {
-        return new ServerGameManager(io, makeAllPlayersFromPartialPlayers(players, allowAI));
+    static fromPartialPlayers(players: Player[], allowAI = false): ServerGameManager {
+        return new ServerGameManager(makeAllPlayersFromPartialPlayers(players, allowAI));
     }
 
-    makeMove(playerName: string, card: Card, position: Point | undefined): CommandResult {
+    makeMove(playerName: string, card: Card, position: Point | undefined): void {
         console.log(
             `Player ${playerName} making move: ${cardToDescription(
                 card
@@ -34,39 +32,26 @@ export class ServerGameManager {
         // Find player index by looking up by their name.
         const playerIndex = this.players.findIndex((p) => p.name === playerName);
         if (playerIndex === -1) {
-            return { error: `Player ${playerName} not found.` };
+            throw new Error(`Player ${playerName} not found.`);
         }
 
-        try {
-            this.gameManager.makeMove(playerIndex, card, position);
-        } catch (e) {
-            if (e instanceof Error) {
-                return { error: e.message };
-            }
-            console.error(e);
-            return { error: 'An unknown error occurred' };
-        }
-        // console.log(boardToString(this.gameManager.state.placedTokens));
-
-        // Do these asynchronously so that the result of the move is sent to the player first.
-        wait(0).then(() => {
-            this.sendGameState();
-            // Not awaited.
-            this.possiblySimulateAIPlayer();
-        });
-
-        return {};
+        this.gameManager.makeMove(playerIndex, card, position);
     }
 
-    sendGameState() {
+    sendGameState(io: Server) {
         console.log('Sending game state');
         for (let i = 0; i < this.players.length; i++) {
             const player = this.players[i];
             const state = this.gameManager.getStateForPlayer(i);
             console.log(`Sending game state to player ${i}`);
 
-            this.io.to(player.name).emit(Command.gameState, state);
+            io.to(player.name).emit(Command.gameState, state);
         }
+    }
+
+    sendBaseGameState(socket: Socket) {
+        const state = this.gameManager.getStateForPlayer();
+        socket.emit(Command.gameState, state);
     }
 
     async possiblySimulateAIPlayer() {

@@ -37,9 +37,15 @@ export class GameDisplay extends LitElement {
             }
 
             @keyframes glow {
-                0%   { outline-color: #000; }
-                50%  { outline-color: #999; }
-                100%   { outline-color: #000; }
+                0% {
+                    outline-color: #000;
+                }
+                50% {
+                    outline-color: #999;
+                }
+                100% {
+                    outline-color: #000;
+                }
             }
 
             .player.active {
@@ -89,7 +95,11 @@ export class GameDisplay extends LitElement {
         let validPositions: Point[] | undefined = undefined;
         let canDiscard: boolean | undefined = undefined;
 
-        if (this.gameState != undefined && this.selectedCard != undefined) {
+        if (
+            this.gameState != undefined &&
+            this.gameState.playerIndex != undefined &&
+            this.selectedCard != undefined
+        ) {
             const sequences = countSequences(this.gameState.placedTokens);
             const sequenceCount = [...sequences.values()].reduce(
                 (a, b) => a + b,

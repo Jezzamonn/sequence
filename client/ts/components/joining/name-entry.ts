@@ -20,8 +20,11 @@ export class NameEntry extends LitElement {
     @property({ type: Array })
     accessor joinedPlayers: Player[] = [];
 
-    @state()
-    private _joined = false;
+    @property({ type: Boolean })
+    accessor joined = false;
+
+    @property({ type: Boolean })
+    accessor autoJoin = false;
 
     @state()
     private _nameValid = true;
@@ -94,6 +97,12 @@ export class NameEntry extends LitElement {
         this.loadFromLocalStorage();
     }
 
+    updated() {
+        if (this.autoJoin && !this.joined) {
+            this.handleJoinGame();
+        }
+    }
+
     render() {
         const joinedPlayers = this.joinedPlayers.map(
             (player) => html`
@@ -116,7 +125,7 @@ export class NameEntry extends LitElement {
                 id="name-input"
                 class="input"
                 type="text"
-                .disabled=${this._joined}
+                .disabled=${this.joined}
                 .value=${this.name}
                 @input=${(event: Event) => {
                     const input = event.target as HTMLInputElement;
@@ -194,7 +203,7 @@ export class NameEntry extends LitElement {
             </div>
             <button
                 class="large-button"
-                .disabled=${!this._joined}
+                .disabled=${!this.joined}
                 @click=${this.handleStartGame}>
                 Start
             </button>
@@ -244,18 +253,18 @@ export class NameEntry extends LitElement {
             return;
         }
 
-        this._joined = true;
+        this.joined = true;
     }
 
     async updateIfJoined() {
-        if (!this._joined) {
+        if (!this.joined) {
             return;
         }
         await this.handleJoinGame();
     }
 
     async handleStartGame() {
-        if (!this._joined) {
+        if (!this.joined) {
             return;
         }
 
