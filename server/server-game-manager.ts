@@ -1,4 +1,4 @@
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { PlayerOrAI } from "../common/ts/ai/ai-interface";
 import { RandomAI } from "../common/ts/ai/random";
 import { Card, cardToDescription } from "../common/ts/cards";
@@ -49,9 +49,8 @@ export class ServerGameManager {
         }
     }
 
-    sendBaseGameState(socket: Socket) {
-        const state = this.gameManager.getStateForPlayer();
-        socket.emit(Command.gameState, state);
+    getBaseGameState() {
+        return this.gameManager.getStateForPlayer();
     }
 
     async possiblySimulateAIPlayer() {

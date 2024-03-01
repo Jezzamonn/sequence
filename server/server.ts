@@ -22,7 +22,7 @@ io.on('connection', (socket: Socket) => {
     console.log('A client has connected');
 
     playerManager.sendPlayersState(socket);
-    gameManager?.sendBaseGameState(socket);
+    socket.emit(Command.gameState, gameManager?.getBaseGameState());
 
     // When a client connects, wait for it to send a join command with the player information.
     // The player manager will add events to the socket to handle the rest of the game.

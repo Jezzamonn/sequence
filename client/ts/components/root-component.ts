@@ -37,7 +37,11 @@ export class RootComponent extends LitElement {
             console.log('Game state:', state);
             this._gameState = state;
             const nameEntry = this.shadowRoot?.querySelector('name-entry') as NameEntry | undefined;
-            if (nameEntry && nameEntry.joined) {
+
+            if (state == undefined) {
+                this._state = 'nameEntry';
+            }
+            else if (nameEntry && nameEntry.joined) {
                 this._state = 'game';
             }
         };
