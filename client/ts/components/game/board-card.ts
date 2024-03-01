@@ -23,17 +23,19 @@ export class BoardCardElement extends LitElement {
 
                 background-color: white;
                 border-radius: 0.5cqw;
+                container-type: size;
             }
 
             .card-image {
-                max-width: 100%;
-                max-height: 100%;
+                width: 100%;
+                height: 100%;
                 object-fit: contain;
                 opacity: 0;
             }
 
             .card-image.card-Joker {
                 opacity: 1;
+                object-fit: cover;
             }
 
             .card-label {
@@ -41,29 +43,22 @@ export class BoardCardElement extends LitElement {
                 background-color: white;
                 top: 0;
                 left: 0;
-                font-size: 20px;
+                font-size: min(40cqh,60cqw);
                 text-align: center;
                 line-height: 1em;
+                user-select: none;
             }
 
             .card-label.card-Joker {
                 display: none;
             }
 
-            .card-Spades {
-                color: black;
+            .card-Spades, .card-Clubs {
+                color: #111;
             }
 
-            .card-Hearts {
-                color: red;
-            }
-
-            .card-Clubs {
-                color: black;
-            }
-
-            .card-Diamonds {
-                color: red;
+            .card-Hearts, .card-Diamonds {
+                color: #a00;
             }
 
             .token {
@@ -71,7 +66,7 @@ export class BoardCardElement extends LitElement {
                 width: 90%;
                 height: 90%;
                 pointer-events: none;
-                filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8));
+                filter: drop-shadow(0 2px 2px black);
             }
         `,
     ];

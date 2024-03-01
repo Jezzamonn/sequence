@@ -46,12 +46,13 @@ export class PlayerHandElement extends LitElement {
             const angleDeg = lerp(-maxAngle, maxAngle, amt);
             const isSelected = i === this.selectedCardIndex;
             const transform = `rotate(${angleDeg}deg) translateY(${isSelected ? '-10%' : '0'})`;
+            const cardMaxWidth = 100 / this.hand!.length;
             return html`<img
                 @click="${(e: MouseEvent) => this.handleCardClick(e, card, i)}"
                 class="card-image card-${card.suit} ${isSelected
                     ? 'card-selected'
                     : ''}"
-                style="transform: ${transform};"
+                style="transform: ${transform}; max-width: ${cardMaxWidth}%;"
                 src="${cardAssetName(card)}"
             />`;
         });

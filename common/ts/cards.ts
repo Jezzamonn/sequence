@@ -74,10 +74,10 @@ export const rankToFullName: Map<Rank, string> = new Map([
 ]);
 
 export const suitToSymbol: Map<Suit, string> = new Map([
-    ['Clubs', '♣'],
-    ['Diamonds', '♦'],
-    ['Hearts', '♥'],
-    ['Spades', '♠'],
+    ['Clubs', '♣\uFE0E'],
+    ['Diamonds', '♦\uFE0E'],
+    ['Hearts', '♥\uFE0E'],
+    ['Spades', '♠\uFE0E'],
 ]);
 
 export const suitToColor: Map<Suit, 'black' | 'red'> = new Map([

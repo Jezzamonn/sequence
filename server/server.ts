@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+import { defaultServerPort } from '../common/ts/interface/defaults';
 import { wait } from '../common/ts/util';
 import { ServerGameManager } from './server-game-manager';
 import { ServerPlayerManager } from './server-player-manager';
@@ -7,7 +8,7 @@ console.log('Server <( Hello World! )');
 
 const io = new Server({
     cors: {
-        origin: 'http://localhost:8080',
+        origin: '*',
     },
 });
 
@@ -18,8 +19,7 @@ playerManager.onJoin = () => {
     gameManager?.sendGameState();
 }
 
-playerManager.onStart = () => {
-    const allowAI = true;
+playerManager.onStart = (allowAI: boolean) => {
     if (gameManager !== undefined) {
         console.warn('Replacing existing game.');
     } else {
@@ -51,5 +51,5 @@ playerManager.onMakeMove = (playerName, card, position) => {
     return gameManager.makeMove(playerName, card, position);
 }
 
-io.listen(3000);
-console.log('Socket.io server listening on port 3000');
+io.listen(defaultServerPort);
+console.log(`Socket.io server listening on port ${defaultServerPort}`);

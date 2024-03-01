@@ -15,7 +15,7 @@ export class ServerPlayerManager {
     joinedPlayers: Map<string, Player> = new Map();
 
     onJoin: (() => void) | undefined;
-    onStart: (() => CommandResult) | undefined;
+    onStart: ((allowAI: boolean) => CommandResult) | undefined;
     onMakeMove:
         | ((
               playerName: string,
@@ -73,12 +73,12 @@ export class ServerPlayerManager {
         // Join the room for the player.
         socket.join(player.name);
 
-        socket.on(Command.start, (callback: CommandCallback) => {
+        socket.on(Command.start, (allowAI: boolean, callback: CommandCallback) => {
             if (this.onStart === undefined) {
                 callback({ error: 'No start handler set' });
                 return;
             }
-            callback(logIfError(this.onStart()));
+            callback(logIfError(this.onStart(allowAI)));
         });
         socket.on(
             Command.makeMove,

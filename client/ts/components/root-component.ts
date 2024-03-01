@@ -9,6 +9,7 @@ export class RootComponent extends LitElement {
     static styles = css`
         :host {
             min-height: 100vh;
+            min-height: 100svh;
             width: 100vw;
             display: flex;
             justify-content: center;

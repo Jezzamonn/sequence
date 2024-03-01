@@ -2,6 +2,10 @@ import { css, html, LitElement } from 'lit-element';
 import { customElement, property } from 'lit/decorators.js';
 import { Token } from '../../../common/ts/board';
 
+const blueColor = '#00f';
+const greenColor = '#1a3';
+const redColor = '#f51';
+
 @customElement('token-marker')
 export class TokenMarker extends LitElement {
     static styles = css`
@@ -32,7 +36,7 @@ export class TokenMarker extends LitElement {
                     viewBox="-50 -50 100 100"
                     xmlns="http://www.w3.org/2000/svg"
                 >
-                    <circle r="45" fill="#00f" />
+                    <circle r="45" fill="${blueColor}" />
                 </svg>`;
                 break;
             case 'green':
@@ -42,8 +46,8 @@ export class TokenMarker extends LitElement {
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <g
-                        fill="#1a3"
-                        stroke="#1a3"
+                        fill="${greenColor}"
+                        stroke="${greenColor}"
                         stroke-width="10"
                         stroke-linejoin="round"
                     >
@@ -59,12 +63,12 @@ export class TokenMarker extends LitElement {
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <g
-                        fill="#b11"
-                        stroke="#b11"
+                        fill="${redColor}"
+                        stroke="${redColor}"
                         stroke-width="10"
                         stroke-linejoin="round"
                     >
-                        <path d="M 0 -35 L 40 35 L -40 35 Z" fill="#b11" />
+                        <path d="M 0 -35 L 40 35 L -40 35 Z" />
                     </g>
                 </svg>`;
                 break;

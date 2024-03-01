@@ -30,8 +30,8 @@ export class GameBoardElement extends LitElement {
 
                 margin: 0.2cqw 0.2cqh;
 
-                max-width: 9.5cqw;
-                max-height: 9.5cqh;
+                width: 9.5cqw;
+                height: 9.5cqh;
 
                 transition: transform 0.2s;
             }

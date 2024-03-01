@@ -19,6 +19,7 @@ export class GameDisplay extends LitElement {
                 grid-template-columns: 1fr 5fr 1fr;
                 grid-template-rows: 1fr 5fr 1fr;
                 height: 100vh;
+                height: 100svh;
                 width: 100vw;
             }
 

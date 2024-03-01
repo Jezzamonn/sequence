@@ -1,6 +1,7 @@
 import { Socket, io } from 'socket.io-client';
 import { Card, cardToDescription } from '../../common/ts/cards';
 import { PlayerVisibleGameState } from '../../common/ts/game';
+import { defaultServerAddress } from '../../common/ts/interface/defaults';
 import { Command, CommandResult } from '../../common/ts/interface/interface';
 import { Player } from '../../common/ts/players';
 import { Point, Points } from '../../common/ts/point';
@@ -14,7 +15,7 @@ export class Connection {
     onPlayersState: ((players: Player[]) => void) | undefined;
 
     constructor() {
-        this.socket = io('http://localhost:3000');
+        this.socket = io(defaultServerAddress);
 
         this.socket.on('connect', () => {
             console.log('Connected to server');
@@ -49,7 +50,7 @@ export class Connection {
         }
     }
 
-    async startGame(): Promise<CommandResult> {
+    async startGame(allowAI = false): Promise<CommandResult> {
         console.log(`Starting game!`);
         if (this.requestInProgress) {
             return { error: 'Request already in progress' };
@@ -58,7 +59,7 @@ export class Connection {
         this.requestInProgress = true;
 
         try {
-            const result = await this.socket.emitWithAck(Command.start);
+            const result = await this.socket.emitWithAck(Command.start, allowAI);
             return result;
         } finally {
             this.requestInProgress = false;
