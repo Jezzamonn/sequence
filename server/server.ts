@@ -2,7 +2,6 @@ import { Server, Socket } from 'socket.io';
 import { defaultServerPort } from '../common/ts/interface/defaults';
 import { Command, CommandCallback } from '../common/ts/interface/interface';
 import { Player } from '../common/ts/players';
-import { wait } from '../common/ts/util';
 import { logIfError } from './server-common';
 import { ServerGameManager } from './server-game-manager';
 import { ServerPlayerManager } from './server-player-manager';
@@ -26,24 +25,18 @@ io.on('connection', (socket: Socket) => {
 
     // When a client connects, wait for it to send a join command with the player information.
     // The player manager will add events to the socket to handle the rest of the game.
-    socket.on(
-        Command.join,
-        (player: Player, callback: CommandCallback) => {
-            const result = playerManager.addOrUpdatePlayer(
-                player,
-                socket
-            );
-            callback(logIfError(result));
+    socket.on(Command.join, (player: Player, callback: CommandCallback) => {
+        const result = playerManager.addOrUpdatePlayer(player, socket);
+        callback(logIfError(result));
 
-            if (result.error != undefined) {
-                return;
-            }
-
-            // Notify all players of the current players.
-            playerManager.sendPlayersState(io);
-            gameManager?.sendGameState(io);
+        if (result.error != undefined) {
+            return;
         }
-    );
+
+        // Notify all players of the current players.
+        playerManager.sendPlayersState(io);
+        gameManager?.sendGameState();
+    });
 });
 
 playerManager.onStart = (allowAI: boolean) => {
@@ -55,7 +48,7 @@ playerManager.onStart = (allowAI: boolean) => {
 
     try {
         const players = playerManager.getValidatedPlayers(allowAI);
-        gameManager = ServerGameManager.fromPartialPlayers(players, allowAI);
+        gameManager = ServerGameManager.fromPartialPlayers(io, players, allowAI);
     } catch (e) {
         if (e instanceof Error) {
             return { error: e.message };
@@ -64,13 +57,8 @@ playerManager.onStart = (allowAI: boolean) => {
         return { error: 'An unknown error occurred' };
     }
 
-    wait(0).then(() => {
-        gameManager?.sendGameState(io);
-        gameManager?.possiblySimulateAIPlayer();
-    });
-
     return {};
-}
+};
 
 playerManager.onMakeMove = (playerName, card, position) => {
     if (gameManager === undefined) {
@@ -87,13 +75,8 @@ playerManager.onMakeMove = (playerName, card, position) => {
         return { error: 'An unknown error occurred' };
     }
 
-    wait(0).then(() => {
-        gameManager?.sendGameState(io);
-        gameManager?.possiblySimulateAIPlayer();
-    });
-
     return {};
-}
+};
 
 io.listen(defaultServerPort);
 console.log(`Socket.io server listening on port ${defaultServerPort}`);

@@ -25,7 +25,41 @@ export interface Player {
     color: Color;
 }
 
-export function validateNumPlayers(numPlayers: number, numTeams: number) {
+export function validatePlayerColors(colors: Color[], allowAI = false) {
+    const colorCounts = new Map<Color, number>();
+    for (const color of colors) {
+        colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
+    }
+    console.log(colors);
+    console.log(colorCounts);
+    console.log(colorCounts.size);
+
+    if (allowAI) {
+        let numTeams = colorCounts.size;
+        // If there's just one player, default to a 2-team game.
+        if (numTeams === 1) {
+            numTeams = 2;
+        }
+
+        if (!validTeamCounts.includes(numTeams)) {
+            throw new Error(`Invalid number of teams: ${numTeams}`);
+        }
+        return;
+    }
+
+    // If we can't create new AI players to fill the teams, then we must have the correct number of players.
+    const numTeams = colorCounts.size;
+    const numPlayers = colors.length;
+    const expectedTeamSize = colors.length / colorCounts.size;
+
+    if (
+        ![...colorCounts.values()].every(
+            (count) => count === expectedTeamSize
+        )
+    ) {
+        throw new Error('Each team must have the same number of players');
+    }
+
     if (!validPlayerCounts.includes(numPlayers)) {
         throw new Error(`Invalid number of players: ${numPlayers}`);
     }
@@ -37,25 +71,4 @@ export function validateNumPlayers(numPlayers: number, numTeams: number) {
             `Number of players must be divisible by number of teams. Got ${numPlayers} players and ${numTeams} teams`
         );
     }
-}
-
-export function validatePlayerColors(colors: Color[], allowAI = false) {
-    const colorCounts = new Map<Color, number>();
-    for (const color of colors) {
-        colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
-    }
-
-    // If we can't create new AI players to fill the teams, then we must have the correct number of players.
-    if (!allowAI) {
-        const expectedTeamSize = colors.length / colorCounts.size;
-        if (
-            ![...colorCounts.values()].every(
-                (count) => count === expectedTeamSize
-            )
-        ) {
-            throw new Error('Each team must have the same number of players');
-        }
-    }
-
-    validateNumPlayers(colors.length, colorCounts.size);
 }

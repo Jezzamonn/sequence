@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { PlayerOrAI } from "../common/ts/ai/ai-interface";
 import { RandomAI } from "../common/ts/ai/random";
+import { allColors } from "../common/ts/board";
 import { Card, cardToDescription } from "../common/ts/cards";
 import { GameManager } from "../common/ts/game";
 import { Command } from "../common/ts/interface/interface";
@@ -9,17 +10,21 @@ import { Point } from "../common/ts/point";
 import { choose, wait } from "../common/ts/util";
 
 export class ServerGameManager {
+    io: Server;
     players: PlayerOrAI[] = [];
     gameManager: GameManager;
 
-    constructor(players: PlayerOrAI[]) {
+    constructor(io: Server, players: PlayerOrAI[]) {
+        this.io = io;
         this.players = players;
 
         this.gameManager = new GameManager(players, Math.random);
+
+        this.queueNextAction();
     }
 
-    static fromPartialPlayers(players: Player[], allowAI = false): ServerGameManager {
-        return new ServerGameManager(makeAllPlayersFromPartialPlayers(players, allowAI));
+    static fromPartialPlayers(io: Server, players: Player[], allowAI = false): ServerGameManager {
+        return new ServerGameManager(io, makeAllPlayersFromPartialPlayers(players, allowAI));
     }
 
     makeMove(playerName: string, card: Card, position: Point | undefined): void {
@@ -36,16 +41,25 @@ export class ServerGameManager {
         }
 
         this.gameManager.makeMove(playerIndex, card, position);
+        this.queueNextAction();
     }
 
-    sendGameState(io: Server) {
+    // Poorly named.
+    queueNextAction() {
+        wait(0).then(() => {
+            this.sendGameState();
+            this.possiblySimulateAIPlayer();
+        });
+    }
+
+    sendGameState() {
         console.log('Sending game state');
         for (let i = 0; i < this.players.length; i++) {
             const player = this.players[i];
             const state = this.gameManager.getStateForPlayer(i);
             console.log(`Sending game state to player ${i}`);
 
-            io.to(player.name).emit(Command.gameState, state);
+            this.io.to(player.name).emit(Command.gameState, state);
         }
     }
 
@@ -80,6 +94,11 @@ export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowA
     const colorsInGame = new Set(
         joinedPlayers.map((p) => p.color)
     );
+    if (allowAI && colorsInGame.size == 1) {
+        // Add an extra color for the AI player.
+        colorsInGame.add(choose(allColors.filter((c) => !colorsInGame.has(c))));
+    }
+
     let aiPlayerCount = 0;
 
     while (addedHumanPlayerNames.size < joinedPlayers.length) {
