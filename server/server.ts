@@ -95,5 +95,6 @@ playerManager.onMakeMove = (playerName, card, position) => {
     return {};
 };
 
-io.listen(port);
-console.log(`Socket.io server listening on port ${port}`);
+server.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+});
