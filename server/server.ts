@@ -18,9 +18,7 @@ const key = fs.readFileSync(sslDir + 'privkey.pem');
 
 // Placeholder express app.
 const app = express();
-app.get('/', (req: express.Request, res: express.Response) => {
-    res.send('Hello World!');
-});
+app.use(express.static('../client/build'));
 
 const server = https.createServer({ cert, key }, app);
 
