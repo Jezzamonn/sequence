@@ -14,7 +14,7 @@ import {
     allCards,
     cardToDescription,
     cardsAreEqual,
-    isOneEyedJack
+    isOneEyedJack,
 } from './cards';
 import {
     Player,
@@ -23,7 +23,7 @@ import {
     validatePlayerColors,
 } from './players';
 import { Point } from './point';
-import { shuffle } from './util';
+import { shuffle, toSentenceCase } from './util';
 
 interface GameState {
     players: Player[];
@@ -36,6 +36,7 @@ interface GameState {
     // Used for stopping players from removing from sequences.
     sequenceCount: number;
 
+    turnNumber: number;
     nextPlayerIndex: number;
     gameWinner: Token;
 }
@@ -52,6 +53,7 @@ export interface PlayerVisibleGameState {
     hand?: Card[];
     lastActionWasDiscard: boolean;
 
+    turnNumber: number;
     nextPlayerIndex: number;
     gameWinner: Token;
 }
@@ -88,12 +90,15 @@ export class GameManager {
             lastActionWasDiscard: false,
             sequenceCount: 0,
 
+            turnNumber: 0,
             nextPlayerIndex: Math.floor(this.random() * numPlayers),
             gameWinner: undefined,
         };
     }
 
-    getStateForPlayer(playerIndex: number | undefined = undefined): PlayerVisibleGameState {
+    getStateForPlayer(
+        playerIndex: number | undefined = undefined
+    ): PlayerVisibleGameState {
         if (
             playerIndex != undefined &&
             (playerIndex < 0 || playerIndex >= this.state.players.length)
@@ -110,6 +115,7 @@ export class GameManager {
                 this.state.discarded[this.state.discarded.length - 1],
             lastActionWasDiscard: this.state.lastActionWasDiscard,
 
+            turnNumber: this.state.turnNumber,
             nextPlayerIndex: this.state.nextPlayerIndex,
             gameWinner: this.state.gameWinner,
         };
@@ -145,7 +151,9 @@ export class GameManager {
     makeMove(playerIndex: number, card: Card, position: Point | undefined) {
         if (this.state.gameWinner !== undefined) {
             throw new Error(
-                `Cannot make a move, the game is over. ${this.state.gameWinner} has won.`
+                `Cannot make a move, the game is over. ${toSentenceCase(
+                    this.state.gameWinner
+                )} has won.`
             );
         }
         if (playerIndex != this.state.nextPlayerIndex) {
@@ -162,7 +170,7 @@ export class GameManager {
             );
         }
 
-        if (position === undefined) {
+        if (position == undefined) {
             if (this.state.lastActionWasDiscard) {
                 throw new Error(`You can't discard twice in a row.`);
             }
@@ -208,6 +216,8 @@ export class GameManager {
             }
         }
 
+        this.state.turnNumber++;
+
         // Check if a player has won.
         const numTeams = new Set(this.state.players.map((p) => p.color)).size;
         const sequences = countSequences(this.state.placedTokens);
@@ -233,7 +243,7 @@ export class GameManager {
             this.state.discarded = [];
         }
 
-        this.state.lastActionWasDiscard = position === undefined;
+        this.state.lastActionWasDiscard = position == undefined;
 
         // If this wasn't a discard, now it's the next player's turn.
         if (position !== undefined) {

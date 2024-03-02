@@ -55,7 +55,7 @@ export class ServerPlayerManager {
         socket.on(
             Command.start,
             (allowAI: boolean, callback: CommandCallback) => {
-                if (this.onStart === undefined) {
+                if (this.onStart == undefined) {
                     callback({ error: 'No start handler set' });
                     return;
                 }
@@ -69,7 +69,7 @@ export class ServerPlayerManager {
                 position: Point | undefined,
                 callback: CommandCallback
             ) => {
-                if (this.onMakeMove === undefined) {
+                if (this.onMakeMove == undefined) {
                     callback({ error: 'No makeMove handler set' });
                     return;
                 }

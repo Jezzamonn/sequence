@@ -19,7 +19,7 @@ export const Points = {
     },
 
     toString(p: Point | undefined): string {
-        if (p === undefined) {
+        if (p == undefined) {
             return 'undefined';
         }
         return `(${p.x}, ${p.y})`;

@@ -127,6 +127,11 @@ export class GameDisplay extends LitElement {
             ></joined-player>`;
         });
 
+        let thisPlayerTurnNumber = -1;
+        if (this.gameState?.playerIndex != undefined) {
+            thisPlayerTurnNumber = Math.floor((this.gameState?.turnNumber - this.gameState.playerIndex) / this.gameState.players.length);
+        }
+
         return html`
             <div class="players">${players}</div>
             <game-board
@@ -150,6 +155,7 @@ export class GameDisplay extends LitElement {
                 }}
                 .hand=${this.gameState?.hand}
                 .selectedCardIndex=${this.selectedCardIndex}
+                .thisPlayerTurnNumber=${thisPlayerTurnNumber}
             ></player-hand>
             <deck-discard
                 @discard-click=${(e: CustomEvent<MouseEvent>) => {

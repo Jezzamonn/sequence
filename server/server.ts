@@ -61,7 +61,7 @@ playerManager.onStart = (allowAI: boolean) => {
 };
 
 playerManager.onMakeMove = (playerName, card, position) => {
-    if (gameManager === undefined) {
+    if (gameManager == undefined) {
         return { error: 'No game has been started' };
     }
 

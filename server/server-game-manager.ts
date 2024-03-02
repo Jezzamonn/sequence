@@ -6,7 +6,7 @@ import { Card, cardToDescription } from "../common/ts/cards";
 import { GameManager } from "../common/ts/game";
 import { Command } from "../common/ts/interface/interface";
 import { Player } from "../common/ts/players";
-import { Point } from "../common/ts/point";
+import { Point, Points } from "../common/ts/point";
 import { choose, wait } from "../common/ts/util";
 
 export class ServerGameManager {
@@ -31,7 +31,7 @@ export class ServerGameManager {
         console.log(
             `Player ${playerName} making move: ${cardToDescription(
                 card
-            )} at ${position}`
+            )} at ${Points.toString(position)}`
         );
 
         // Find player index by looking up by their name.
@@ -71,7 +71,7 @@ export class ServerGameManager {
         const playerIndex = this.gameManager.state.nextPlayerIndex;
         const player = this.players[playerIndex];
 
-        if (player.ai === undefined) {
+        if (player.ai == undefined) {
             return;
         }
 
@@ -110,7 +110,7 @@ export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowA
                         !addedHumanPlayerNames.has(p.name)
                 )
             );
-            if (player === undefined) {
+            if (player == undefined) {
                 // No human player for this color, add an AI player.
                 if (!allowAI) {
                     throw new Error(

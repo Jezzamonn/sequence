@@ -149,3 +149,7 @@ export function choose<T>(arr: Array<T>, rng: () => number = Math.random): T {
     const index = Math.floor(rng() * arr.length);
     return arr[index];
 }
+
+export function toSentenceCase(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
