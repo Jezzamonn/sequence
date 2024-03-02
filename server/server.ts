@@ -1,5 +1,7 @@
+import express from 'express';
+import fs from 'fs/promises';
+import https from 'https';
 import { Server, Socket } from 'socket.io';
-import { defaultServerPort } from '../common/ts/interface/defaults';
 import { Command, CommandCallback } from '../common/ts/interface/interface';
 import { Player } from '../common/ts/players';
 import { logIfError } from './server-common';
@@ -8,9 +10,24 @@ import { ServerPlayerManager } from './server-player-manager';
 
 console.log('Server <( Hello World! )');
 
-const io = new Server({
+const port = 443;
+
+const sslDir = '/etc/letsencrypt/live/seq.jezzamon.com/'
+const cert = await fs.readFile(sslDir + 'fullchain.pem');
+const key = await fs.readFile(sslDir + 'privkey.pem');
+
+// Placeholder express app.
+const app = express();
+app.get('/', (req: express.Request, res: express.Response) => {
+    res.send('Hello World!');
+});
+
+const server = https.createServer({ cert, key }, app);
+
+const io = new Server(server, {
     cors: {
         origin: '*',
+        methods: ["GET", "POST"]
     },
 });
 
@@ -78,5 +95,5 @@ playerManager.onMakeMove = (playerName, card, position) => {
     return {};
 };
 
-io.listen(defaultServerPort);
-console.log(`Socket.io server listening on port ${defaultServerPort}`);
+io.listen(port);
+console.log(`Socket.io server listening on port ${port}`);
