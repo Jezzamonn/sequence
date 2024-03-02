@@ -268,7 +268,7 @@ export class NameEntry extends LitElement {
             return;
         }
 
-        const result = await connection.startGame();
+        const result = await connection.startGame(true);
         if (result.error != undefined) {
             this.dispatchEvent(
                 new CustomEvent<string>('notify', {

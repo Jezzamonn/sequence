@@ -14,8 +14,7 @@ import {
     allCards,
     cardToDescription,
     cardsAreEqual,
-    compareCards,
-    isOneEyedJack,
+    isOneEyedJack
 } from './cards';
 import {
     Player,
@@ -76,7 +75,6 @@ export class GameManager {
         for (let i = 0; i < numPlayers; i++) {
             // To be consistent, we use the end of the deck for each player.
             const hand = deck.splice(deck.length - handSize, handSize);
-            hand.sort(compareCards);
             hands.push(hand);
         }
 
@@ -227,7 +225,6 @@ export class GameManager {
 
         // Add a new card to the player's hand.
         hand.push(this.state.deck.pop()!);
-        hand.sort(compareCards);
 
         // If that was the last card, shuffle the discarded cards and use them as the new deck.
         if (this.state.deck.length == 0) {

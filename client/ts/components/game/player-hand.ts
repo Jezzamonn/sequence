@@ -2,7 +2,8 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
     Card,
-    cardAssetName
+    cardAssetName,
+    compareCards
 } from '../../../../common/ts/cards';
 import { lerp } from '../../../../common/ts/util';
 import { HandClickEventParams } from '../events';
@@ -29,6 +30,26 @@ export class PlayerHandElement extends LitElement {
                 margin: 0 -2cqh;
                 filter: brightness(0.6) contrast(1.5) brightness(2) saturate(0.5);
             }
+
+            .card-selected {
+                transform: translateY(-10%);
+            }
+
+            @keyframes slideIntoHand {
+                0% {
+                    transform: translateY(-30%);
+                }
+                30% {
+                    transform: translateY(-30%);
+                }
+                100% {
+                    transform: translateY(0);
+                }
+            }
+
+            .card-last-added {
+                animation: slideIntoHand 0.5s 1;
+            }
         `,
     ];
 
@@ -41,19 +62,25 @@ export class PlayerHandElement extends LitElement {
     render() {
         const maxAngle = 4;
 
-        // language=HTML
-        return this.hand?.map((card, i) => {
+        if (this.hand == undefined) {
+            return;
+        }
+
+        const sortedCards = this.hand.slice().sort(compareCards);
+        const lastAddedCard = this.hand[this.hand.length - 1];
+
+        return sortedCards.map((card, i) => {
             const amt = i / (this.hand!.length - 1);
             const angleDeg = lerp(-maxAngle, maxAngle, amt);
             const isSelected = i === this.selectedCardIndex;
-            const transform = `rotate(${angleDeg}deg) translateY(${isSelected ? '-10%' : '0'})`;
+            // const transform = `rotate(${angleDeg}deg) translateY(${isSelected ? '-10%' : '0'})`;
             const cardMaxWidth = 100 / this.hand!.length;
             return html`<img
                 @click="${(e: MouseEvent) => this.handleCardClick(e, card, i)}"
                 class="card-image card-${card.suit} ${isSelected
                     ? 'card-selected'
-                    : ''}"
-                style="transform: ${transform}; max-width: ${cardMaxWidth}%;"
+                    : ''} ${card === lastAddedCard ? 'card-last-added' : ''}"
+                style="max-width: ${cardMaxWidth}%;"
                 src="${cardAssetName(card)}"
             />`;
         });
