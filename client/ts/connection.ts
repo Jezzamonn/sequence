@@ -1,7 +1,6 @@
 import { Socket, io } from 'socket.io-client';
 import { Card, cardToDescription } from '../../common/ts/cards';
 import { PlayerVisibleGameState } from '../../common/ts/game';
-import { defaultServerAddress } from '../../common/ts/interface/defaults';
 import { Command, CommandResult } from '../../common/ts/interface/interface';
 import { Player } from '../../common/ts/players';
 import { Point, Points } from '../../common/ts/point';
@@ -15,7 +14,7 @@ export class Connection {
     onPlayersState: ((players: Player[]) => void) | undefined;
 
     constructor() {
-        this.socket = io(defaultServerAddress);
+        this.socket = io('kit.jezzamon.com');
 
         this.socket.on('connect', () => {
             console.log('Connected to server');
