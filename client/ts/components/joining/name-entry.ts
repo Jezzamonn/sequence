@@ -230,7 +230,7 @@ export class NameEntry extends LitElement {
 
     validateInput() {
         this._nameValid = this.name.trim() !== '';
-        this._colorValid = this.color !== undefined;
+        this._colorValid = this.color != undefined;
     }
 
     async handleJoinGame() {

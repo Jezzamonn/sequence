@@ -352,7 +352,7 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
         for (const { x, y } of row) {
             const card = boardLayout[y][x];
             const color = placedTokens[y][x];
-            if (color !== undefined && (color == lastColor || lastWasJoker)) {
+            if (color != undefined && (color == lastColor || lastWasJoker)) {
                 count++;
                 // Update this variable in case the last card was a joker.
                 lastColor = color;

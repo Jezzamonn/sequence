@@ -149,7 +149,7 @@ export class GameManager {
     // Other small weirdness: If you have two of the same card, this might pull the
     // wrong card out of the player's hand.
     makeMove(playerIndex: number, card: Card, position: Point | undefined) {
-        if (this.state.gameWinner !== undefined) {
+        if (this.state.gameWinner != undefined) {
             throw new Error(
                 `Cannot make a move, the game is over. ${toSentenceCase(
                     this.state.gameWinner
@@ -208,7 +208,7 @@ export class GameManager {
         hand.splice(index, 1);
         this.state.discarded.push(card);
 
-        if (position !== undefined) {
+        if (position != undefined) {
             if (isOneEyedJack(card)) {
                 this.state.placedTokens[position.y][position.x] = undefined;
             } else {
@@ -246,7 +246,7 @@ export class GameManager {
         this.state.lastActionWasDiscard = position == undefined;
 
         // If this wasn't a discard, now it's the next player's turn.
-        if (position !== undefined) {
+        if (position != undefined) {
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;
         } else if (

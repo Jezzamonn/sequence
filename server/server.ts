@@ -55,7 +55,7 @@ io.on('connection', (socket: Socket) => {
 });
 
 playerManager.onStart = (allowAI: boolean) => {
-    if (gameManager !== undefined) {
+    if (gameManager != undefined) {
         console.warn('Replacing existing game.');
     } else {
         console.log('Starting new game');

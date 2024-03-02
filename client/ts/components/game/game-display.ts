@@ -86,6 +86,16 @@ export class GameDisplay extends LitElement {
         this.handleWindowClick = this.handleWindowClick.bind(this);
     }
 
+    connectedCallback() {
+        super.connectedCallback();
+        window.addEventListener('click', this.handleWindowClick);
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        window.removeEventListener('click', this.handleWindowClick);
+    }
+
     private handleWindowClick() {
         this.selectedCard = undefined;
         this.selectedCardIndex = undefined;
@@ -129,7 +139,10 @@ export class GameDisplay extends LitElement {
 
         let thisPlayerTurnNumber = -1;
         if (this.gameState?.playerIndex != undefined) {
-            thisPlayerTurnNumber = Math.floor((this.gameState?.turnNumber - this.gameState.playerIndex) / this.gameState.players.length);
+            thisPlayerTurnNumber = Math.ceil(
+                (this.gameState?.turnNumber - this.gameState.playerIndex) /
+                    this.gameState.players.length
+            );
         }
 
         return html`
@@ -148,8 +161,14 @@ export class GameDisplay extends LitElement {
             ></game-board>
             <player-hand
                 @card-click=${(e: CustomEvent<HandClickEventParams>) => {
-                    this.selectedCard = e.detail.card;
-                    this.selectedCardIndex = e.detail.index;
+                    if (this.selectedCardIndex === e.detail.index) {
+                        this.selectedCard = undefined;
+                        this.selectedCardIndex = undefined;
+                    }
+                    else {
+                        this.selectedCard = e.detail.card;
+                        this.selectedCardIndex = e.detail.index;
+                    }
 
                     e.detail.sourceEvent.stopPropagation();
                 }}
