@@ -1,5 +1,5 @@
 import express from 'express';
-import fs from 'fs/promises';
+import fs from 'fs';
 import https from 'https';
 import { Server, Socket } from 'socket.io';
 import { Command, CommandCallback } from '../common/ts/interface/interface';
@@ -13,8 +13,8 @@ console.log('Server <( Hello World! )');
 const port = 443;
 
 const sslDir = '/etc/letsencrypt/live/seq.jezzamon.com/'
-const cert = await fs.readFile(sslDir + 'fullchain.pem');
-const key = await fs.readFile(sslDir + 'privkey.pem');
+const cert = fs.readFileSync(sslDir + 'fullchain.pem');
+const key = fs.readFileSync(sslDir + 'privkey.pem');
 
 // Placeholder express app.
 const app = express();
