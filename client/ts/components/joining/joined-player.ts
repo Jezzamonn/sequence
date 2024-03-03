@@ -17,6 +17,7 @@ export class JoinedPlayer extends LitElement {
             width: 20px;
             height: 20px;
             margin-right: 5px;
+            margin-top: 5px;
         }
 
         .player-text {

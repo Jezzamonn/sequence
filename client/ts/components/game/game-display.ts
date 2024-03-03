@@ -26,14 +26,12 @@ export class GameDisplay extends LitElement {
             .players {
                 grid-row: 1;
                 grid-column: 1 / span 3;
+                gap: 10px;
+                margin: 10px;
 
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
-            }
-
-            .player {
-                min-width: 200px;
             }
 
             @keyframes glow {
