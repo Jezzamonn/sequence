@@ -2,6 +2,7 @@ import { LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { PlayerVisibleGameState } from '../../../common/ts/game';
 import { Player } from '../../../common/ts/players';
+import { toSentenceCase } from '../../../common/ts/util';
 import { connection } from '../connection';
 import { NameEntry } from './joining/name-entry';
 
@@ -35,13 +36,29 @@ export class RootComponent extends LitElement {
         super.connectedCallback();
         connection.onGameState = (state: PlayerVisibleGameState) => {
             console.log('Game state:', state);
+
+            if (
+                this._gameState != undefined &&
+                this._gameState.gameWinner == undefined &&
+                state.gameWinner != undefined
+            ) {
+                this.notify(
+                    'Game over! ' + toSentenceCase(state.gameWinner) + ' wins!'
+                );
+            }
+
             this._gameState = state;
-            const nameEntry = this.shadowRoot?.querySelector('name-entry') as NameEntry | undefined;
+            const nameEntry = this.shadowRoot?.querySelector('name-entry') as
+                | NameEntry
+                | undefined;
 
             if (state == undefined) {
                 this._state = 'nameEntry';
-            }
-            else if (nameEntry && nameEntry.joined) {
+            } else if (
+                state.gameWinner == undefined &&
+                nameEntry &&
+                nameEntry.joined
+            ) {
                 this._state = 'game';
             }
         };
@@ -60,7 +77,8 @@ export class RootComponent extends LitElement {
         if (this._state === 'nameEntry') {
             mainElem = html`<name-entry
                 .joinedPlayers=${this._players}
-                .autoJoin=${this._gameState != undefined}
+                .autoJoin=${this._gameState != undefined &&
+                this._gameState.gameWinner == undefined}
                 @notify=${(event: CustomEvent<string>) =>
                     this.notify(event.detail)}
             >

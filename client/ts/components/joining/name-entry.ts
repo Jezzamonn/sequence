@@ -8,29 +8,6 @@ const localStoragePrefix = 'sequence';
 
 @customElement('name-entry')
 export class NameEntry extends LitElement {
-    @property({ type: String })
-    accessor name = '';
-
-    @property({ type: String })
-    accessor quest = '';
-
-    @property({ type: String })
-    accessor color: Color | undefined;
-
-    @property({ type: Array })
-    accessor joinedPlayers: Player[] = [];
-
-    @property({ type: Boolean })
-    accessor joined = false;
-
-    @property({ type: Boolean })
-    accessor autoJoin = false;
-
-    @state()
-    private _nameValid = true;
-    @state()
-    private _colorValid = true;
-
     static styles = css`
         :host {
             background: #ffffff99;
@@ -91,6 +68,33 @@ export class NameEntry extends LitElement {
         }
     `;
 
+    @property({ type: String })
+    accessor name = '';
+
+    @property({ type: String })
+    accessor quest = '';
+
+    @property({ type: String })
+    accessor color: Color | undefined;
+
+    @property({ type: Array })
+    accessor joinedPlayers: Player[] = [];
+
+    @property({ type: Boolean })
+    accessor joined = false;
+
+    @property({ type: Boolean })
+    accessor autoJoin = false;
+
+    @state()
+    private _nameValid = true;
+    @state()
+    private _colorValid = true;
+
+    get inputsValid(): boolean {
+        return this.name.trim() !== '' && this.color != undefined;
+    }
+
     constructor() {
         super();
 
@@ -98,7 +102,7 @@ export class NameEntry extends LitElement {
     }
 
     updated() {
-        if (this.autoJoin && !this.joined) {
+        if (this.autoJoin && !this.joined && this.inputsValid) {
             this.handleJoinGame();
         }
     }
@@ -235,14 +239,14 @@ export class NameEntry extends LitElement {
 
     async handleJoinGame() {
         this.validateInput();
-        if (this.name.trim() === '' || this.color == undefined) {
+        if (!this.inputsValid) {
             return;
         }
 
         const result = await connection.join({
             name: this.name,
             quest: this.quest.trim() == '' ? undefined : this.quest.trim(),
-            color: this.color,
+            color: this.color!,
         });
         if (result.error != undefined) {
             this.dispatchEvent(
