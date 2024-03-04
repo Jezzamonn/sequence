@@ -74,9 +74,16 @@ export class RootComponent extends LitElement {
 
     render() {
         let mainElem: TemplateResult;
+        // Only show on going players if the game isn't won.
+        const ongoingPlayers =
+            this._gameState?.gameWinner == undefined
+                ? this._gameState?.players ?? []
+                : [];
+
         if (this._state === 'nameEntry') {
             mainElem = html`<name-entry
                 .joinedPlayers=${this._players}
+                .ongoingGamePlayers=${ongoingPlayers}
                 .autoJoin=${this._gameState != undefined &&
                 this._gameState.gameWinner == undefined}
                 @notify=${(event: CustomEvent<string>) =>

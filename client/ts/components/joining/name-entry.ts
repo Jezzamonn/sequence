@@ -1,4 +1,4 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Color, allColors } from '../../../../common/ts/board';
 import { Player } from '../../../../common/ts/players';
@@ -80,6 +80,9 @@ export class NameEntry extends LitElement {
     @property({ type: Array })
     accessor joinedPlayers: Player[] = [];
 
+    @property({ type: Array })
+    accessor ongoingGamePlayers: Player[] = [];
+
     @property({ type: Boolean })
     accessor joined = false;
 
@@ -108,17 +111,13 @@ export class NameEntry extends LitElement {
     }
 
     render() {
-        const joinedPlayers = this.joinedPlayers.map(
-            (player) => html`
-                <joined-player
-                    name=${player.name}
-                    quest=${player.quest}
-                    color=${player.color}
-                ></joined-player>
-            `
+        const sections: TemplateResult[] = [];
+
+        const nameIsInGame = this.ongoingGamePlayers.some(
+            (player) => player.name === this.name
         );
 
-        return html`
+        const entry = html`
             <h1>Online Sequence</h1>
             <label
                 class="label ${this._nameValid ? '' : 'invalid'}"
@@ -160,7 +159,7 @@ export class NameEntry extends LitElement {
                         ? 'selected'
                         : ''}"
                     @click=${() => {
-                        this.color = 'blue'
+                        this.color = 'blue';
                         this.saveToLocalStorage();
                         this.updateIfJoined();
                     }}
@@ -172,11 +171,11 @@ export class NameEntry extends LitElement {
                     class="token-button ${this.color === 'green'
                         ? 'selected'
                         : ''}"
-                        @click=${() => {
-                            this.color = 'green'
-                            this.saveToLocalStorage();
-                            this.updateIfJoined();
-                        }}
+                    @click=${() => {
+                        this.color = 'green';
+                        this.saveToLocalStorage();
+                        this.updateIfJoined();
+                    }}
                 >
                     <token-marker color="green"></token-marker>
                 </button>
@@ -184,34 +183,67 @@ export class NameEntry extends LitElement {
                     class="token-button ${this.color === 'red'
                         ? 'selected'
                         : ''}"
-                        @click=${() => {
-                            this.color = 'red'
-                            this.saveToLocalStorage();
-                            this.updateIfJoined();
-                        }}
+                    @click=${() => {
+                        this.color = 'red';
+                        this.saveToLocalStorage();
+                        this.updateIfJoined();
+                    }}
                 >
                     <token-marker color="red"></token-marker>
                 </button>
             </div>
             <hr />
-            <button
-                class="large-button"
-                @click=${this.handleJoinGame}
-            >
-                Join
-            </button>
-            <hr />
-            <h2>Joined players:</h2>
-            <div class="joined-players">
-                ${joinedPlayers}
-            </div>
-            <button
-                class="large-button"
-                .disabled=${!this.joined}
-                @click=${this.handleStartGame}>
-                Start
+            <button class="large-button" @click=${this.handleJoinGame}>
+                ${nameIsInGame ? 'Rejoin' : 'Join'}
             </button>
         `;
+        sections.push(entry);
+
+        if (this.ongoingGamePlayers.length > 0) {
+            const ongoingGame = html`
+                <hr />
+                <h2>Ongoing game:</h2>
+                <div class="joined-players">
+                    ${this.ongoingGamePlayers.map(
+                        (player) => html`
+                            <joined-player
+                                name=${player.name}
+                                quest=${player.quest}
+                                color=${player.color}
+                            ></joined-player>
+                        `
+                    )}
+                </div>
+            `;
+            sections.push(ongoingGame);
+        }
+
+        if (this.joinedPlayers.length > 0) {
+            const joinedPlayers = html`
+                <hr />
+                <h2>Joined players:</h2>
+                <div class="joined-players">
+                    ${this.joinedPlayers.map(
+                        (player) => html`
+                            <joined-player
+                                name=${player.name}
+                                quest=${player.quest}
+                                color=${player.color}
+                            ></joined-player>
+                        `
+                    )}
+                </div>
+                <button
+                    class="large-button"
+                    .disabled=${!this.joined}
+                    @click=${this.handleStartGame}
+                >
+                    Start
+                </button>
+            `;
+            sections.push(joinedPlayers);
+        }
+        return sections;
     }
 
     saveToLocalStorage() {
@@ -226,8 +258,7 @@ export class NameEntry extends LitElement {
         const savedColor = localStorage.getItem(`${localStoragePrefix}-color`);
         if (allColors.includes(savedColor as any)) {
             this.color = savedColor as Color;
-        }
-        else {
+        } else {
             this.color = undefined;
         }
     }
