@@ -4,6 +4,7 @@ import https from 'https';
 import { Server, Socket } from 'socket.io';
 import { Command, CommandCallback } from '../common/ts/interface/interface';
 import { Player } from '../common/ts/players';
+import { wait } from '../common/ts/util';
 import { logIfError } from './server-common';
 import { ServerGameManager } from './server-game-manager';
 import { ServerPlayerManager } from './server-player-manager';
@@ -72,6 +73,10 @@ playerManager.onStart = (allowAI: boolean) => {
         console.error(e);
         return { error: 'An unknown error occurred' };
     }
+
+    wait(0).then(() => {
+        playerManager.sendPlayersState(io);
+    });
 
     return {};
 };
