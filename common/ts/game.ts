@@ -77,6 +77,10 @@ export class GameManager {
 
         this.random = random;
 
+        // Move a random amount of players to the end of the players array so that a random player goes first.
+        const numToMove = Math.floor(random() * numPlayers);
+        const playersWithRandomStartPlayer = players.slice(numToMove).concat(players.slice(0, numToMove));
+
         // Two decks.
         const deck = shuffle(allCards.concat(allCards), this.random);
 
@@ -90,7 +94,7 @@ export class GameManager {
         }
 
         this.state = {
-            players,
+            players: playersWithRandomStartPlayer,
 
             deck,
             discarded: [],
@@ -101,7 +105,7 @@ export class GameManager {
             sequenceCount: 0,
 
             turnNumber: 0,
-            nextPlayerIndex: Math.floor(this.random() * numPlayers),
+            nextPlayerIndex: 0,
             gameWinner: undefined,
         };
     }

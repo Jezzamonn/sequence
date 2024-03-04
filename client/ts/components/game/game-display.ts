@@ -141,6 +141,7 @@ export class GameDisplay extends LitElement {
                 (this.gameState?.turnNumber - this.gameState.playerIndex) /
                     this.gameState.players.length
             );
+            console.log('Turn number:', thisPlayerTurnNumber)
         }
 
         return html`
