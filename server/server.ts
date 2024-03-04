@@ -64,6 +64,7 @@ playerManager.onStart = (allowAI: boolean) => {
     try {
         const players = playerManager.getValidatedPlayers(allowAI);
         gameManager = ServerGameManager.fromPartialPlayers(io, players, allowAI);
+        playerManager.clearPlayers();
     } catch (e) {
         if (e instanceof Error) {
             return { error: e.message };
