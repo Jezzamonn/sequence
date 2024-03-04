@@ -121,7 +121,7 @@ export class GameDisplay extends LitElement {
             );
             canDiscard =
                 validPositions.length === 0 &&
-                !this.gameState.lastActionWasDiscard;
+                !this.gameState.discardedThisTurn;
         }
 
         const players = this.gameState?.players.map((p, i) => {

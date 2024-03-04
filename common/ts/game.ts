@@ -32,7 +32,8 @@ interface GameState {
     discarded: Card[];
     placedTokens: Token[][];
     hands: Card[][];
-    lastActionWasDiscard: boolean;
+    lastAction: [Card, Point | undefined] | undefined;
+    discardedThisTurn: boolean;
     // Used for stopping players from removing from sequences.
     sequenceCount: number;
 
@@ -51,7 +52,8 @@ export interface PlayerVisibleGameState {
     lastCardPlayed: Card | undefined;
     // Undefined if this is a spectator.
     hand?: Card[];
-    lastActionWasDiscard: boolean;
+    lastAction?: [Card, Point | undefined];
+    discardedThisTurn: boolean;
 
     turnNumber: number;
     nextPlayerIndex: number;
@@ -87,7 +89,8 @@ export class GameManager {
             discarded: [],
             placedTokens: makeEmptyPlacedTokens(),
             hands,
-            lastActionWasDiscard: false,
+            lastAction: undefined,
+            discardedThisTurn: false,
             sequenceCount: 0,
 
             turnNumber: 0,
@@ -113,7 +116,8 @@ export class GameManager {
             deckSize: this.state.deck.length,
             lastCardPlayed:
                 this.state.discarded[this.state.discarded.length - 1],
-            lastActionWasDiscard: this.state.lastActionWasDiscard,
+            lastAction: this.state.lastAction,
+            discardedThisTurn: this.state.discardedThisTurn,
 
             turnNumber: this.state.turnNumber,
             nextPlayerIndex: this.state.nextPlayerIndex,
@@ -134,7 +138,7 @@ export class GameManager {
             this.state.sequenceCount,
             this.state.players[playerIndex].color,
             this.state.hands[playerIndex],
-            !this.state.lastActionWasDiscard
+            !this.state.discardedThisTurn
         );
     }
 
@@ -171,7 +175,7 @@ export class GameManager {
         }
 
         if (position == undefined) {
-            if (this.state.lastActionWasDiscard) {
+            if (this.state.discardedThisTurn) {
                 throw new Error(`You can't discard twice in a row.`);
             }
             if (
@@ -217,6 +221,8 @@ export class GameManager {
         }
 
         this.state.turnNumber++;
+        this.state.lastAction = [card, position];
+        this.state.discardedThisTurn = position == undefined;
 
         // Check if a player has won.
         const numTeams = new Set(this.state.players.map((p) => p.color)).size;
@@ -243,8 +249,6 @@ export class GameManager {
             this.state.discarded = [];
         }
 
-        this.state.lastActionWasDiscard = position == undefined;
-
         // If this wasn't a discard, now it's the next player's turn.
         if (position != undefined) {
             this.state.nextPlayerIndex =
@@ -260,7 +264,7 @@ export class GameManager {
             console.log(`Player ${player.name} has no moves, ending turn.`);
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;
-            this.state.lastActionWasDiscard = false;
+            this.state.discardedThisTurn = false;
         }
     }
 }
