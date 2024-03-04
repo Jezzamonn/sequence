@@ -156,6 +156,7 @@ export class GameDisplay extends LitElement {
                 }}
                 .placedTokens=${this.gameState?.placedTokens}
                 .validPositions=${validPositions}
+                .lastMove=${this.gameState?.lastMove}
             ></game-board>
             <player-hand
                 @card-click=${(e: CustomEvent<HandClickEventParams>) => {

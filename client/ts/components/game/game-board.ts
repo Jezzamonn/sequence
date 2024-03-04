@@ -4,6 +4,8 @@ import {
     boardLayout,
     boardSize
 } from '../../../../common/ts/board';
+import { isOneEyedJack } from '../../../../common/ts/cards';
+import { Move } from '../../../../common/ts/game';
 import { Point } from '../../../../common/ts/point';
 import { BoardClickEventParams } from '../events';
 
@@ -45,6 +47,10 @@ export class GameBoardElement extends LitElement {
             .card-invalid {
                 filter: brightness(0.9);
             }
+
+            .card-animated {
+                z-index: 1;
+            }
         `,
     ];
 
@@ -54,13 +60,29 @@ export class GameBoardElement extends LitElement {
     @property({ type: Array })
     accessor validPositions: Point[] | undefined;
 
+    @property({ type: Object})
+    accessor lastMove: Move | undefined;
+
     render() {
         let cards = [];
         for (let y = 0; y < boardSize; y++) {
             let rowCards = [];
             for (let x = 0; x < boardSize; x++) {
                 const card = boardLayout[y][x];
-                const token = this.placedTokens?.[y]?.[x];
+                let token = this.placedTokens?.[y]?.[x];
+
+                let animatePlacement = false;
+                let animateRemoval = false;
+
+                if (this.lastMove?.position?.x === x && this.lastMove?.position?.y === y) {
+                    token = this.lastMove?.color;
+                    if (isOneEyedJack(this.lastMove?.card)) {
+                        animateRemoval = true;
+                    } else {
+                        animatePlacement = true;
+                    }
+                }
+
                 const valid = this.validPositions?.some(
                     (p) => p.x === x && p.y === y
                 );
@@ -70,12 +92,15 @@ export class GameBoardElement extends LitElement {
                             ? 'card-valid'
                             : 'card-invalid'
                         : '';
+                const animatedClass = animatePlacement || animateRemoval ? 'card-animated' : '';
                 rowCards.push(html`<board-card
                     @click="${(e: MouseEvent) => this.handleCardClick(e, x, y)}"
-                    class="card ${validityClass}"
+                    class="card ${validityClass} ${animatedClass}"
                     rank="${card.rank}"
                     suit="${card.suit}"
                     token="${token || nothing}"
+                    .animatePlacement=${animatePlacement}
+                    .animateRemoval=${animateRemoval}
                 ></board-card>`);
             }
             cards.push(html`<div class="row">${rowCards}</div>`);

@@ -15,7 +15,6 @@ export class BoardCardElement extends LitElement {
         // language=CSS
         css`
             :host {
-                overflow: hidden;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -43,7 +42,7 @@ export class BoardCardElement extends LitElement {
                 background-color: white;
                 top: 0;
                 left: 0;
-                font-size: min(40cqh,60cqw);
+                font-size: min(40cqh, 60cqw);
                 text-align: center;
                 line-height: 1em;
                 user-select: none;
@@ -53,11 +52,13 @@ export class BoardCardElement extends LitElement {
                 display: none;
             }
 
-            .card-Spades, .card-Clubs {
+            .card-Spades,
+            .card-Clubs {
                 color: #111;
             }
 
-            .card-Hearts, .card-Diamonds {
+            .card-Hearts,
+            .card-Diamonds {
                 color: #a00;
             }
 
@@ -67,6 +68,37 @@ export class BoardCardElement extends LitElement {
                 height: 90%;
                 pointer-events: none;
                 filter: drop-shadow(0 2px 2px black);
+                transition: transform 0.5s;
+            }
+
+            @keyframes place-token {
+                0% {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+                100% {
+                    transform: scale(1.3);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes remove-token {
+                0% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(2);
+                    opacity: 0.2;
+                }
+            }
+
+            .token-placed {
+                animation: place-token 0.5s forwards;
+            }
+
+            .token-removed {
+                animation: remove-token 0.5s forwards;
             }
         `,
     ];
@@ -79,6 +111,12 @@ export class BoardCardElement extends LitElement {
 
     @property({ type: String })
     accessor token: string | undefined;
+
+    @property({ type: Boolean })
+    accessor animatePlacement: boolean = false;
+
+    @property({ type: Boolean })
+    accessor animateRemoval: boolean = false;
 
     get shortString() {
         return cardToShortString({ rank: this.rank, suit: this.suit });
@@ -96,13 +134,20 @@ export class BoardCardElement extends LitElement {
         // language=HTML
         let tokenElem;
         if (this.token != undefined && this.token !== '') {
-            tokenElem = html`<token-marker class="token" color="${this.token}"></token-marker>`
+            const placedClass = this.animatePlacement ? 'token-placed' : '';
+            const removedClass = this.animateRemoval ? 'token-removed' : '';
+            tokenElem = html`<token-marker
+                class="token ${placedClass} ${removedClass}"
+                color="${this.token}"
+            ></token-marker>`;
         }
 
         // language=HTML
         return html`
             <img class="card-image card-${this.suit}" src="${this.assetName}" />
-            <div class="card-label card-${this.suit}">${this.rank}<br>${suitToSymbol.get(this.suit)}</div>
+            <div class="card-label card-${this.suit}">
+                ${this.rank}<br />${suitToSymbol.get(this.suit)}
+            </div>
             ${tokenElem}
         `;
     }

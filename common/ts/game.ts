@@ -1,6 +1,7 @@
 // State of the game
 
 import {
+    Color,
     Token,
     countSequences,
     getMovesForPlayer,
@@ -25,6 +26,12 @@ import {
 import { Point } from './point';
 import { shuffle, toSentenceCase } from './util';
 
+export interface Move {
+    card: Card;
+    position: Point | undefined;
+    color: Color;
+}
+
 interface GameState {
     players: Player[];
 
@@ -32,7 +39,7 @@ interface GameState {
     discarded: Card[];
     placedTokens: Token[][];
     hands: Card[][];
-    lastAction: [Card, Point | undefined] | undefined;
+    lastMove: Move | undefined;
     discardedThisTurn: boolean;
     // Used for stopping players from removing from sequences.
     sequenceCount: number;
@@ -52,7 +59,7 @@ export interface PlayerVisibleGameState {
     lastCardPlayed: Card | undefined;
     // Undefined if this is a spectator.
     hand?: Card[];
-    lastAction?: [Card, Point | undefined];
+    lastMove: Move | undefined;
     discardedThisTurn: boolean;
 
     turnNumber: number;
@@ -89,7 +96,7 @@ export class GameManager {
             discarded: [],
             placedTokens: makeEmptyPlacedTokens(),
             hands,
-            lastAction: undefined,
+            lastMove: undefined,
             discardedThisTurn: false,
             sequenceCount: 0,
 
@@ -116,7 +123,7 @@ export class GameManager {
             deckSize: this.state.deck.length,
             lastCardPlayed:
                 this.state.discarded[this.state.discarded.length - 1],
-            lastAction: this.state.lastAction,
+            lastMove: this.state.lastMove,
             discardedThisTurn: this.state.discardedThisTurn,
 
             turnNumber: this.state.turnNumber,
@@ -212,8 +219,11 @@ export class GameManager {
         hand.splice(index, 1);
         this.state.discarded.push(card);
 
+        let moveColor = player.color;
+
         if (position != undefined) {
             if (isOneEyedJack(card)) {
+                moveColor = this.state.placedTokens[position.y][position.x]!;
                 this.state.placedTokens[position.y][position.x] = undefined;
             } else {
                 this.state.placedTokens[position.y][position.x] = player.color;
@@ -221,7 +231,7 @@ export class GameManager {
         }
 
         this.state.turnNumber++;
-        this.state.lastAction = [card, position];
+        this.state.lastMove = {card, position, color: moveColor};
         this.state.discardedThisTurn = position == undefined;
 
         // Check if a player has won.
