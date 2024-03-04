@@ -14,7 +14,7 @@ export class Connection {
     onPlayersState: ((players: Player[]) => void) | undefined;
 
     constructor() {
-        this.socket = io('https://seq.jezzamon.com');
+        this.socket = io(location.origin);
 
         this.socket.on('connect', () => {
             console.log('Connected to server');

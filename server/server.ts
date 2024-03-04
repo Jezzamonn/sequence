@@ -1,5 +1,6 @@
 import express from 'express';
 import fs from 'fs';
+import http from 'http';
 import https from 'https';
 import { Server, Socket } from 'socket.io';
 import { Command, CommandCallback } from '../common/ts/interface/interface';
@@ -11,17 +12,26 @@ import { ServerPlayerManager } from './server-player-manager';
 
 console.log('Server <( Hello World! )');
 
-const port = 443;
-
-const sslDir = '/etc/letsencrypt/live/seq.jezzamon.com/'
-const cert = fs.readFileSync(sslDir + 'fullchain.pem');
-const key = fs.readFileSync(sslDir + 'privkey.pem');
+let port: number;
 
 // Placeholder express app.
 const app = express();
 app.use(express.static('../client/build'));
 
-const server = https.createServer({ cert, key }, app);
+let server: http.Server | https.Server;
+
+if (process.env.NODE_ENV === 'production') {
+    port = 443;
+
+    const sslDir = '/etc/letsencrypt/live/seq.jezzamon.com/'
+    const cert = fs.readFileSync(sslDir + 'fullchain.pem');
+    const key = fs.readFileSync(sslDir + 'privkey.pem');
+
+    server = https.createServer({ cert, key }, app);
+} else {
+    port = 8080;
+    server = http.createServer(app);
+}
 
 const io = new Server(server, {
     cors: {
