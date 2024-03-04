@@ -93,4 +93,8 @@ export class ServerPlayerManager {
         this.validatePlayers(allowAI);
         return [...this.joinedPlayers.values()];
     }
+
+    clearPlayers(): void {
+        this.joinedPlayers.clear();
+    }
 }
