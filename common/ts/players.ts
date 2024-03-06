@@ -30,9 +30,6 @@ export function validatePlayerColors(colors: Color[], allowAI = false) {
     for (const color of colors) {
         colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
     }
-    console.log(colors);
-    console.log(colorCounts);
-    console.log(colorCounts.size);
 
     if (allowAI) {
         let numTeams = colorCounts.size;

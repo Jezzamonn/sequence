@@ -2,7 +2,7 @@ import { Move, boardSize } from "../board";
 import { PlayerVisibleGameState } from "../game";
 import { AIInterface } from "./ai-interface";
 
-export class PreferMiddle implements AIInterface {
+export class PreferMiddleAI implements AIInterface {
 
     makeMove(moves: Move[], state: PlayerVisibleGameState): Move {
         let closestDist = Infinity;

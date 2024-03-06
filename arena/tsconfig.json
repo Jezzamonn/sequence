@@ -1,0 +1,18 @@
+{
+    "extends": "@tsconfig/recommended/tsconfig.json",
+
+    "compilerOptions": {
+        "target": "es2020",
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "allowJs": true,
+        "experimentalDecorators": true,
+        "typeRoots": ["types"]
+    },
+
+    "include": [
+        "**/*",
+        "../common/ts/**/*",
+    ]
+
+}

@@ -1,0 +1,16 @@
+{
+  "name": "sequence-arena",
+  "version": "0.0.1",
+  "description": "Sequence AI Arena",
+  "scripts": {
+    "start": "ts-node arena.ts"
+  },
+  "author": "Jezzamon",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@tsconfig/recommended": "^1.0.3",
+    "glicko2": "^1.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

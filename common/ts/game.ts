@@ -65,12 +65,15 @@ export interface PlayerVisibleGameState {
 export class GameManager {
     state: GameState;
     random: () => number;
+    // Function for logging messages.
+    log: (message: string) => void;
 
-    constructor(players: Player[], random: () => number) {
+    constructor(players: Player[], random: () => number, log: (message: string) => void = () => {}) {
         validatePlayerColors(players.map((p) => p.color));
         const numPlayers = players.length;
 
         this.random = random;
+        this.log = log;
 
         // Move a random amount of players to the end of the players array so that a random player goes first.
         const numToMove = Math.floor(random() * numPlayers);
@@ -253,7 +256,7 @@ export class GameManager {
 
         // If that was the last card, shuffle the discarded cards and use them as the new deck.
         if (this.state.deck.length == 0) {
-            console.log('Shuffling discards.');
+            this.log('Shuffling discards.');
             this.state.deck = shuffle(this.state.discarded, this.random);
             this.state.discarded = [];
         }
@@ -270,7 +273,7 @@ export class GameManager {
                 hand
             )
         ) {
-            console.log(`Player ${player.name} has no moves, ending turn.`);
+            this.log(`Player ${player.name} has no moves, ending turn.`);
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;
             this.state.discardedThisTurn = false;
