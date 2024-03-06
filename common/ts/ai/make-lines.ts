@@ -5,11 +5,7 @@ import { AIInterface } from "./ai-interface";
 
 export class MakeLinesAI implements AIInterface {
 
-    fallback: AIInterface;
-
-    constructor(fallback: AIInterface) {
-        this.fallback = fallback;
-    }
+    constructor(private fallback: AIInterface) { }
 
     makeMove(moves: Move[], state: PlayerVisibleGameState): Move {
         let bestMoves: Move[] = [];

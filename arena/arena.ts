@@ -59,8 +59,9 @@ const players = allAIs.map((aiClass) => ({
 const matches: [GlickoPlayer, GlickoPlayer, number][] = [];
 const numPairs = (allAIs.length * (allAIs.length - 1)) / 2;
 
-const totalMatches = 1000;
-const numMatchesPerPair = Math.floor(totalMatches / numPairs);
+const totalMatches = 5000;
+const numMatchesPerPair = Math.ceil(totalMatches / numPairs);
+console.log(`Matches per pair: ${numMatchesPerPair}`);
 
 let matchNum = 1;
 for (let i = 0; i < allAIs.length; i++) {

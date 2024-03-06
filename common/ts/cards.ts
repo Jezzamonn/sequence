@@ -28,6 +28,10 @@ export function isOneEyedJack(card: Card) {
     return card.rank == 'J' && (card.suit == 'Hearts' || card.suit == 'Spades');
 }
 
+export function isTwoEyedJack(card: Card) {
+    return card.rank == 'J' && (card.suit == 'Diamonds' || card.suit == 'Clubs');
+}
+
 export const allSuits: Suit[] = ['Spades', 'Diamonds', 'Clubs', 'Hearts'];
 export const allRanks: Rank[] = [
     '2',
