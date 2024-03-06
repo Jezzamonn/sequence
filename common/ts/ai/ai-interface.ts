@@ -1,11 +1,10 @@
-import { Card } from "../cards";
+import { Move } from "../board";
 import { PlayerVisibleGameState } from "../game";
 import { Player } from "../players";
-import { Point } from "../point";
 
 export interface AIInterface {
 
-    makeMove(moves: [Card, Point | undefined][], state: PlayerVisibleGameState): [Card, Point | undefined];
+    makeMove(moves: Move[], state: PlayerVisibleGameState): Move;
 
 }
 

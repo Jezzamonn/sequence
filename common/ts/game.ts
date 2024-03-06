@@ -1,14 +1,15 @@
 // State of the game
 
 import {
-    Color,
+    Move,
+    MoveAndColor,
     Token,
     countSequences,
     getMovesForPlayer,
     isValidDiscard,
     isValidPlacement,
     makeEmptyPlacedTokens,
-    playerHasPossibleMove,
+    playerHasPossibleMove
 } from './board';
 import {
     Card,
@@ -26,12 +27,6 @@ import {
 import { Point } from './point';
 import { shuffle, toSentenceCase } from './util';
 
-export interface Move {
-    card: Card;
-    position: Point | undefined;
-    color: Color;
-}
-
 interface GameState {
     players: Player[];
 
@@ -39,7 +34,7 @@ interface GameState {
     discarded: Card[];
     placedTokens: Token[][];
     hands: Card[][];
-    lastMove: Move | undefined;
+    lastMove: MoveAndColor | undefined;
     discardedThisTurn: boolean;
     // Used for stopping players from removing from sequences.
     sequenceCount: number;
@@ -59,7 +54,7 @@ export interface PlayerVisibleGameState {
     lastCardPlayed: Card | undefined;
     // Undefined if this is a spectator.
     hand?: Card[];
-    lastMove: Move | undefined;
+    lastMove: MoveAndColor | undefined;
     discardedThisTurn: boolean;
 
     turnNumber: number;
@@ -143,7 +138,7 @@ export class GameManager {
         return state;
     }
 
-    getMovesForPlayer(playerIndex: number): [Card, Point | undefined][] {
+    getMovesForPlayer(playerIndex: number): Move[] {
         return getMovesForPlayer(
             this.state.placedTokens,
             this.state.sequenceCount,

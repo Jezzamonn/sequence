@@ -1,0 +1,31 @@
+import { Move, boardSize } from "../board";
+import { PlayerVisibleGameState } from "../game";
+import { AIInterface } from "./ai-interface";
+
+export class PreferMiddle implements AIInterface {
+
+    makeMove(moves: Move[], state: PlayerVisibleGameState): Move {
+        let closestDist = Infinity;
+        let closestMove = moves[0];
+        const middleX = (boardSize - 1) / 2;
+        const middleY = (boardSize - 1) / 2;
+        for (let move of moves) {
+            const { position } = move;
+            if (position == undefined) {
+                continue;
+            }
+            const xDist = Math.abs(position.x - middleX);
+            const yDist = Math.abs(position.y - middleY);
+
+            // Eucledian distance doesn't really make sense here, so use a distance function with square iso-lines.
+            const dist = Math.max(xDist, yDist);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestMove = move;
+            }
+        }
+
+        return closestMove;
+    }
+
+}

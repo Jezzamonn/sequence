@@ -13,6 +13,21 @@ export type Color = 'blue' | 'green' | 'red';
 export const allColors: Color[] = ['blue', 'green', 'red'];
 export type Token = Color | undefined;
 
+/**
+ * A move and the color of token that changed (not necessarily the player that
+ * made the move if a token was removed by a one-eyed joker)
+ */
+export interface MoveAndColor {
+    card: Card;
+    position: Point | undefined;
+    color: Color;
+}
+
+export interface Move {
+    card: Card;
+    position: Point | undefined;
+}
+
 export const boardSize = 10;
 
 export const allPositions = Array(boardSize)
@@ -264,7 +279,7 @@ export function getMovesForPlayer(
     playerColor: Color,
     cards: Card[],
     canDiscard: boolean
-): [Card, Point | undefined][] {
+): Move[] {
     return cards.flatMap((card) => {
         const moves = getMovesForCard(
             placedTokens,
@@ -273,9 +288,9 @@ export function getMovesForPlayer(
             card
         );
         if (moves.length == 0 && canDiscard) {
-            return [[card, undefined]] as [Card, Point | undefined][];
+            return { card, position: undefined } as Move;
         }
-        return moves.map((point) => [card, point]) as [Card, Point][];
+        return moves.map((point) => ({ card, position: point }));
     });
 }
 

@@ -2,10 +2,10 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
     boardLayout,
-    boardSize
+    boardSize,
+    MoveAndColor
 } from '../../../../common/ts/board';
 import { isOneEyedJack } from '../../../../common/ts/cards';
-import { Move } from '../../../../common/ts/game';
 import { Point } from '../../../../common/ts/point';
 import { BoardClickEventParams } from '../events';
 
@@ -61,7 +61,7 @@ export class GameBoardElement extends LitElement {
     accessor validPositions: Point[] | undefined;
 
     @property({ type: Object})
-    accessor lastMove: Move | undefined;
+    accessor lastMove: MoveAndColor | undefined;
 
     render() {
         let cards = [];
