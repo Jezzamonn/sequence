@@ -43,8 +43,6 @@ function playGame(ai1: AIInterface, ai2: AIInterface): GameWinner {
     return GameWinner.Second;
 }
 
-const numMatchesPerPair = 100;
-
 const ratings = new Glicko2({
     tau: 0.5,
     rating: 1500,
@@ -54,12 +52,16 @@ const ratings = new Glicko2({
 
 const players = allAIs.map((aiClass) => ({
     name: aiClass.name,
+    factory: aiClass.factory,
     glickoPlayer: ratings.makePlayer(),
-    constructor: aiClass,
 }));
 
 const matches: [GlickoPlayer, GlickoPlayer, number][] = [];
 const numPairs = (allAIs.length * (allAIs.length - 1)) / 2;
+
+const totalMatches = 1000;
+const numMatchesPerPair = Math.floor(totalMatches / numPairs);
+
 let matchNum = 1;
 for (let i = 0; i < allAIs.length; i++) {
     for (let j = i + 1; j < allAIs.length; j++) {
@@ -70,8 +72,8 @@ for (let i = 0; i < allAIs.length; i++) {
         );
         for (let k = 0; k < numMatchesPerPair; k++) {
             const winner = playGame(
-                new aiInfo1.constructor(),
-                new aiInfo2.constructor()
+                aiInfo1.factory(),
+                aiInfo2.factory()
             );
             matches.push([
                 aiInfo1.glickoPlayer,

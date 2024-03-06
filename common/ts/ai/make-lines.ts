@@ -1,10 +1,15 @@
 import { Color, Move, Token, allRows } from "../board";
 import { isOneEyedJack } from "../cards";
 import { PlayerVisibleGameState } from "../game";
-import { choose } from "../util";
 import { AIInterface } from "./ai-interface";
 
 export class MakeLinesAI implements AIInterface {
+
+    fallback: AIInterface;
+
+    constructor(fallback: AIInterface) {
+        this.fallback = fallback;
+    }
 
     makeMove(moves: Move[], state: PlayerVisibleGameState): Move {
         let bestMoves: Move[] = [];
@@ -44,11 +49,10 @@ export class MakeLinesAI implements AIInterface {
         }
 
         if (bestMoves.length > 0) {
-            return choose(bestMoves, Math.random);
+            return this.fallback.makeMove(bestMoves, state);
         }
 
-        // Fallback: Choose a random move.
-        return choose(moves, Math.random);
+        return this.fallback.makeMove(moves, state);
     }
 }
 
