@@ -349,7 +349,8 @@ function* decreasingDiagonalRows(): Generator<Point[], void, undefined> {
     }
 }
 
-function* allRows(): Generator<Point[], void, undefined> {
+// Exported to be used by AIs and such.
+export function* allRows(): Generator<Point[], void, undefined> {
     yield* horizontalRows();
     yield* verticalRows();
     yield* increasingDiagonalRows();

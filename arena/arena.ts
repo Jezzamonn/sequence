@@ -1,17 +1,7 @@
 import { Glicko2, Player as GlickoPlayer } from 'glicko2';
 import { AIInterface } from '../common/ts/ai/ai-interface';
-import { ClusterAI } from '../common/ts/ai/cluster';
-import { PreferEdgesAI } from '../common/ts/ai/prefer-edges';
-import { PreferMiddleAI } from '../common/ts/ai/prefer-middle';
-import { RandomAI } from '../common/ts/ai/random';
+import { allAIs } from '../common/ts/ai/ais';
 import { GameManager } from '../common/ts/game';
-
-const aiClasses: (new () => AIInterface)[] = [
-    RandomAI,
-    ClusterAI,
-    PreferEdgesAI,
-    PreferMiddleAI,
-];
 
 enum GameWinner {
     First = 0,
@@ -62,17 +52,17 @@ const ratings = new Glicko2({
     vol: 0.06,
 });
 
-const players = aiClasses.map((aiClass) => ({
+const players = allAIs.map((aiClass) => ({
     name: aiClass.name,
     glickoPlayer: ratings.makePlayer(),
     constructor: aiClass,
 }));
 
 const matches: [GlickoPlayer, GlickoPlayer, number][] = [];
-const numPairs = (aiClasses.length * (aiClasses.length - 1)) / 2;
+const numPairs = (allAIs.length * (allAIs.length - 1)) / 2;
 let matchNum = 1;
-for (let i = 0; i < aiClasses.length; i++) {
-    for (let j = i + 1; j < aiClasses.length; j++) {
+for (let i = 0; i < allAIs.length; i++) {
+    for (let j = i + 1; j < allAIs.length; j++) {
         const aiInfo1 = players[i];
         const aiInfo2 = players[j];
         console.log(
@@ -97,13 +87,13 @@ ratings.updateRatings(matches);
 // Print out all the ratings in a nice ASCII table.
 
 const rankingLength = 'Rank'.length;
-const nameLength = aiClasses
-    .map((aiClass) => aiClass.name.length)
+const nameLength = players
+    .map((p) => p.name.length)
     .reduce((a, b) => Math.max(a, b), 0);
 const ratingLength = 6;
 const rdLength = 6;
 
-const header =  [
+const header = [
     'Rank'.padEnd(rankingLength),
     'Name'.padEnd(nameLength),
     'Rating'.padEnd(ratingLength),
