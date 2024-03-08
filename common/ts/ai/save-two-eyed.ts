@@ -38,7 +38,10 @@ export class SaveTwoEyedJackAI implements AIInterface {
         if (bestMoves.length > 0) {
             return this.fallback.makeMove(bestMoves, state);
         }
-        return this.fallback.makeMove(nonTwoEyedJackMoves, state);
+        if (nonTwoEyedJackMoves.length > 0) {
+            return this.fallback.makeMove(nonTwoEyedJackMoves, state);
+        }
+        return this.fallback.makeMove(moves, state);
     }
 
 }

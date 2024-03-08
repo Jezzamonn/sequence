@@ -6,8 +6,8 @@ import {
     Token,
     countSequences,
     getMovesForPlayer,
+    getPlacementErrorMessage,
     isValidDiscard,
-    isValidPlacement,
     makeEmptyPlacedTokens,
     playerHasPossibleMove
 } from './board';
@@ -202,18 +202,15 @@ export class GameManager {
                 );
             }
         } else {
-            if (
-                !isValidPlacement(
-                    this.state.placedTokens,
-                    this.state.sequenceCount,
-                    player.color,
-                    card,
-                    position
-                )
-            ) {
-                throw new Error(
-                    `You can't place ${cardToDescription(card)} there.`
-                );
+            const possibleErrorMessage = getPlacementErrorMessage(
+                this.state.placedTokens,
+                this.state.sequenceCount,
+                player.color,
+                card,
+                position
+            );
+            if (possibleErrorMessage != undefined) {
+                throw new Error(possibleErrorMessage);
             }
         }
 

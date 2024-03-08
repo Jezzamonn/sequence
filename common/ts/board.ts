@@ -4,7 +4,7 @@ import {
     allSuits,
     cardToShortString,
     cardsAreEqual,
-    isOneEyedJack
+    isOneEyedJack,
 } from './cards';
 import { Point, Points } from './point';
 
@@ -183,23 +183,40 @@ export function isValidPlacement(
     card: Card,
     position: Point
 ) {
+    return (
+        getPlacementErrorMessage(
+            placedTokens,
+            sequenceCount,
+            playerColor,
+            card,
+            position
+        ) == undefined
+    );
+}
+
+export function getPlacementErrorMessage(
+    placedTokens: Token[][],
+    sequenceCount: number,
+    playerColor: Color,
+    card: Card,
+    position: Point
+): string | undefined {
     const tokenAtPosition = placedTokens[position.y][position.x];
     const cardAtPosition = boardLayout[position.y][position.x];
 
-    // Can't place tokens on the wild spaces.
     if (cardAtPosition.rank == 'Joker') {
-        return false;
+        return "Can't place tokens on the corner spaces.";
     }
 
     // Jacks, as wilds, have their own rules.
     if (card.rank == 'J') {
         if (isOneEyedJack(card)) {
             // Can only remove opponent's tokens.
-            if (
-                tokenAtPosition == playerColor ||
-                tokenAtPosition == undefined
-            ) {
-                return false;
+            if (tokenAtPosition == playerColor) {
+                return "Can't remove your own tokens.";
+            }
+            if (tokenAtPosition == undefined) {
+                return "Can't remove a token from an empty space.";
             }
             // Prevent removing sequences. Do this by removing the piece,
             // counting sequences, and seeing if the number is different.
@@ -216,18 +233,28 @@ export function isValidPlacement(
             ].reduce((a, b) => a + b, 0);
             placedTokens[position.y][position.x] = prevValue;
 
-            return newSequences == sequenceCount;
+            if (newSequences != sequenceCount) {
+                return "Can't remove a token that breaks a sequence.";
+            }
+            return undefined;
         } else {
             // Only restriction is that the spot is free.
-            return tokenAtPosition == undefined;
+            if (tokenAtPosition != undefined) {
+                return "Can't place a token on top of another token.";
+            }
+            return undefined;
         }
     }
 
     // Otherwise, the cards need to match, and the spot must be free.
-    return (
-        cardsAreEqual(cardAtPosition, card) &&
-        tokenAtPosition == undefined
-    );
+    if (!cardsAreEqual(cardAtPosition, card)) {
+        return `Can't place ${cardToShortString(
+            card
+        )} on top of ${cardToShortString(cardAtPosition)}.`;
+    }
+    if (tokenAtPosition != undefined) {
+        return "Can't place a token on top of another token.";
+    }
 }
 
 export function cardHasPossibleMove(
@@ -355,6 +382,39 @@ export function* allRows(): Generator<Point[], void, undefined> {
     yield* verticalRows();
     yield* increasingDiagonalRows();
     yield* decreasingDiagonalRows();
+}
+
+function isWildPosition(point: Point): boolean {
+    return (
+        (point.x == 0 || point.x == boardSize - 1) &&
+        (point.y == 0 || point.y == boardSize - 1)
+    );
+}
+
+export function* allPossibleSequences(): Generator<Point[], void, undefined> {
+    for (const row of allRows()) {
+        let start = 0;
+        // End of the loop, one past the last index.
+        let end = row.length;
+        // Skip the corners
+        if (isWildPosition(row[0])) {
+            start++;
+        }
+        if (isWildPosition(row[row.length - 1])) {
+            end--;
+        }
+
+        // range = 0 - 10
+        // i = 0, i+5 = 5, includes 0, 1, 2, 3, 4
+        // i = 1, i+5 = 6, includes 1, 2, 3, 4, 5
+        // i = 2, i+5 = 7, includes 2, 3, 4, 5, 6
+        // i = 3, i+5 = 8, includes 3, 4, 5, 6, 7
+        // i = 4, i+5 = 9, includes 4, 5, 6, 7, 8
+        // i = 5, i+5 = 10, includes 5, 6, 7, 8, 9
+        for (let i = start; i + 5 <= end; i++) {
+            yield row.slice(i, i + 5);
+        }
+    }
 }
 
 export function countSequences(placedTokens: Token[][]): Map<Color, number> {

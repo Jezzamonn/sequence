@@ -23,6 +23,10 @@ export const Points = {
             return 'undefined';
         }
         return `(${p.x}, ${p.y})`;
+    },
+
+    equal(a: Point | undefined, b: Point | undefined): boolean {
+        return a?.x == b?.x && a?.y == b?.y;
     }
 
 };

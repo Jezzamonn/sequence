@@ -4,8 +4,9 @@ import { allAIs } from '../common/ts/ai/ais';
 import { GameManager } from '../common/ts/game';
 
 enum GameWinner {
-    First = 0,
-    Second = 1,
+    First = 1,
+    Second = 0,
+    Tie = 0.5,
 }
 
 function playGame(ai1: AIInterface, ai2: AIInterface): GameWinner {
@@ -27,7 +28,8 @@ function playGame(ai1: AIInterface, ai2: AIInterface): GameWinner {
         Math.random
     );
 
-    while (game.state.gameWinner == undefined) {
+    const maxMoves = 52 * 4;
+    for (let i = 0; i < maxMoves && game.state.gameWinner == undefined; i++) {
         const playerIndex = game.state.nextPlayerIndex;
         const player = game.state.players[playerIndex];
         const ai = aisByName[player.name];
@@ -40,7 +42,10 @@ function playGame(ai1: AIInterface, ai2: AIInterface): GameWinner {
     if (game.state.gameWinner == 'red') {
         return GameWinner.First;
     }
-    return GameWinner.Second;
+    if (game.state.gameWinner == 'blue') {
+        return GameWinner.Second;
+    }
+    return GameWinner.Tie;
 }
 
 const ratings = new Glicko2({
@@ -58,8 +63,9 @@ const players = allAIs.map((aiClass) => ({
 
 const matches: [GlickoPlayer, GlickoPlayer, number][] = [];
 const numPairs = (allAIs.length * (allAIs.length - 1)) / 2;
+const numPairsStr = numPairs.toString();
 
-const totalMatches = 5000;
+const totalMatches = 1000;
 const numMatchesPerPair = Math.ceil(totalMatches / numPairs);
 console.log(`Matches per pair: ${numMatchesPerPair}`);
 
@@ -68,8 +74,9 @@ for (let i = 0; i < allAIs.length; i++) {
     for (let j = i + 1; j < allAIs.length; j++) {
         const aiInfo1 = players[i];
         const aiInfo2 = players[j];
+        const matchStr = matchNum.toString().padStart(numPairsStr.length);
         console.log(
-            `Playing ${aiInfo1.name} vs ${aiInfo2.name} (${matchNum}/${numPairs})`
+            `[${matchStr}/${numPairsStr}] Playing ${aiInfo1.name} vs ${aiInfo2.name}`
         );
         for (let k = 0; k < numMatchesPerPair; k++) {
             const winner = playGame(
@@ -79,7 +86,7 @@ for (let i = 0; i < allAIs.length; i++) {
             matches.push([
                 aiInfo1.glickoPlayer,
                 aiInfo2.glickoPlayer,
-                winner == GameWinner.First ? 1 : 0,
+                winner,
             ]);
         }
         matchNum++;

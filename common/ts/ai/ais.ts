@@ -5,11 +5,17 @@ import { PreferCornersAI } from './prefer-corners';
 import { PreferEdgesAI } from './prefer-edges';
 import { PreferMiddleAI } from './prefer-middle';
 import { RandomAI } from './random';
-import { SaveTwoEyedJackAI } from './save_joker';
+import { SaveOneEyedJackAI } from './save-one-eyed';
+import { SaveTwoEyedJackAI } from './save-two-eyed';
 
 interface AIInfo {
     name: string;
     factory: () => AIInterface;
+}
+
+interface CompositeAIInfo {
+    name: string;
+    factory: (fallback: AIInterface) => AIInterface;
 }
 
 const baseAIs: AIInfo[] = [
@@ -20,20 +26,34 @@ const baseAIs: AIInfo[] = [
     { name: 'PreferCorners', factory: () => new PreferCornersAI() },
 ];
 
+const compositeAIs: CompositeAIInfo[] = [
+    { name: 'MakeLines', factory: (fallback) => new MakeLinesAI(fallback) },
+    { name: 'SaveTwoEyed', factory: (fallback) => new SaveTwoEyedJackAI(fallback) },
+    { name: 'SaveOneEyed', factory: (fallback) => new SaveOneEyedJackAI(fallback) },
+];
+
 export const allAIs: AIInfo[] = [];
 
 allAIs.push(...baseAIs);
 
-for (const baseAI of allAIs.slice()) {
-    allAIs.push({
-        name: `MakeLines_${baseAI.name}`,
-        factory: () => new MakeLinesAI(baseAI.factory()),
-    });
-}
+for (const compositeAI of compositeAIs) {
+    for (const baseAI of baseAIs) {
+        allAIs.push({
+            name: `${compositeAI.name}_${baseAI.name}`,
+            factory: () => compositeAI.factory(baseAI.factory()),
+        });
+    }
 
-for (const baseAI of allAIs.slice()) {
-    allAIs.push({
-        name: `SaveTwoEyed_${baseAI.name}`,
-        factory: () => new SaveTwoEyedJackAI(baseAI.factory()),
-    });
+    // // Also add two levels of composite AIs.
+    // for (const compositeAI2 of compositeAIs) {
+    //     if (compositeAI2 === compositeAI) {
+    //         continue;
+    //     }
+    //     for (const baseAI of baseAIs) {
+    //         allAIs.push({
+    //             name: `${compositeAI2.name}_${compositeAI.name}_${baseAI.name}`,
+    //             factory: () => compositeAI2.factory(compositeAI.factory(baseAI.factory())),
+    //         });
+    //     }
+    // }
 }
