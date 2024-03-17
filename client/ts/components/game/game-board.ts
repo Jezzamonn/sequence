@@ -3,7 +3,8 @@ import { customElement, property } from 'lit/decorators.js';
 import {
     boardLayout,
     boardSize,
-    MoveAndColor
+    MoveAndColor,
+    spiralPositionIndices
 } from '../../../../common/ts/board';
 import { isOneEyedJack } from '../../../../common/ts/cards';
 import { Point } from '../../../../common/ts/point';
@@ -76,8 +77,6 @@ export class GameBoardElement extends LitElement {
     accessor lastMove: MoveAndColor | undefined;
 
     render() {
-        const totalAnimationTime = 0.4;
-        const animationDelayPerCard = totalAnimationTime / (boardSize + 2);
         let cards = [];
         for (let y = 0; y < boardSize; y++) {
             let rowCards = [];
@@ -107,7 +106,7 @@ export class GameBoardElement extends LitElement {
                             : 'card-invalid'
                         : '';
                 const animatedClass = animatePlacement || animateRemoval ? 'card-animated' : '';
-                const animationDelay = (x + y) * animationDelayPerCard;
+                const animationDelay = this.getAnimationDelay(x, y);
                 rowCards.push(html`<board-card
                     @click="${(e: MouseEvent) => this.handleCardClick(e, x, y)}"
                     class="card ${validityClass} ${animatedClass}"
@@ -122,6 +121,17 @@ export class GameBoardElement extends LitElement {
             cards.push(html`<div class="row">${rowCards}</div>`);
         }
         return cards;
+    }
+
+    getAnimationDelay(x: number, y: number) {
+        // const totalAnimationTime = 0.4;
+        // const animationDelayPerCard = totalAnimationTime / (boardSize * 2);
+        // return (x + y) * animationDelayPerCard;
+
+        const totalAnimationTime = 2;
+        const animationDelayPerCard = totalAnimationTime / (boardSize * boardSize);
+        const spiralIndex = spiralPositionIndices[y][x];
+        return spiralIndex * animationDelayPerCard;
     }
 
     handleCardClick(e: MouseEvent, x: number, y: number) {

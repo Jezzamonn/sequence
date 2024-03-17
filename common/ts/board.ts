@@ -87,6 +87,17 @@ function* positionsInSpiralOrder(
     }
 }
 
+// For animation effects.
+export const spiralPositionIndices: number[][] = Array(boardSize)
+    .fill(0)
+    .map(() => Array(boardSize).fill(0));
+
+let spiralIndex = 0;
+for (const p of positionsInSpiralOrder(boardSize)) {
+    spiralPositionIndices[p.y][p.x] = spiralIndex;
+    spiralIndex++;
+}
+
 export function createBoard(): Card[][] {
     const board: Card[][] = [];
 
