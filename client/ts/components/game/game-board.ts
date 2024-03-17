@@ -27,6 +27,16 @@ export class GameBoardElement extends LitElement {
                 justify-content: center;
             }
 
+            /* a fun visual effect where the cards appear one by one */
+            @keyframes card-animate-in {
+                0% {
+                    transform: scale(0);
+                }
+                100% {
+                    transform: scale(1);
+                }
+            }
+
             .card {
                 position: relative;
 
@@ -36,6 +46,8 @@ export class GameBoardElement extends LitElement {
                 height: 9.5cqh;
 
                 transition: transform 0.2s;
+
+                animation: card-animate-in 0.3s both;
             }
 
             .card-valid {
@@ -64,6 +76,8 @@ export class GameBoardElement extends LitElement {
     accessor lastMove: MoveAndColor | undefined;
 
     render() {
+        const totalAnimationTime = 0.4;
+        const animationDelayPerCard = totalAnimationTime / (boardSize + 2);
         let cards = [];
         for (let y = 0; y < boardSize; y++) {
             let rowCards = [];
@@ -93,9 +107,11 @@ export class GameBoardElement extends LitElement {
                             : 'card-invalid'
                         : '';
                 const animatedClass = animatePlacement || animateRemoval ? 'card-animated' : '';
+                const animationDelay = (x + y) * animationDelayPerCard;
                 rowCards.push(html`<board-card
                     @click="${(e: MouseEvent) => this.handleCardClick(e, x, y)}"
                     class="card ${validityClass} ${animatedClass}"
+                    style="animation-delay: ${animationDelay}s"
                     rank="${card.rank}"
                     suit="${card.suit}"
                     token="${token || nothing}"
