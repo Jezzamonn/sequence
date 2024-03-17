@@ -14,9 +14,11 @@ console.log('Server <( Hello World! )');
 
 let port: number;
 
+const buildDir = '../client/build';
+
 // Placeholder express app.
 const app = express();
-app.use(express.static('../client/build'));
+app.use(express.static(buildDir));
 
 let server: http.Server | https.Server;
 
@@ -108,6 +110,27 @@ playerManager.onMakeMove = (playerName, card, position) => {
 
     return {};
 };
+
+// Watch the build directory for changes and tell clients to refresh when it
+// changes.
+
+// Also want to debounce this so that we don't spam the clients with refreshes
+// and so that we wait for all the building to finish.
+let refreshTimeout: NodeJS.Timeout | undefined;
+const refreshDebounceTimeSec = 1;
+
+fs.watch(buildDir, { recursive: true }, (event, filename) => {
+    console.log('File change detected:', event, filename)
+    if (refreshTimeout != undefined) {
+        clearTimeout(refreshTimeout);
+    }
+
+    refreshTimeout = setTimeout(() => {
+        console.log('Refreshing clients');
+        io.emit(Command.refresh);
+        refreshTimeout = undefined;
+    }, refreshDebounceTimeSec * 1000);
+});
 
 server.listen(port, () => {
     console.log(`Listening on port ${port}`);

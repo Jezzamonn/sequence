@@ -31,6 +31,11 @@ export class Connection {
         this.socket.on(Command.playersState, (players: Player[]) => {
             this.onPlayersState?.(players);
         });
+
+        this.socket.on(Command.refresh, () => {
+            // Just reload the page without caring about the current state of the game.
+            window.location.reload();
+        });
     }
 
     async join(player: Player): Promise<CommandResult> {

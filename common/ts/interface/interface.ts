@@ -8,6 +8,8 @@ export const Command = {
     makeMove: 'makeMove',
     gameState: 'gameState',
     playersState: 'playersState',
+    // Forces the client to refresh the page.
+    refresh: 'refresh',
 };
 
 export type CommandCallback = (result: CommandResult) => void;
