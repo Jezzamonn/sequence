@@ -31,10 +31,15 @@ export class GameBoardElement extends LitElement {
             /* a fun visual effect where the cards appear one by one */
             @keyframes card-animate-in {
                 0% {
-                    transform: scale(0);
+                    transform: scale(2) translate(-50px, -50px);
+                    opacity: 0;
+                }
+                20% {
+                    opacity: 1;
                 }
                 100% {
-                    transform: scale(1);
+                    transform: scale(1) translate(0, 0);
+                    opacity: 1;
                 }
             }
 
@@ -128,7 +133,7 @@ export class GameBoardElement extends LitElement {
         // const animationDelayPerCard = totalAnimationTime / (boardSize * 2);
         // return (x + y) * animationDelayPerCard;
 
-        const totalAnimationTime = 2;
+        const totalAnimationTime = 5;
         const animationDelayPerCard = totalAnimationTime / (boardSize * boardSize);
         const spiralIndex = spiralPositionIndices[y][x];
         return spiralIndex * animationDelayPerCard;
