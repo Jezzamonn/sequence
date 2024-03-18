@@ -47,6 +47,12 @@ export class RootComponent extends LitElement {
                 );
             }
 
+            if (this._gameState == undefined || this._gameState.turnNumber != state.turnNumber) {
+                // Play sound effect.
+                const audio = new Audio('/sfx/chip1.mp3');
+                audio.play();
+            }
+
             this._gameState = state;
             const nameEntry = this.shadowRoot?.querySelector('name-entry') as
                 | NameEntry
