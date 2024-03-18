@@ -51,6 +51,7 @@ export interface PlayerVisibleGameState {
 
     placedTokens: Token[][];
     deckSize: number;
+    discardSize: number;
     lastCardPlayed: Card | undefined;
     // Undefined if this is a spectator.
     hand?: Card[];
@@ -123,6 +124,7 @@ export class GameManager {
 
             placedTokens: this.state.placedTokens,
             deckSize: this.state.deck.length,
+            discardSize: this.state.discarded.length,
             lastCardPlayed:
                 this.state.discarded[this.state.discarded.length - 1],
             lastMove: this.state.lastMove,

@@ -1,11 +1,12 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, TemplateResult, css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
     Rank,
     Suit,
     cardAssetName,
-    cardBackAssetName,
+    cardBackAssetName
 } from '../../../../common/ts/cards';
+import { seededRandom } from '../../../../common/ts/util';
 
 @customElement('deck-discard')
 export class DeckAndDiscardElement extends LitElement {
@@ -20,10 +21,20 @@ export class DeckAndDiscardElement extends LitElement {
                 container-type: size;
             }
 
+            .card-pile {
+                width: 100%;
+                height: 20cqh;
+                position: relative;
+            }
+
             .card-image {
-                max-width: 100%;
-                max-height: 20cqh;
+                position: absolute;
+                height: 100%;
                 object-fit: contain;
+                background-color: white;
+                border-radius: 5cqw;
+                aspect-ratio: 360 / 540;
+                left: 50%;
             }
 
             .card-face {
@@ -51,10 +62,15 @@ export class DeckAndDiscardElement extends LitElement {
     @property({ type: Number })
     accessor deckSize: number = 0;
 
+    @property({ type: Number })
+    accessor discardSize: number = 0;
+
     @property({ type: Boolean })
     accessor canDiscard: boolean | undefined = undefined;
 
     render() {
+        const discardRng = seededRandom('discard');
+
         // TODO: Add more cards to represent the size of the deck.
         const validityClass =
         this.canDiscard != undefined
@@ -62,14 +78,49 @@ export class DeckAndDiscardElement extends LitElement {
                 ? 'card-valid'
                 : 'card-invalid'
             : '';
+        const drawPile: TemplateResult[] = [];
+        for (let i = 0; i < this.deckSize; i++) {
+            const offset = -i * 0.1;
+            drawPile.push(html`<img
+                class="card-image"
+                style="transform: translate(calc(${offset}cqw - 50%), ${offset}cqw)"
+                src="${cardBackAssetName}"
+            />`);
+        }
+        // TODO: Also subtract the cards in the players' hands.
+        const discardPile: TemplateResult[] = [];
+        for (let i = 0; i < this.discardSize - 1; i++) {
+            const offset = -i * 0.1;
+            const rotation = discardRng() * 10 - 5;
+            discardPile.push(html`<img
+                class="card-image"
+                style="transform: translate(calc(${offset}cqw - 50%), ${offset}cqw) rotate(${rotation}deg)"
+            />`);
+        }
+        // Add the top discard card to the discard pile.
+        // If there are no discarded cards, this will be a blank white card.
+        {
+            const offset = -(this.discardSize - 1) * 0.1;
+            const cardSrc = this.discardSize > 0 ? cardAssetName({ rank: this.rank, suit: this.suit }) : nothing;
+            const rotation = this.discardSize > 0 ? discardRng() * 10 - 5 : 0;
+            discardPile.push(html`<img
+                @click=${this.handleDiscardClick}
+                class="card-image card-face ${validityClass}"
+                style="transform: translate(calc(${offset}cqw - 50%), ${offset}cqw) rotate(${rotation}deg)"
+                src="${cardSrc}"
+            />`);
+        }
+        discardPile.push()
+
+
         // language=HTML
         return html`
-            <img class="card-image" src="${cardBackAssetName}" />
-            <img
-                @click="${(e: MouseEvent) => this.handleDiscardClick(e)}"
-                class="card-image card-face ${validityClass}"
-                src="${cardAssetName({ rank: this.rank, suit: this.suit })}"
-            />
+            <div class="card-pile">
+                ${drawPile}
+            </div>
+            <div class="card-pile">
+                ${discardPile}
+            </div>
         `;
     }
 

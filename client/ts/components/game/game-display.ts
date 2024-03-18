@@ -185,6 +185,7 @@ export class GameDisplay extends LitElement {
                 }}
                 .canDiscard=${canDiscard}
                 .deckSize=${this.gameState?.deckSize}
+                .discardSize=${this.gameState?.discardSize}
                 .rank=${this.gameState?.lastCardPlayed?.rank ?? 'Joker'}
                 .suit=${this.gameState?.lastCardPlayed?.suit ?? 'Joker'}
             ></deck-discard>

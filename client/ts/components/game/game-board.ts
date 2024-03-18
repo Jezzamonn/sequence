@@ -33,13 +33,16 @@ export class GameBoardElement extends LitElement {
                 0% {
                     transform: scale(2) translate(-50px, -50px);
                     opacity: 0;
+                    z-index: 1;
                 }
                 20% {
                     opacity: 1;
+                    z-index: 1;
                 }
                 100% {
                     transform: scale(1) translate(0, 0);
                     opacity: 1;
+                    z-index: initial;
                 }
             }
 
