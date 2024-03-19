@@ -47,7 +47,7 @@ export class RootComponent extends LitElement {
                 );
             }
 
-            if (this._gameState == undefined || this._gameState.turnNumber != state.turnNumber) {
+            if (this._gameState != undefined && this._gameState.turnNumber != state.turnNumber) {
                 // Play sound effect.
                 const audio = new Audio('/sfx/chip1.mp3');
                 audio.play();
