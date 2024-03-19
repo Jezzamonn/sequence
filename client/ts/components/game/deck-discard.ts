@@ -19,21 +19,23 @@ export class DeckAndDiscardElement extends LitElement {
                 justify-content: center;
                 align-items: center;
                 container-type: size;
+                row-gap: 10px;
             }
 
             .card-pile {
-                width: 100%;
-                height: 20cqh;
+                width: 15cqh;
+                max-width: 100%;
                 position: relative;
+                aspect-ratio: 360 / 540;
             }
 
             .card-image {
                 position: absolute;
+                width: 100%;
                 height: 100%;
                 object-fit: contain;
                 background-color: white;
                 border-radius: 5cqw;
-                aspect-ratio: 360 / 540;
                 left: 50%;
             }
 
