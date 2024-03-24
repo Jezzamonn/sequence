@@ -24,4 +24,7 @@ export default {
         filename: 'main.bundle.js'
     },
     devtool: 'source-map',
+    cache: {
+        type: 'filesystem',
+    },
 }
