@@ -18,6 +18,7 @@ export class Connection {
 
         this.socket.on('connect', () => {
             console.log('Connected to server');
+            // TODO: Send join request again if the player has already joined.
         });
 
         this.socket.on('disconnect', () => {

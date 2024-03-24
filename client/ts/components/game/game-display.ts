@@ -56,6 +56,7 @@ export class GameDisplay extends LitElement {
                 max-height: 100%;
                 grid-row: 2;
                 grid-column: 2;
+                z-index: 1;
             }
 
             deck-and-discard {
@@ -66,6 +67,7 @@ export class GameDisplay extends LitElement {
             player-hand {
                 grid-row: 3;
                 grid-column: 1 / span 3;
+                z-index: 2;
             }
         `,
     ];
@@ -158,6 +160,7 @@ export class GameDisplay extends LitElement {
                 .placedTokens=${this.gameState?.placedTokens}
                 .validPositions=${validPositions}
                 .lastMove=${this.gameState?.lastMove}
+                .doInitialAnimation=${this.gameState?.turnNumber === 0}
             ></game-board>
             <player-hand
                 @card-click=${(e: CustomEvent<HandClickEventParams>) => {

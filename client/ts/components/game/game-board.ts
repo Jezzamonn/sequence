@@ -55,7 +55,9 @@ export class GameBoardElement extends LitElement {
                 height: 9.5cqh;
 
                 transition: transform 0.2s;
+            }
 
+            .card-animate-in {
                 animation: card-animate-in 0.3s both;
             }
 
@@ -69,7 +71,7 @@ export class GameBoardElement extends LitElement {
                 filter: brightness(0.9);
             }
 
-            .card-animated {
+            .card-with-token-animation {
                 z-index: 1;
             }
         `,
@@ -83,6 +85,9 @@ export class GameBoardElement extends LitElement {
 
     @property({ type: Object})
     accessor lastMove: MoveAndColor | undefined;
+
+    @property({ type: Boolean})
+    accessor doInitialAnimation: boolean = false;
 
     render() {
         let cards = [];
@@ -113,11 +118,12 @@ export class GameBoardElement extends LitElement {
                             ? 'card-valid'
                             : 'card-invalid'
                         : '';
-                const animatedClass = animatePlacement || animateRemoval ? 'card-animated' : '';
+                const tokenAnimatedClass = animatePlacement || animateRemoval ? 'card-with-token-animation' : '';
+                const animateInClass = this.doInitialAnimation ? 'card-animate-in' : '';
                 const animationDelay = this.getAnimationDelay(x, y);
                 rowCards.push(html`<board-card
                     @click="${(e: MouseEvent) => this.handleCardClick(e, x, y)}"
-                    class="card ${validityClass} ${animatedClass}"
+                    class="card ${validityClass} ${tokenAnimatedClass} ${animateInClass}"
                     style="animation-delay: ${animationDelay}s"
                     rank="${card.rank}"
                     suit="${card.suit}"
