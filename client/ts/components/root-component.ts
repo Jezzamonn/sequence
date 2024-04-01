@@ -34,39 +34,52 @@ export class RootComponent extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        connection.onGameState = (state: PlayerVisibleGameState) => {
+        connection.onGameState = (
+            state: PlayerVisibleGameState | undefined
+        ) => {
             console.log('Game state:', state);
-
-            if (
-                this._gameState != undefined &&
-                this._gameState.gameWinner == undefined &&
-                state.gameWinner != undefined
-            ) {
-                this.notify(
-                    'Game over! ' + toSentenceCase(state.gameWinner) + ' wins!'
-                );
-            }
-
-            if (this._gameState != undefined && this._gameState.turnNumber != state.turnNumber) {
-                // Play sound effect.
-                const audio = new Audio('/sfx/chip1.mp3');
-                audio.play();
-            }
-
-            this._gameState = state;
-            const nameEntry = this.shadowRoot?.querySelector('name-entry') as
-                | NameEntry
-                | undefined;
 
             if (state == undefined) {
                 this._state = 'nameEntry';
-            } else if (
-                state.gameWinner == undefined &&
-                nameEntry &&
-                nameEntry.joined
-            ) {
-                this._state = 'game';
+            } else {
+                const nameEntry = this.shadowRoot?.querySelector(
+                    'name-entry'
+                ) as NameEntry | undefined;
+
+                // If we were on the name entry page, switch to the game UI when we receive the
+                // game state. Exceptions:
+                // - If we haven't joined yet (so we're not part of the game).
+                // - If the game is over, stay there too so a new game can be started.
+                if (
+                    state.gameWinner == undefined &&
+                    nameEntry &&
+                    nameEntry.joined
+                ) {
+                    this._state = 'game';
+                }
+
+                // Notifications and sound effects only happen when the game is
+                // already going.
+                if (this._gameState != undefined) {
+                    if (
+                        this._gameState.gameWinner == undefined &&
+                        state.gameWinner != undefined
+                    ) {
+                        this.notify(
+                            'Game over! ' +
+                                toSentenceCase(state.gameWinner) +
+                                ' wins!'
+                        );
+                    }
+
+                    if (this._gameState.turnNumber != state.turnNumber) {
+                        // Play sound effect.
+                        const audio = new Audio('/sfx/chip1.mp3');
+                        audio.play();
+                    }
+                }
             }
+            this._gameState = state;
         };
         connection.onPlayersState = (players: Player[]) => {
             this._players = players;
