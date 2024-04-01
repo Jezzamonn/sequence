@@ -116,21 +116,26 @@ playerManager.onMakeMove = (playerName, card, position) => {
 
 // Also want to debounce this so that we don't spam the clients with refreshes
 // and so that we wait for all the building to finish.
-let refreshTimeout: NodeJS.Timeout | undefined;
-const refreshDebounceTimeSec = 1;
+try {
+    let refreshTimeout: NodeJS.Timeout | undefined;
+    const refreshDebounceTimeSec = 1;
 
-fs.watch(buildDir, { recursive: true }, (event, filename) => {
-    console.log('File change detected:', event, filename)
-    if (refreshTimeout != undefined) {
-        clearTimeout(refreshTimeout);
-    }
+    fs.watch(buildDir, { recursive: true }, (event, filename) => {
+        console.log('File change detected:', event, filename)
+        if (refreshTimeout != undefined) {
+            clearTimeout(refreshTimeout);
+        }
 
-    refreshTimeout = setTimeout(() => {
-        console.log('Refreshing clients');
-        io.emit(Command.refresh);
-        refreshTimeout = undefined;
-    }, refreshDebounceTimeSec * 1000);
-});
+        refreshTimeout = setTimeout(() => {
+            console.log('Refreshing clients');
+            io.emit(Command.refresh);
+            refreshTimeout = undefined;
+        }, refreshDebounceTimeSec * 1000);
+    });
+} catch (e) {
+    console.error('Failed to watch build directory for changes:', e);
+    console.log('No worries :)')
+}
 
 server.listen(port, () => {
     console.log(`Listening on port ${port}`);
