@@ -1,6 +1,8 @@
 import { Server } from "socket.io";
 import { PlayerOrAI } from "../common/ts/ai/ai-interface";
-import { RandomAI } from "../common/ts/ai/random";
+import { BlockingAI } from "../common/ts/ai/blocking";
+import { PreferMiddleAI } from "../common/ts/ai/prefer-middle";
+import { SaveTwoEyedJackAI } from "../common/ts/ai/save-two-eyed";
 import { allColors } from "../common/ts/board";
 import { Card, cardToDescription } from "../common/ts/cards";
 import { GameManager } from "../common/ts/game";
@@ -117,10 +119,10 @@ export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowA
                         'Error creating players. Not enough human players for all colors.'
                     );
                 }
-                const ai = new RandomAI();
+                const ai = new SaveTwoEyedJackAI(new BlockingAI(new PreferMiddleAI()));
                 player = {
                     name: `AI ${++aiPlayerCount}`,
-                    quest: 'To make random moves.',
+                    quest: 'To robotically win └[ ∵ ]┘',
                     color,
                     ai,
                 };
