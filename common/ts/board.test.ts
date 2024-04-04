@@ -175,7 +175,7 @@ describe('countSequences', function () {
         expect(countSequences(placedTokens)).toEqual(new Map());
     });
 
-    it('should count a horizontal sequence', function () {
+    it('should count a vertical sequence', function () {
         const placedTokens = makeEmptyPlacedTokens();
         placedTokens[0][1] = 'red';
         placedTokens[1][1] = 'red';
@@ -185,7 +185,7 @@ describe('countSequences', function () {
         expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
-    it('should count a vertical sequence', function () {
+    it('should count a horizontal sequence', function () {
         const placedTokens = makeEmptyPlacedTokens();
         placedTokens[1][0] = 'red';
         placedTokens[1][1] = 'red';
@@ -247,7 +247,7 @@ describe('countSequences', function () {
         expect(countSequences(placedTokens)).toEqual(new Map([['red', 1], ['green', 1]]));
     });
 
-    it('should count a horizontal sequence that uses wilds', function () {
+    it('should count top left vertical sequence that uses wilds', function () {
         const placedTokens = makeEmptyPlacedTokens();
         placedTokens[1][0] = 'red';
         placedTokens[2][0] = 'red';
@@ -256,7 +256,34 @@ describe('countSequences', function () {
         expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
-    it('should count a vertical sequence that uses wilds', function () {
+    it('should count top right vertical sequence that uses wilds', function () {
+        const placedTokens = makeEmptyPlacedTokens();
+        placedTokens[1][9] = 'red';
+        placedTokens[2][9] = 'red';
+        placedTokens[3][9] = 'red';
+        placedTokens[4][9] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
+    });
+
+    it('should count bottom left vertical sequence that uses wilds', function () {
+        const placedTokens = makeEmptyPlacedTokens();
+        placedTokens[8][0] = 'red';
+        placedTokens[7][0] = 'red';
+        placedTokens[6][0] = 'red';
+        placedTokens[5][0] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
+    });
+
+    it('should count bottom right vertical sequence that uses wilds', function () {
+        const placedTokens = makeEmptyPlacedTokens();
+        placedTokens[8][9] = 'red';
+        placedTokens[7][9] = 'red';
+        placedTokens[6][9] = 'red';
+        placedTokens[5][9] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
+    });
+
+    it('should count top left horizontal sequence that uses wilds', function () {
         const placedTokens = makeEmptyPlacedTokens();
         placedTokens[0][1] = 'red';
         placedTokens[0][2] = 'red';
@@ -265,7 +292,34 @@ describe('countSequences', function () {
         expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
-    it('should count an increasing diagonal sequence that uses wilds', function () {
+    it('should count top right horizontal sequence that uses wilds', function () {
+        const placedTokens = makeEmptyPlacedTokens();
+        placedTokens[0][8] = 'red';
+        placedTokens[0][7] = 'red';
+        placedTokens[0][6] = 'red';
+        placedTokens[0][5] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
+    });
+
+    it('should count bottom left horizontal sequence that uses wilds', function () {
+        const placedTokens = makeEmptyPlacedTokens();
+        placedTokens[9][1] = 'red';
+        placedTokens[9][2] = 'red';
+        placedTokens[9][3] = 'red';
+        placedTokens[9][4] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
+    });
+
+    it('should count bottom right horizontal sequence that uses wilds', function () {
+        const placedTokens = makeEmptyPlacedTokens();
+        placedTokens[9][8] = 'red';
+        placedTokens[9][7] = 'red';
+        placedTokens[9][6] = 'red';
+        placedTokens[9][5] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
+    });
+
+    it('should count top left diagonal sequence that uses wilds', function () {
         const placedTokens = makeEmptyPlacedTokens();
         placedTokens[1][1] = 'red';
         placedTokens[2][2] = 'red';
@@ -274,12 +328,30 @@ describe('countSequences', function () {
         expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 
-    it('should count a decreasing diagonal sequence that uses wilds', function () {
+    it('should count bottom right diagonal sequence that uses wilds', function () {
+        const placedTokens = makeEmptyPlacedTokens();
+        placedTokens[5][5] = 'red';
+        placedTokens[6][6] = 'red';
+        placedTokens[7][7] = 'red';
+        placedTokens[8][8] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
+    });
+
+    it('should count bottom left diagonal sequence that uses wilds', function () {
         const placedTokens = makeEmptyPlacedTokens();
         placedTokens[8][1] = 'red';
         placedTokens[7][2] = 'red';
         placedTokens[6][3] = 'red';
         placedTokens[5][4] = 'red';
+        expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
+    });
+
+    it('should count top right decreasing diagonal sequence that uses wilds', function () {
+        const placedTokens = makeEmptyPlacedTokens();
+        placedTokens[1][8] = 'red';
+        placedTokens[2][7] = 'red';
+        placedTokens[3][6] = 'red';
+        placedTokens[4][5] = 'red';
         expect(countSequences(placedTokens)).toEqual(new Map([['red', 1]]));
     });
 

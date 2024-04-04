@@ -434,32 +434,39 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
 
     for (const row of allRows()) {
         let count = 0;
-        let lastWasJoker = false;
+        let lastWasWild = false;
         let lastColor: Token = undefined;
-        for (const { x, y } of row) {
-            const card = boardLayout[y][x];
+        for (const p of row) {
+            const { x, y } = p;
+            const isWild = isWildPosition(p);
             const color = placedTokens[y][x];
-            if (color != undefined && (color == lastColor || lastWasJoker)) {
+            if (isWild) {
                 count++;
-                // Update this variable in case the last card was a joker.
-                lastColor = color;
-
-                if (count == 5) {
-                    sequences.set(
-                        lastColor,
-                        (sequences.get(lastColor) ?? 0) + 1
-                    );
-                    // We're allowed to start a new sequence from here,
-                    // reusing only one token of the previous sequence.
+            } else if (color == undefined) {
+                count = 0;
+            }
+            else {
+                // isWild handles the possible start and end wild positions
+                // lastWasWild handles the position after the wild
+                // color == lastColor is the main check
+                if (lastWasWild || color == lastColor) {
+                    count++;
+                }
+                else {
                     count = 1;
                 }
-            } else {
-                // This also runs when we encounter a joker, treating it as the
-                // start of a sequence as desired.
-                count = 1;
-                lastColor = color;
             }
-            lastWasJoker = card.rank === 'Joker';
+            if (count == 5) {
+                sequences.set(
+                    lastColor!,
+                    (sequences.get(lastColor!) ?? 0) + 1
+                );
+                // We're allowed to start a new sequence from here,
+                // reusing only one token of the previous sequence.
+                count = 1;
+            }
+            lastWasWild = isWild;
+            lastColor = color;
         }
     }
 

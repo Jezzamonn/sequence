@@ -4,7 +4,14 @@
   "description": "Sequence common files",
   "author": "Jezzamon",
   "license": "UNLICENSED",
-  "dependencies": {
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "ts-jest": "^29.1.2",
+    "@tsconfig/recommended": "^1.0.3",
+    "jest": "^29.7.0",
     "jest-extended": "^4.0.2"
   }
 }
