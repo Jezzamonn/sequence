@@ -1,3 +1,4 @@
+import { program } from 'commander';
 import express from 'express';
 import fs from 'fs';
 import http from 'http';
@@ -11,6 +12,14 @@ import { ServerGameManager } from './server-game-manager';
 import { ServerPlayerManager } from './server-player-manager';
 
 console.log('Server <( Hello World! )');
+
+program
+    .option('--minPlayers <players>', 'Minimum number of players in a game. The rest will be filled with AI players', '2')
+    .parse(process.argv);
+
+const options = program.opts();
+
+const minPlayers = parseInt(options.minPlayers);
 
 let port: number;
 
@@ -76,7 +85,7 @@ playerManager.onStart = (allowAI: boolean) => {
 
     try {
         const players = playerManager.getValidatedPlayers(allowAI);
-        gameManager = ServerGameManager.fromPartialPlayers(io, players, allowAI);
+        gameManager = ServerGameManager.fromPartialPlayers(io, players, allowAI, minPlayers);
         playerManager.clearPlayers();
     } catch (e) {
         if (e instanceof Error) {

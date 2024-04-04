@@ -25,8 +25,8 @@ export class ServerGameManager {
         this.queueNextAction();
     }
 
-    static fromPartialPlayers(io: Server, players: Player[], allowAI = false): ServerGameManager {
-        return new ServerGameManager(io, makeAllPlayersFromPartialPlayers(players, allowAI));
+    static fromPartialPlayers(io: Server, players: Player[], allowAI = false, minPlayers: number): ServerGameManager {
+        return new ServerGameManager(io, makeAllPlayersFromPartialPlayers(players, allowAI, minPlayers));
     }
 
     makeMove(playerName: string, card: Card, position: Point | undefined): void {
@@ -89,7 +89,7 @@ export class ServerGameManager {
     }
 }
 
-export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowAI = false): PlayerOrAI[] {
+export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowAI: boolean, minimumPlayers: number): PlayerOrAI[] {
     const players: PlayerOrAI[] = [];
     const addedHumanPlayerNames = new Set<string>();
     // JS sets actually maintain a consistent order, so we can look up the next color from that.
@@ -103,7 +103,7 @@ export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowA
 
     let aiPlayerCount = 0;
 
-    while (addedHumanPlayerNames.size < joinedPlayers.length) {
+    while (addedHumanPlayerNames.size < joinedPlayers.length || players.length < minimumPlayers) {
         for (const color of colorsInGame) {
             let player: PlayerOrAI = choose(
                 joinedPlayers.filter(
@@ -133,5 +133,6 @@ export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowA
             players.push(player);
         }
     }
+    console.log(players);
     return players;
 }
