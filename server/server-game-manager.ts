@@ -77,6 +77,11 @@ export class ServerGameManager {
             return;
         }
 
+        // Don't try to do AI if the game is over
+        if (this.gameManager.state.gameWinner != undefined) {
+            return;
+        }
+
         console.log(`Simulating AI player ${player.name}`);
 
         await wait(1);
