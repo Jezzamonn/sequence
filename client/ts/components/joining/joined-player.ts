@@ -1,4 +1,4 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Color } from '../../../../common/ts/board';
 
@@ -10,7 +10,6 @@ export class JoinedPlayer extends LitElement {
             background-color: white;
             padding: 5px;
             border-radius: 10px;
-            margin: 10px 0;
         }
 
         token-marker {
@@ -35,6 +34,16 @@ export class JoinedPlayer extends LitElement {
         p {
             margin: 0;
         }
+
+        p {
+            font-size: 12px;
+        }
+
+        @media (max-aspect-ratio: 1/1) {
+            .quest-collapsible {
+                display: none;
+            }
+        }
     `;
 
     @property({ type: String })
@@ -46,6 +55,9 @@ export class JoinedPlayer extends LitElement {
     @property({ type: String })
     accessor color: Color | undefined;
 
+    @property({ type: Boolean })
+    accessor canCollapse: boolean = false;
+
     get questOrDefault() {
         if (this.quest != undefined && this.quest.trim() != '') {
             return this.quest;
@@ -54,11 +66,12 @@ export class JoinedPlayer extends LitElement {
     }
 
     render() {
+        const questClass = this.canCollapse ? 'quest-collapsible' : nothing;
         return html`
             <token-marker .color=${this.color}></token-marker>
             <div class="player-text">
                 <h3>${this.name}</h3>
-                <p>Quest: ${this.questOrDefault}</p>
+                <p class=${questClass}>Quest: ${this.questOrDefault}</p>
             </div>
         `;
     }

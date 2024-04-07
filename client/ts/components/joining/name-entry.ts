@@ -66,6 +66,10 @@ export class NameEntry extends LitElement {
             padding: 10px 20px;
             font-size: 18px;
         }
+
+        joined-player {
+            margin: 10px 0;
+        }
     `;
 
     @property({ type: String })

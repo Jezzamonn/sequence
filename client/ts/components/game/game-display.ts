@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { countSequences, getMovesForCard } from '../../../../common/ts/board';
 import { Card } from '../../../../common/ts/cards';
@@ -26,12 +26,15 @@ export class GameDisplay extends LitElement {
             .players {
                 grid-row: 1;
                 grid-column: 1 / span 3;
-                gap: 10px;
-                margin: 10px;
+                padding: 0 5px;
 
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
+
+                overflow-y: visible;
+                overflow-x: scroll;
+                scroll-behavior: smooth;
             }
 
             @keyframes glow {
@@ -44,6 +47,11 @@ export class GameDisplay extends LitElement {
                 100% {
                     outline-color: #000;
                 }
+            }
+
+            .player {
+                margin: 5px;
+                flex-shrink: 0;
             }
 
             .player.active {
@@ -134,6 +142,7 @@ export class GameDisplay extends LitElement {
                 .name=${p.name}
                 .quest=${p.quest}
                 .color=${p.color}
+                .canCollapse=${true}
             ></joined-player>`;
         });
 
@@ -195,6 +204,21 @@ export class GameDisplay extends LitElement {
         `;
     }
 
+
+    updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.updated(_changedProperties);
+        const playersElement = this.shadowRoot?.querySelector('.players');
+        if (playersElement == undefined) {
+            throw new Error('Players element not found???');
+        }
+        // Scroll active player into view
+        const activePlayer = playersElement.querySelector('.player.active') as HTMLElement;
+        if (activePlayer != null) {
+            horizontalScrollToCenterOfParent(activePlayer);
+        }
+    }
+
+
     async makeMove(card: Card, position: Point | undefined) {
         if (connection.requestInProgress) {
             return;
@@ -213,4 +237,30 @@ export class GameDisplay extends LitElement {
         this.selectedCard = undefined;
         this.selectedCardIndex = undefined;
     }
+}
+
+
+export function horizontalScrollToCenterOfParent(
+    childElement: HTMLElement
+): void {
+    const parent = childElement.parentElement;
+    if (parent == null) {
+        throw new Error('Element has no parent');
+    }
+
+    const childLeft = childElement.offsetLeft;
+    const elementWidth = childElement.offsetWidth;
+    const parentWidth = parent.offsetWidth;
+
+    // Calculate distance to scroll with centering
+    const scrollDistance = childLeft - (parentWidth - elementWidth) / 2;
+
+    parent.scrollLeft = scrollDistance;
+
+
+    // Animate scroll smoothly
+    parent.scrollTo({
+        left: scrollDistance,
+        behavior: 'smooth',
+    });
 }
