@@ -90,7 +90,11 @@ export class ServerGameManager {
         const state = this.gameManager.getStateForPlayer(playerIndex);
         const move = player.ai.makeMove(moves, state);
 
-        this.makeMove(player.name, move.card, move.position);
+        try {
+            this.makeMove(player.name, move.card, move.position);
+        } catch (e) {
+            console.error(`AI Player made problematic move?? ${e}`);
+        }
     }
 }
 
