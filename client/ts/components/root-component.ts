@@ -77,6 +77,14 @@ export class RootComponent extends LitElement {
                         const audio = new Audio('/sfx/chip1.mp3');
                         audio.play();
                     }
+
+                    if (this._gameState.nextPlayerIndex != state.nextPlayerIndex &&
+                        state.nextPlayerIndex == state.playerIndex) {
+                        // Let the player know it's their time to shine
+                        const audio = new Audio('/sfx/ding.mp3');
+                        audio.volume = 0.1;
+                        audio.play();
+                    }
                 }
             }
             this._gameState = state;
