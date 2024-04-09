@@ -2,7 +2,7 @@ import { LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { PlayerVisibleGameState } from '../../../common/ts/game';
 import { Player } from '../../../common/ts/players';
-import { toSentenceCase } from '../../../common/ts/util';
+import { toSentenceCase, wait } from '../../../common/ts/util';
 import { connection } from '../connection';
 import { NameEntry } from './joining/name-entry';
 
@@ -81,9 +81,11 @@ export class RootComponent extends LitElement {
                     if (this._gameState.nextPlayerIndex != state.nextPlayerIndex &&
                         state.nextPlayerIndex == state.playerIndex) {
                         // Let the player know it's their time to shine
-                        const audio = new Audio('/sfx/ding.mp3');
-                        audio.volume = 0.1;
-                        audio.play();
+                        wait(0.8).then(() => {
+                            const audio = new Audio('/sfx/ding.mp3');
+                            audio.volume = 0.1;
+                            audio.play();
+                        });
                     }
                 }
             }
