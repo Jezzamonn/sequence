@@ -36,6 +36,7 @@ export class SaveTwoEyedJackAI implements AIInterface {
         }
 
         if (bestMoves.length > 0) {
+            console.log('Playing two eyed jack to complete a sequence!')
             return this.fallback.makeMove(bestMoves, state);
         }
         if (nonTwoEyedJackMoves.length > 0) {

@@ -46,4 +46,5 @@ export const allAIs: AIInfo[] = [
     makeAIInfo(SaveTwoEyedJackAI, PreferMiddleAI),
     makeAIInfo(SaveOneEyedJackAI, PreferMiddleAI),
     makeAIInfo(SaveTwoEyedJackAI, BlockingAI, PreferMiddleAI),
+    makeAIInfo(SaveOneEyedJackAI, BlockingAI, PreferMiddleAI),
 ];

@@ -49,6 +49,7 @@ export class SaveOneEyedJackAI implements AIInterface {
 
         const possibleRemovals = moves.filter(move => isOneEyedJack(move.card) && sequenceBlockingPositions.some(pos => Points.equal(pos, move.position)));
         if (possibleRemovals.length > 0) {
+            console.log('Blocking opponent sequence with one eyed jack!')
             return this.fallback.makeMove(possibleRemovals, state);
         }
 
