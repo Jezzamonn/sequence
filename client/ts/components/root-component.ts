@@ -83,7 +83,7 @@ export class RootComponent extends LitElement {
                         // Let the player know it's their time to shine
                         wait(0.8).then(() => {
                             const audio = new Audio('/sfx/ding.mp3');
-                            audio.volume = 0.1;
+                            audio.volume = 0.03;
                             audio.play();
                         });
                     }
