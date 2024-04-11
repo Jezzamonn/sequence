@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Sequence AI Arena",
   "scripts": {
-    "start": "ts-node arena.ts"
+    "start": "NODE_OPTIONS='-r ts-node/register' node ts/main.ts"
   },
   "author": "Jezzamon",
   "license": "UNLICENSED",

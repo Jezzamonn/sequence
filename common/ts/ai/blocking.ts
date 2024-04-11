@@ -1,16 +1,19 @@
-import { Move, allPossibleSequences, boardSize } from "../board";
-import { PlayerVisibleGameState } from "../game";
-import { AIInterface } from "./ai-interface";
+import { Move, allPossibleSequences, boardSize } from '../board';
+import { PlayerVisibleGameState } from '../game';
+import { AIInterface } from './ai-interface';
 
 export class BlockingAI implements AIInterface {
-
     constructor(private fallback: AIInterface) {}
 
     makeMove(moves: Move[], state: PlayerVisibleGameState): Move {
         const color = state.players[state.playerIndex!].color;
 
-        const oneAwayFromSequence: number[][] = new Array(boardSize).fill(0).map(() => new Array(boardSize).fill(0));
-        const twoAwayFromSequence: number[][] = new Array(boardSize).fill(0).map(() => new Array(boardSize).fill(0));
+        const oneAwayFromSequence: number[][] = new Array(boardSize)
+            .fill(0)
+            .map(() => new Array(boardSize).fill(0));
+        const twoAwayFromSequence: number[][] = new Array(boardSize)
+            .fill(0)
+            .map(() => new Array(boardSize).fill(0));
 
         for (const possibleSequence of allPossibleSequences()) {
             const colorCounts = new Map<string, number>();
@@ -19,7 +22,10 @@ export class BlockingAI implements AIInterface {
                 if (tokenColor == undefined) {
                     continue;
                 }
-                colorCounts.set(tokenColor, (colorCounts.get(tokenColor) || 0) + 1);
+                colorCounts.set(
+                    tokenColor,
+                    (colorCounts.get(tokenColor) || 0) + 1
+                );
             }
             // Already have two colors here, so it can't be a sequence
             if (colorCounts.size != 1) {
@@ -30,12 +36,11 @@ export class BlockingAI implements AIInterface {
                 continue;
             }
             // This is a possible sequence! Update the arrays!
-            if (colorCounts.get(possibleSequenceColor) == 4) {
+            if (colorCounts.get(possibleSequenceColor) == possibleSequence.length - 1) {
                 for (const pos of possibleSequence) {
                     oneAwayFromSequence[pos.y][pos.x]++;
                 }
-            }
-            else if (colorCounts.get(possibleSequenceColor) == 3) {
+            } else if (colorCounts.get(possibleSequenceColor) == possibleSequence.length - 2) {
                 for (const pos of possibleSequence) {
                     twoAwayFromSequence[pos.y][pos.x]++;
                 }
@@ -50,25 +55,30 @@ export class BlockingAI implements AIInterface {
                 continue;
             }
 
-            // Blocking almost victories is a lot more important.
-            const score = oneAwayFromSequence[move.position.y][move.position.x] * 10 + twoAwayFromSequence[move.position.y][move.position.x];
+            // Penalize playing the jack so we don't use the jack to just block 3 in a rows.
+            const playingJackCost = move.card.rank == 'J' ? 10 : 0;
+            const score =
+                // Blocking almost victories is a lot more important.
+                100 * oneAwayFromSequence[move.position.y][move.position.x] +
+                twoAwayFromSequence[move.position.y][move.position.x] -
+                playingJackCost;
 
             if (score > bestScore) {
                 bestMoves = [move];
                 bestScore = score;
-            }
-            else if (score == bestScore) {
+            } else if (score == bestScore) {
                 bestMoves.push(move);
             }
         }
 
         if (bestMoves.length > 0) {
             if (bestScore > 0) {
-                console.log(`Blocking AI blocking a sequence! Score = ${bestScore}`);
+                console.log(
+                    `Blocking AI blocking a sequence! Score = ${bestScore}`
+                );
             }
             return this.fallback.makeMove(bestMoves, state);
         }
         return this.fallback.makeMove(moves, state);
     }
-
 }

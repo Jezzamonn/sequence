@@ -83,7 +83,7 @@ declare module 'glicko2' {
             id?: number
         ): Player;
         addResult(player1: Player, player2: Player, outcome: number): void;
-        updateRatings(matches?: Race | any[][]): void;
+        updateRatings(matches?: Race | [Player, Player, number][]): void;
         predict(player1: Player, player2: Player): number;
     }
 

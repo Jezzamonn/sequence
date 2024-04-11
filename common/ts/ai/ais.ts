@@ -1,13 +1,10 @@
 import { AIInterface } from './ai-interface';
 import { BlockingAI } from './blocking';
 import { ClusterAI } from './cluster';
-import { FirstMoveAI } from './first-move';
 import { MakeLinesAI } from './make-lines';
-import { PreferCornersAI } from './prefer-corners';
 import { PreferEdgesAI } from './prefer-edges';
 import { PreferMiddleAI } from './prefer-middle';
 import { RandomAI } from './random';
-import { SaveOneEyedJackAI } from './save-one-eyed';
 import { SaveTwoEyedJackAI } from './save-two-eyed';
 
 type BaseAIConstructor = new () => AIInterface;
@@ -36,15 +33,9 @@ export const allAIs: AIInfo[] = [
     makeAIInfo(ClusterAI),
     makeAIInfo(PreferEdgesAI),
     makeAIInfo(PreferMiddleAI),
-    makeAIInfo(PreferCornersAI),
-    makeAIInfo(FirstMoveAI),
-    makeAIInfo(MakeLinesAI, FirstMoveAI),
     makeAIInfo(MakeLinesAI, PreferMiddleAI),
-    makeAIInfo(BlockingAI, FirstMoveAI),
     makeAIInfo(BlockingAI, PreferMiddleAI),
-    makeAIInfo(BlockingAI, MakeLinesAI, FirstMoveAI),
+    makeAIInfo(BlockingAI, MakeLinesAI, PreferMiddleAI),
     makeAIInfo(SaveTwoEyedJackAI, PreferMiddleAI),
-    makeAIInfo(SaveOneEyedJackAI, PreferMiddleAI),
     makeAIInfo(SaveTwoEyedJackAI, BlockingAI, PreferMiddleAI),
-    makeAIInfo(SaveOneEyedJackAI, BlockingAI, PreferMiddleAI),
 ];
