@@ -86,7 +86,6 @@ playerManager.onStart = (allowAI: boolean) => {
     try {
         const players = playerManager.getValidatedPlayers(allowAI);
         gameManager = ServerGameManager.fromPartialPlayers(io, players, allowAI, minPlayers);
-        playerManager.clearPlayers();
     } catch (e) {
         if (e instanceof Error) {
             return { error: e.message };
@@ -119,6 +118,16 @@ playerManager.onMakeMove = (playerName, card, position) => {
 
     return {};
 };
+
+playerManager.onEndGame = () => {
+    if (gameManager == undefined) {
+        console.warn('No game to end');
+        return;
+    }
+
+    io.emit(Command.gameState, undefined);
+    gameManager = undefined;
+}
 
 // Watch the build directory for changes and tell clients to refresh when it
 // changes.

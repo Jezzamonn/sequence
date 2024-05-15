@@ -4,6 +4,7 @@ import './components/game/deck-discard';
 import './components/game/game-board';
 import './components/game/game-display';
 import './components/game/player-hand';
+import './components/game/settings-modal';
 import './components/joining/joined-player';
 import './components/joining/name-entry';
 import './components/root-component';

@@ -1,5 +1,5 @@
-import { css, html, LitElement, PropertyValueMap } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, LitElement, nothing, PropertyValueMap } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import { countSequences, getMovesForCard } from '../../../../common/ts/board';
 import { Card } from '../../../../common/ts/cards';
 import { PlayerVisibleGameState } from '../../../../common/ts/game';
@@ -25,7 +25,7 @@ export class GameDisplay extends LitElement {
 
             .players {
                 grid-row: 1;
-                grid-column: 1 / span 3;
+                grid-column: 2 / span 2;
                 padding: 0 5px;
 
                 display: flex;
@@ -67,15 +67,24 @@ export class GameDisplay extends LitElement {
                 z-index: 1;
             }
 
-            deck-and-discard {
+            deck-discard {
                 grid-row: 2;
-                grid-column: 3;
+                grid-column: 1;
             }
 
             player-hand {
                 grid-row: 3;
                 grid-column: 1 / span 3;
                 z-index: 2;
+            }
+
+            .settings-button {
+                grid-row: 1;
+                grid-column: 1;
+            }
+
+            settings-modal {
+                z-index: 10;
             }
         `,
     ];
@@ -88,6 +97,9 @@ export class GameDisplay extends LitElement {
 
     @property({ type: String })
     accessor selectedCardIndex: number | undefined = undefined;
+
+    @state()
+    private showingSettings = false;
 
     constructor() {
         super();
@@ -152,7 +164,7 @@ export class GameDisplay extends LitElement {
                 (this.gameState?.turnNumber - this.gameState.playerIndex) /
                     this.gameState.players.length
             );
-            console.log('Turn number:', thisPlayerTurnNumber)
+            console.log('Turn number:', thisPlayerTurnNumber);
         }
 
         return html`
@@ -176,8 +188,7 @@ export class GameDisplay extends LitElement {
                     if (this.selectedCardIndex === e.detail.index) {
                         this.selectedCard = undefined;
                         this.selectedCardIndex = undefined;
-                    }
-                    else {
+                    } else {
                         this.selectedCard = e.detail.card;
                         this.selectedCardIndex = e.detail.index;
                     }
@@ -201,23 +212,43 @@ export class GameDisplay extends LitElement {
                 .rank=${this.gameState?.lastCardPlayed?.rank ?? 'Joker'}
                 .suit=${this.gameState?.lastCardPlayed?.suit ?? 'Joker'}
             ></deck-discard>
+            <button
+                class="settings-button"
+                @click=${() => {
+                    this.showingSettings = true;
+                }}
+            >
+                Settings
+            </button>
+            ${this.showingSettings
+                ? html`<settings-modal
+                      @close=${() => {
+                          this.showingSettings = false;
+                      }}
+                      @end-game=${() => {
+                          connection.endGame();
+                      }}
+                  ></settings-modal>`
+                : nothing}
         `;
     }
 
-
-    updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    updated(
+        _changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>
+    ): void {
         super.updated(_changedProperties);
         const playersElement = this.shadowRoot?.querySelector('.players');
         if (playersElement == undefined) {
             throw new Error('Players element not found???');
         }
         // Scroll active player into view
-        const activePlayer = playersElement.querySelector('.player.active') as HTMLElement;
+        const activePlayer = playersElement.querySelector(
+            '.player.active'
+        ) as HTMLElement;
         if (activePlayer != null) {
             horizontalScrollToCenterOfParent(activePlayer);
         }
     }
-
 
     async makeMove(card: Card, position: Point | undefined) {
         if (connection.requestInProgress) {
@@ -239,7 +270,6 @@ export class GameDisplay extends LitElement {
     }
 }
 
-
 export function horizontalScrollToCenterOfParent(
     childElement: HTMLElement
 ): void {
@@ -256,7 +286,6 @@ export function horizontalScrollToCenterOfParent(
     const scrollDistance = childLeft - (parentWidth - elementWidth) / 2;
 
     parent.scrollLeft = scrollDistance;
-
 
     // Animate scroll smoothly
     parent.scrollTo({

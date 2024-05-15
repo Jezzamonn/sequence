@@ -71,6 +71,22 @@ export class Connection {
         }
     }
 
+    async endGame(): Promise<CommandResult> {
+        console.log(`Ending game!`);
+        if (this.requestInProgress) {
+            return { error: 'Request already in progress' };
+        }
+
+        this.requestInProgress = true;
+
+        try {
+            const result = await this.socket.emitWithAck(Command.endGame);
+            return result;
+        } finally {
+            this.requestInProgress = false;
+        }
+    }
+
     async makeMove(card: Card, position: Point | undefined): Promise<CommandResult> {
         console.log(`Making move: ${cardToDescription(card)} to ${Points.toString(position)}`);
         if (this.requestInProgress) {

@@ -23,6 +23,7 @@ export class ServerPlayerManager {
               position: Point | undefined
           ) => CommandResult)
         | undefined;
+    onEndGame: (() => void) | undefined;
 
     sendPlayersState(target: Server | Socket): void {
         const players = [...this.joinedPlayers.values()];
@@ -38,8 +39,7 @@ export class ServerPlayerManager {
 
         if (this.allowPlayerChanges) {
             this.joinedPlayers.set(player.name, player);
-        }
-        else {
+        } else {
             const existingPlayer = this.joinedPlayers.get(player.name);
             if (existingPlayer == undefined) {
                 return {
@@ -78,6 +78,14 @@ export class ServerPlayerManager {
                 );
             }
         );
+        socket.on(Command.endGame, (callback: CommandCallback) => {
+            if (this.onEndGame == undefined) {
+                callback({ error: 'No endGame handler set' });
+                return;
+            }
+            this.onEndGame();
+            callback({});
+        });
 
         return {};
     }

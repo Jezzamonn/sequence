@@ -10,6 +10,7 @@ export const Command = {
     playersState: 'playersState',
     // Forces the client to refresh the page.
     refresh: 'refresh',
+    endGame: 'endGame',
 };
 
 export type CommandCallback = (result: CommandResult) => void;
