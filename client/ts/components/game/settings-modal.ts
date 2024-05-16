@@ -41,7 +41,7 @@ export class SettingsModal extends LitElement {
 
         .danger-button {
             background-color: #ff7878;
-            color: white;
+            color: #500;
         }
 
         .close-button {
