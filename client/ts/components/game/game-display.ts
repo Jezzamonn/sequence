@@ -25,7 +25,7 @@ export class GameDisplay extends LitElement {
 
             .players {
                 grid-row: 1;
-                grid-column: 2 / span 2;
+                grid-column: 1 / span 3;
                 padding: 0 5px;
 
                 display: flex;
@@ -79,8 +79,20 @@ export class GameDisplay extends LitElement {
             }
 
             .settings-button {
-                grid-row: 1;
+                grid-row: 2;
                 grid-column: 1;
+                border: none;
+                background: none;
+                padding: 10%;
+                align-self: start;
+                max-width: 90px;
+            }
+
+            .settings-image {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                opacity: 0.5;
             }
 
             settings-modal {
@@ -218,7 +230,7 @@ export class GameDisplay extends LitElement {
                     this.showingSettings = true;
                 }}
             >
-                Settings
+                <img class="settings-image" src="/img/gear.svg" />
             </button>
             ${this.showingSettings
                 ? html`<settings-modal

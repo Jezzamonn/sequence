@@ -58,8 +58,6 @@ export class SettingsModal extends LitElement {
         return html`
             <div class="modal">
                 <h2>Settings</h2>
-                <!-- Add your settings options here -->
-                <p>Some settings...</p>
                 <hr />
                 <button
                     class="large-button danger-button"
