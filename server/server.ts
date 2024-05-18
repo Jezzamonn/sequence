@@ -121,12 +121,31 @@ playerManager.onMakeMove = (playerName, card, position) => {
 
 playerManager.onEndGame = () => {
     if (gameManager == undefined) {
-        console.warn('No game to end');
-        return;
+        return { error: 'No game has been started' };
     }
 
     io.emit(Command.gameState, undefined);
     gameManager = undefined;
+
+    return {};
+}
+
+playerManager.onRemovePlayer = (playerName) => {
+    try {
+        playerManager.removePlayer(playerName);
+    } catch (e) {
+        if (e instanceof Error) {
+            return { error: e.message };
+        }
+        console.error(e);
+        return { error: 'An unknown error occurred' };
+    }
+
+    wait(0).then(() => {
+        playerManager.sendPlayersState(io);
+    });
+
+    return {};
 }
 
 // Watch the build directory for changes and tell clients to refresh when it

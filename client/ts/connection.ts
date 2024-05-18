@@ -102,6 +102,22 @@ export class Connection {
             this.requestInProgress = false;
         }
     }
+
+    async removePlayer(playerName: string): Promise<CommandResult> {
+        console.log(`Removing player: ${playerName}`);
+        if (this.requestInProgress) {
+            return { error: 'Request already in progress' };
+        }
+
+        this.requestInProgress = true;
+
+        try {
+            const result = await this.socket.emitWithAck(Command.removePlayer, playerName);
+            return result;
+        } finally {
+            this.requestInProgress = false;
+        }
+    }
 }
 
 export const connection = new Connection();

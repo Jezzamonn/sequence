@@ -23,7 +23,8 @@ export class ServerPlayerManager {
               position: Point | undefined
           ) => CommandResult)
         | undefined;
-    onEndGame: (() => void) | undefined;
+    onEndGame: (() => CommandResult) | undefined;
+    onRemovePlayer: ((playerName: string) => CommandResult) | undefined;
 
     sendPlayersState(target: Server | Socket): void {
         const players = [...this.joinedPlayers.values()];
@@ -78,13 +79,25 @@ export class ServerPlayerManager {
                 );
             }
         );
+
         socket.on(Command.endGame, (callback: CommandCallback) => {
             if (this.onEndGame == undefined) {
                 callback({ error: 'No endGame handler set' });
                 return;
             }
-            this.onEndGame();
-            callback({});
+            callback(
+                logIfError(this.onEndGame())
+            );
+        });
+
+        socket.on(Command.removePlayer, (playerName: string, callback: CommandCallback) => {
+            if (this.onRemovePlayer == undefined) {
+                callback({ error: 'No removePlayer handler set' });
+                return;
+            }
+            callback(
+                logIfError(this.onRemovePlayer(playerName))
+            );
         });
 
         return {};
@@ -104,5 +117,14 @@ export class ServerPlayerManager {
 
     clearPlayers(): void {
         this.joinedPlayers.clear();
+    }
+
+    removePlayer(playerName: string): void {
+        if (!this.joinedPlayers.has(playerName)) {
+            throw new Error(`Player ${playerName} not found.`);
+        }
+        this.joinedPlayers.delete(playerName);
+
+        // TODO: I suppose this should remove the socket stuff?
     }
 }

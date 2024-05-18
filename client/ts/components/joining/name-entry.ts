@@ -230,6 +230,9 @@ export class NameEntry extends LitElement {
                     ${this.joinedPlayers.map(
                         (player) => html`
                             <joined-player
+                                @remove-player=${() => {
+                                    connection.removePlayer(player.name);
+                                }}
                                 name=${player.name}
                                 quest=${player.quest}
                                 color=${player.color}

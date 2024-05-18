@@ -44,6 +44,20 @@ export class JoinedPlayer extends LitElement {
                 display: none;
             }
         }
+
+        .remove-button {
+            border: none;
+            background: none;
+            padding: 0;
+            align-self: start;
+            margin-left: auto;
+        }
+
+        .remove-button-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
     `;
 
     @property({ type: String })
@@ -57,6 +71,9 @@ export class JoinedPlayer extends LitElement {
 
     @property({ type: Boolean })
     accessor canCollapse: boolean = false;
+
+    @property({ type: Boolean })
+    accessor canRemove: boolean = false;
 
     get questOrDefault() {
         if (this.quest != undefined && this.quest.trim() != '') {
@@ -73,6 +90,21 @@ export class JoinedPlayer extends LitElement {
                 <h3>${this.name}</h3>
                 <p class=${questClass}>Quest: ${this.questOrDefault}</p>
             </div>
+            <button class="remove-button" @click=${() => {
+                this.dispatchEvent(new CustomEvent<string>('remove-player', {
+                    detail: this.name,
+                    bubbles: true,
+                    composed: true,
+                }));
+            }}>
+                <img class="remove-button-image" src="/img/delete.svg" />
+            </button>
         `;
+    }
+}
+
+declare global {
+    interface HTMLElementEventMap {
+        'remove-player': CustomEvent<string>;
     }
 }

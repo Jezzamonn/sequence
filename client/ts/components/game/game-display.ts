@@ -86,13 +86,13 @@ export class GameDisplay extends LitElement {
                 padding: 10%;
                 align-self: start;
                 max-width: 90px;
+                z-index: 1;
             }
 
             .settings-image {
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
-                opacity: 0.5;
             }
 
             settings-modal {
@@ -230,7 +230,7 @@ export class GameDisplay extends LitElement {
                     this.showingSettings = true;
                 }}
             >
-                <img class="settings-image" src="/img/gear.svg" />
+                <img class="settings-image" src="/img/settings.svg" />
             </button>
             ${this.showingSettings
                 ? html`<settings-modal
