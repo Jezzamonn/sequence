@@ -3,6 +3,7 @@ import express from 'express';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
+import { AddressInfo } from 'net';
 import { Server, Socket } from 'socket.io';
 import { Command, CommandCallback } from '../common/ts/interface/interface';
 import { Player } from '../common/ts/players';
@@ -14,14 +15,24 @@ import { ServerPlayerManager } from './server-player-manager';
 console.log('Server <( Hello World! )');
 
 program
-    .option('--minPlayers <players>', 'Minimum number of players in a game. The rest will be filled with AI players', '2')
+    .option(
+        '--minPlayers <players>',
+        'Minimum number of players in a game. The rest will be filled with AI players',
+        '2'
+    )
+    .option('--port <port>', 'Port to listen on', '')
+    .option('--randomSeed <seed>', 'Seed for generating random numbers', '')
     .parse(process.argv);
 
 const options = program.opts();
 
 const minPlayers = parseInt(options.minPlayers);
 
-let port: number;
+let port: number | undefined;
+
+if (options.port != '') {
+    port = parseInt(options.port);
+}
 
 const buildDir = '../client/build';
 
@@ -32,22 +43,26 @@ app.use(express.static(buildDir));
 let server: http.Server | https.Server;
 
 if (process.env.NODE_ENV === 'production') {
-    port = 443;
+    if (port == undefined) {
+        port = 443;
+    }
 
-    const sslDir = '/etc/letsencrypt/live/seq.jezzamon.com/'
+    const sslDir = '/etc/letsencrypt/live/seq.jezzamon.com/';
     const cert = fs.readFileSync(sslDir + 'fullchain.pem');
     const key = fs.readFileSync(sslDir + 'privkey.pem');
 
     server = https.createServer({ cert, key }, app);
 } else {
-    port = 8080;
+    if (port == undefined) {
+        port = 8080;
+    }
     server = http.createServer(app);
 }
 
 const io = new Server(server, {
     cors: {
         origin: '*',
-        methods: ["GET", "POST"]
+        methods: ['GET', 'POST'],
     },
 });
 
@@ -85,7 +100,14 @@ playerManager.onStart = (allowAI: boolean) => {
 
     try {
         const players = playerManager.getValidatedPlayers(allowAI);
-        gameManager = ServerGameManager.fromPartialPlayers(io, players, allowAI, minPlayers);
+        const randomSeed = (options.randomSeed as string) || undefined;
+        gameManager = ServerGameManager.fromPartialPlayers(
+            io,
+            players,
+            allowAI,
+            minPlayers,
+            randomSeed
+        );
     } catch (e) {
         if (e instanceof Error) {
             return { error: e.message };
@@ -128,7 +150,7 @@ playerManager.onEndGame = () => {
     gameManager = undefined;
 
     return {};
-}
+};
 
 playerManager.onRemovePlayer = (playerName) => {
     try {
@@ -146,7 +168,7 @@ playerManager.onRemovePlayer = (playerName) => {
     });
 
     return {};
-}
+};
 
 // Watch the build directory for changes and tell clients to refresh when it
 // changes.
@@ -158,7 +180,7 @@ try {
     const refreshDebounceTimeSec = 1;
 
     fs.watch(buildDir, { recursive: true }, (event, filename) => {
-        console.log('File change detected:', event, filename)
+        console.log('File change detected:', event, filename);
         if (refreshTimeout != undefined) {
             clearTimeout(refreshTimeout);
         }
@@ -171,9 +193,9 @@ try {
     });
 } catch (e) {
     console.error('Failed to watch build directory for changes:', e);
-    console.log('No worries :)')
+    console.log('No worries :)');
 }
 
 server.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+    console.log(`Listening on port ${(server.address() as AddressInfo).port}`);
 });

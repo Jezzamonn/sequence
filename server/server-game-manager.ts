@@ -1,34 +1,53 @@
-import { Server } from "socket.io";
-import { PlayerOrAI } from "../common/ts/ai/ai-interface";
-import { BlockingAI } from "../common/ts/ai/blocking";
-import { PreferMiddleAI } from "../common/ts/ai/prefer-middle";
-import { allColors } from "../common/ts/board";
-import { Card, cardToDescription } from "../common/ts/cards";
-import { GameManager } from "../common/ts/game";
-import { Command } from "../common/ts/interface/interface";
-import { Player } from "../common/ts/players";
-import { Point, Points } from "../common/ts/point";
-import { choose, wait } from "../common/ts/util";
+import { Server } from 'socket.io';
+import { PlayerOrAI } from '../common/ts/ai/ai-interface';
+import { BlockingAI } from '../common/ts/ai/blocking';
+import { PreferMiddleAI } from '../common/ts/ai/prefer-middle';
+import { allColors } from '../common/ts/board';
+import { Card, cardToDescription } from '../common/ts/cards';
+import { GameManager } from '../common/ts/game';
+import { Command } from '../common/ts/interface/interface';
+import { Player } from '../common/ts/players';
+import { Point, Points } from '../common/ts/point';
+import { choose, seededRandom, wait } from '../common/ts/util';
 
 export class ServerGameManager {
     io: Server;
     players: PlayerOrAI[] = [];
     gameManager: GameManager;
 
-    constructor(io: Server, players: PlayerOrAI[]) {
+    constructor(io: Server, players: PlayerOrAI[], randomSeed?: string) {
         this.io = io;
         this.players = players;
 
-        this.gameManager = new GameManager(players, Math.random);
+        let random: () => number = Math.random;
+        if (randomSeed != undefined) {
+            random = seededRandom(randomSeed);
+        }
+
+        this.gameManager = new GameManager(players, random);
 
         this.queueNextAction();
     }
 
-    static fromPartialPlayers(io: Server, players: Player[], allowAI = false, minPlayers: number): ServerGameManager {
-        return new ServerGameManager(io, makeAllPlayersFromPartialPlayers(players, allowAI, minPlayers));
+    static fromPartialPlayers(
+        io: Server,
+        players: Player[],
+        allowAI = false,
+        minPlayers: number,
+        randomSeed?: string
+    ): ServerGameManager {
+        return new ServerGameManager(
+            io,
+            makeAllPlayersFromPartialPlayers(players, allowAI, minPlayers),
+            randomSeed
+        );
     }
 
-    makeMove(playerName: string, card: Card, position: Point | undefined): void {
+    makeMove(
+        playerName: string,
+        card: Card,
+        position: Point | undefined
+    ): void {
         console.log(
             `Player ${playerName} making move: ${cardToDescription(
                 card
@@ -36,7 +55,9 @@ export class ServerGameManager {
         );
 
         // Find player index by looking up by their name.
-        const playerIndex = this.players.findIndex((p) => p.name === playerName);
+        const playerIndex = this.players.findIndex(
+            (p) => p.name === playerName
+        );
         if (playerIndex === -1) {
             throw new Error(`Player ${playerName} not found.`);
         }
@@ -97,13 +118,15 @@ export class ServerGameManager {
     }
 }
 
-export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowAI: boolean, minimumPlayers: number): PlayerOrAI[] {
+export function makeAllPlayersFromPartialPlayers(
+    joinedPlayers: Player[],
+    allowAI: boolean,
+    minimumPlayers: number
+): PlayerOrAI[] {
     const players: PlayerOrAI[] = [];
     const addedHumanPlayerNames = new Set<string>();
     // JS sets actually maintain a consistent order, so we can look up the next color from that.
-    const colorsInGame = new Set(
-        joinedPlayers.map((p) => p.color)
-    );
+    const colorsInGame = new Set(joinedPlayers.map((p) => p.color));
     if (allowAI && colorsInGame.size == 1) {
         // Add an extra color for the AI player.
         colorsInGame.add(choose(allColors.filter((c) => !colorsInGame.has(c))));
@@ -111,13 +134,15 @@ export function makeAllPlayersFromPartialPlayers(joinedPlayers: Player[], allowA
 
     let aiPlayerCount = 0;
 
-    while (addedHumanPlayerNames.size < joinedPlayers.length || players.length < minimumPlayers) {
+    while (
+        addedHumanPlayerNames.size < joinedPlayers.length ||
+        players.length < minimumPlayers
+    ) {
         for (const color of colorsInGame) {
             let player: PlayerOrAI = choose(
                 joinedPlayers.filter(
                     (p) =>
-                        p.color === color &&
-                        !addedHumanPlayerNames.has(p.name)
+                        p.color === color && !addedHumanPlayerNames.has(p.name)
                 )
             );
             if (player == undefined) {
