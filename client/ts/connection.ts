@@ -1,7 +1,7 @@
 import { Socket, io } from 'socket.io-client';
 import { Card, cardToDescription } from '../../common/ts/cards';
 import { PlayerVisibleGameState } from '../../common/ts/game';
-import { Command, CommandResult } from '../../common/ts/interface/interface';
+import { ClientCommand, CommandResult, ServerCommand } from '../../common/ts/interface/interface';
 import { Player } from '../../common/ts/players';
 import { Point, Points } from '../../common/ts/point';
 
@@ -25,15 +25,15 @@ export class Connection {
             console.log('Disconnected from server');
         });
 
-        this.socket.on(Command.gameState, (state: PlayerVisibleGameState) => {
+        this.socket.on(ServerCommand.gameState, (state: PlayerVisibleGameState) => {
             this.onGameState?.(state);
         });
 
-        this.socket.on(Command.playersState, (players: Player[]) => {
+        this.socket.on(ServerCommand.playersState, (players: Player[]) => {
             this.onPlayersState?.(players);
         });
 
-        this.socket.on(Command.refresh, () => {
+        this.socket.on(ServerCommand.refresh, () => {
             // Just reload the page without caring about the current state of the game.
             window.location.reload();
         });
@@ -48,7 +48,7 @@ export class Connection {
         this.requestInProgress = true;
 
         try {
-            const result = await this.socket.emitWithAck(Command.join, player);
+            const result = await this.socket.emitWithAck(ClientCommand.join, player);
             return result;
         } finally {
             this.requestInProgress = false;
@@ -64,7 +64,7 @@ export class Connection {
         this.requestInProgress = true;
 
         try {
-            const result = await this.socket.emitWithAck(Command.start, allowAI);
+            const result = await this.socket.emitWithAck(ClientCommand.start, allowAI);
             return result;
         } finally {
             this.requestInProgress = false;
@@ -80,7 +80,7 @@ export class Connection {
         this.requestInProgress = true;
 
         try {
-            const result = await this.socket.emitWithAck(Command.endGame);
+            const result = await this.socket.emitWithAck(ClientCommand.endGame);
             return result;
         } finally {
             this.requestInProgress = false;
@@ -96,7 +96,7 @@ export class Connection {
         this.requestInProgress = true;
 
         try {
-            const result = await this.socket.emitWithAck(Command.makeMove, card, position);
+            const result = await this.socket.emitWithAck(ClientCommand.makeMove, card, position);
             return result;
         } finally {
             this.requestInProgress = false;
@@ -112,7 +112,7 @@ export class Connection {
         this.requestInProgress = true;
 
         try {
-            const result = await this.socket.emitWithAck(Command.removePlayer, playerName);
+            const result = await this.socket.emitWithAck(ClientCommand.removePlayer, playerName);
             return result;
         } finally {
             this.requestInProgress = false;

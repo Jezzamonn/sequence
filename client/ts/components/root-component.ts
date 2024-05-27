@@ -4,7 +4,6 @@ import { PlayerVisibleGameState } from '../../../common/ts/game';
 import { Player } from '../../../common/ts/players';
 import { toSentenceCase, wait } from '../../../common/ts/util';
 import { connection } from '../connection';
-import { NameEntry } from './joining/name-entry';
 
 @customElement('root-component')
 export class RootComponent extends LitElement {
@@ -42,21 +41,8 @@ export class RootComponent extends LitElement {
             if (state == undefined) {
                 this._state = 'nameEntry';
             } else {
-                const nameEntry = this.shadowRoot?.querySelector(
-                    'name-entry'
-                ) as NameEntry | undefined;
-
-                // If we were on the name entry page, switch to the game UI when we receive the
-                // game state. Exceptions:
-                // - If we haven't joined yet (so we're not part of the game).
-                // - If the game is over, stay there too so a new game can be started.
-                if (
-                    state.gameWinner == undefined &&
-                    nameEntry &&
-                    nameEntry.joined
-                ) {
-                    this._state = 'game';
-                }
+                // Switch to game state always.
+                this._state = 'game';
 
                 // Notifications and sound effects only happen when the game is
                 // already going.
@@ -103,18 +89,13 @@ export class RootComponent extends LitElement {
 
     render() {
         let mainElem: TemplateResult;
-        // Only show on going players if the game isn't won.
-        const ongoingPlayers =
-            this._gameState?.gameWinner == undefined
-                ? this._gameState?.players ?? []
-                : [];
+        const ongoingPlayers = this._gameState?.players ?? [];
 
         if (this._state === 'nameEntry') {
             mainElem = html`<name-entry
                 .joinedPlayers=${this._players}
                 .ongoingGamePlayers=${ongoingPlayers}
-                .autoJoin=${this._gameState != undefined &&
-                this._gameState.gameWinner == undefined}
+                .autoJoin=${this._gameState != undefined}
                 @notify=${(event: CustomEvent<string>) =>
                     this.notify(event.detail)}
             >

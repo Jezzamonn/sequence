@@ -2,16 +2,22 @@ export interface CommandResult {
     error?: string;
 }
 
-export enum Command {
+// Sent from client -> server
+export enum ClientCommand {
     join = 'join',
     start = 'start',
     makeMove = 'makeMove',
+    endGame = 'endGame',
+    removePlayer = 'removePlayer',
+};
+
+// Sent from server -> client
+export enum ServerCommand {
     gameState = 'gameState',
     playersState = 'playersState',
     // Forces the client to refresh the page.
     refresh = 'refresh',
-    endGame = 'endGame',
-    removePlayer = 'removePlayer',
-};
+}
+
 
 export type CommandCallback = (result: CommandResult) => void;

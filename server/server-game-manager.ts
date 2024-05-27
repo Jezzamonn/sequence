@@ -5,7 +5,7 @@ import { PreferMiddleAI } from '../common/ts/ai/prefer-middle';
 import { allColors } from '../common/ts/board';
 import { Card, cardToDescription } from '../common/ts/cards';
 import { GameManager } from '../common/ts/game';
-import { Command } from '../common/ts/interface/interface';
+import { ServerCommand } from '../common/ts/interface/interface';
 import { Player } from '../common/ts/players';
 import { Point, Points } from '../common/ts/point';
 import { choose, seededRandom, wait } from '../common/ts/util';
@@ -81,7 +81,7 @@ export class ServerGameManager {
             const state = this.gameManager.getStateForPlayer(i);
             console.log(`Sending game state to player ${i}`);
 
-            this.io.to(player.name).emit(Command.gameState, state);
+            this.io.to(player.name).emit(ServerCommand.gameState, state);
         }
     }
 

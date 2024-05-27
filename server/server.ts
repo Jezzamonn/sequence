@@ -5,7 +5,7 @@ import http from 'http';
 import https from 'https';
 import { AddressInfo } from 'net';
 import { Server, Socket } from 'socket.io';
-import { Command, CommandCallback } from '../common/ts/interface/interface';
+import { ClientCommand, CommandCallback, ServerCommand } from '../common/ts/interface/interface';
 import { Player } from '../common/ts/players';
 import { wait } from '../common/ts/util';
 import { logIfError } from './server-common';
@@ -73,11 +73,11 @@ io.on('connection', (socket: Socket) => {
     console.log('A client has connected');
 
     playerManager.sendPlayersState(socket);
-    socket.emit(Command.gameState, gameManager?.getBaseGameState());
+    socket.emit(ServerCommand.gameState, gameManager?.getBaseGameState());
 
     // When a client connects, wait for it to send a join command with the player information.
     // The player manager will add events to the socket to handle the rest of the game.
-    socket.on(Command.join, (player: Player, callback: CommandCallback) => {
+    socket.on(ClientCommand.join, (player: Player, callback: CommandCallback) => {
         const result = playerManager.addOrUpdatePlayer(player, socket);
         callback(logIfError(result));
 
@@ -146,7 +146,7 @@ playerManager.onEndGame = () => {
         return { error: 'No game has been started' };
     }
 
-    io.emit(Command.gameState, undefined);
+    io.emit(ServerCommand.gameState, undefined);
     gameManager = undefined;
 
     return {};
@@ -187,7 +187,7 @@ try {
 
         refreshTimeout = setTimeout(() => {
             console.log('Refreshing clients');
-            io.emit(Command.refresh);
+            io.emit(ServerCommand.refresh);
             refreshTimeout = undefined;
         }, refreshDebounceTimeSec * 1000);
     });

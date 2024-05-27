@@ -1,9 +1,10 @@
 import { Server, Socket } from 'socket.io';
 import { Card } from '../common/ts/cards';
 import {
-    Command,
+    ClientCommand,
     CommandCallback,
     CommandResult,
+    ServerCommand,
 } from '../common/ts/interface/interface';
 import { Player, validatePlayerColors } from '../common/ts/players';
 import { Point } from '../common/ts/point';
@@ -32,7 +33,7 @@ export class ServerPlayerManager {
         players.sort((a, b) => a.name.localeCompare(b.name));
 
         // Broadcast so that it goes to players that haven't joined yet.
-        target.emit(Command.playersState, players);
+        target.emit(ServerCommand.playersState, players);
     }
 
     addOrUpdatePlayer(player: Player, socket: Socket): CommandResult {
@@ -54,7 +55,7 @@ export class ServerPlayerManager {
         socket.join(player.name);
 
         socket.on(
-            Command.start,
+            ClientCommand.start,
             (allowAI: boolean, callback: CommandCallback) => {
                 if (this.onStart == undefined) {
                     callback({ error: 'No start handler set' });
@@ -64,7 +65,7 @@ export class ServerPlayerManager {
             }
         );
         socket.on(
-            Command.makeMove,
+            ClientCommand.makeMove,
             (
                 card: Card,
                 position: Point | undefined,
@@ -80,7 +81,7 @@ export class ServerPlayerManager {
             }
         );
 
-        socket.on(Command.endGame, (callback: CommandCallback) => {
+        socket.on(ClientCommand.endGame, (callback: CommandCallback) => {
             if (this.onEndGame == undefined) {
                 callback({ error: 'No endGame handler set' });
                 return;
@@ -90,7 +91,7 @@ export class ServerPlayerManager {
             );
         });
 
-        socket.on(Command.removePlayer, (playerName: string, callback: CommandCallback) => {
+        socket.on(ClientCommand.removePlayer, (playerName: string, callback: CommandCallback) => {
             if (this.onRemovePlayer == undefined) {
                 callback({ error: 'No removePlayer handler set' });
                 return;
