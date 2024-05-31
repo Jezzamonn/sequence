@@ -182,6 +182,7 @@ export class GameDisplay extends LitElement {
         return html`
             <div class="players">${players}</div>
             <game-board
+                class="game-board"
                 @board-position-click=${(
                     e: CustomEvent<BoardClickEventParams>
                 ) => {
@@ -226,6 +227,7 @@ export class GameDisplay extends LitElement {
             ></deck-discard>
             <button
                 class="settings-button"
+                aria-label="Settings"
                 @click=${() => {
                     this.showingSettings = true;
                 }}

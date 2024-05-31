@@ -63,9 +63,7 @@ export class SettingsModal extends LitElement {
                     class="large-button danger-button"
                     @click=${() =>
                         this.dispatchEvent(new CustomEvent<void>('end-game'))}
-                >
-                    End game for all players
-                </button>
+                >End game for all players</button>
                 <button
                     class="close-button"
                     @click=${() =>
