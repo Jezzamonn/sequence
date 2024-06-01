@@ -1,9 +1,9 @@
-import { Page } from 'puppeteer';
+import { ElementHandle, Page } from 'puppeteer';
 import { NameEntryPageObject } from '../joining/name-entry-po';
 import { SettingsModalPageObject } from './settings-modal-po';
 
 export class GameDisplayPageObject {
-    private page: Page;
+    page: Page;
 
     constructor(page: Page) {
         this.page = page;
@@ -24,5 +24,11 @@ export class GameDisplayPageObject {
         const nameEntryPO = new NameEntryPageObject(this.page);
         await nameEntryPO.ensureLoaded();
         return nameEntryPO;
+    }
+
+    async getPlayerCards(): Promise<ElementHandle<Element>[]> {
+        const cardElement = await this.page.$('>>> player-hand');
+        const cards = cardElement?.$$('>>> .card-image');
+        return cards ?? [];
     }
 }

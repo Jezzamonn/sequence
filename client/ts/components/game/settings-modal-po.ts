@@ -2,7 +2,7 @@ import { Page } from 'puppeteer';
 import { NameEntryPageObject } from '../joining/name-entry-po';
 
 export class SettingsModalPageObject {
-    private page: Page;
+    page: Page;
 
     constructor(page: Page) {
         this.page = page;

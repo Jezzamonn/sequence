@@ -2,7 +2,7 @@ import { Page } from 'puppeteer';
 import { GameDisplayPageObject } from '../game/game-display-po';
 
 export class NameEntryPageObject {
-    private page: Page;
+    page: Page;
 
     constructor(page: Page) {
         this.page = page;

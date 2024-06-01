@@ -1,5 +1,6 @@
 import { ChildProcess, spawn } from 'child_process';
 import puppeteer, { Browser } from 'puppeteer';
+import { GameDisplayPageObject } from '../client/ts/components/game/game-display-po';
 import { NameEntryPageObject } from '../client/ts/components/joining/name-entry-po';
 
 const serverStartRegex = /Listening on port (\d+)/;
@@ -12,6 +13,7 @@ else {
 }
 
 const headless = true;
+
 
 describe('Server Test', () => {
     let serverProcess: ChildProcess | undefined;
@@ -89,19 +91,38 @@ describe('Server Test', () => {
         await nameEntryPO.ensureLoaded();
     });
 
-    it('allows a game with a single player to be started and stopped', async () => {
-        var nameEntryPO = await newBrowser();
+    describe('with a single player when the game is started', () => {
+        let gamePO: GameDisplayPageObject;
 
-        await nameEntryPO.enterName('test player');
-        await nameEntryPO.selectColor('blue');
+        beforeEach(async () => {
+            let nameEntryPO = await newBrowser();
 
-        await nameEntryPO.clickJoin();
-        var gamePO = await nameEntryPO.clickStart();
-        var settingsPO = await gamePO.openSettings();
-        var nameEntryPO = await settingsPO.endGame();
+            await nameEntryPO.enterName('test player');
+            await nameEntryPO.selectColor('blue');
+
+            await nameEntryPO.clickJoin();
+            gamePO = await nameEntryPO.clickStart();
+        });
+
+        it('allows the game to be stopped', async () => {
+            let settingsPO = await gamePO.openSettings();
+            await settingsPO.endGame();
+        });
+
+        it('has cards', async () => {
+            let cards = await gamePO.getPlayerCards();
+            expect(cards.length).toBeGreaterThan(0);
+        });
+
+        it(`still has cards after network reconnect`, async () => {
+            await gamePO.page.setOfflineMode(true);
+            await gamePO.page.setOfflineMode(false);
+            await gamePO.page.waitForNetworkIdle();
+
+        });
     });
 
-    it('allow a game with two players to be started and stopped', async () => {
+    it(`should show first joined player on each player's screen`, async () => {
         var nameEntryPO1 = await newBrowser();
         var nameEntryPO2 = await newBrowser();
 
@@ -109,28 +130,89 @@ describe('Server Test', () => {
         await nameEntryPO1.selectColor('blue');
         await nameEntryPO1.clickJoin();
 
-        // Check that the player shows up on player 2's screen
+        await nameEntryPO1.page.waitForNetworkIdle();
+
+        await nameEntryPO1.assertHasPlayer('test player 1');
         await nameEntryPO2.assertHasPlayer('test player 1');
+    });
+
+    it(`should show second joined player on each player's screen`, async () => {
+        var nameEntryPO1 = await newBrowser();
+        var nameEntryPO2 = await newBrowser();
+
+        await nameEntryPO1.enterName('test player 1');
+        await nameEntryPO1.selectColor('blue');
+        await nameEntryPO1.clickJoin();
 
         await nameEntryPO2.enterName('test player 2');
         await nameEntryPO2.selectColor('red');
         await nameEntryPO2.clickJoin();
 
-        var gamePO2 = await nameEntryPO2.clickStart();
+        await nameEntryPO1.page.waitForNetworkIdle();
+        await nameEntryPO2.page.waitForNetworkIdle();
 
-        var gamePO1 = await nameEntryPO1.assertSwitchedToGame();
-        var settingsPO1 = await gamePO1.openSettings();
-        var nameEntryPO1 = await settingsPO1.endGame();
-
-        var nameEntryPO2 = await gamePO2.assertSwitchedToGame();
-
-        await nameEntryPO1.assertHasPlayer('test player 1');
         await nameEntryPO1.assertHasPlayer('test player 2');
-        await nameEntryPO2.assertHasPlayer('test player 1');
         await nameEntryPO2.assertHasPlayer('test player 2');
+    });
 
-        // Starting the game again should start it for both players
-        var gamePO1 = await nameEntryPO1.clickStart();
-        var gamePO2 = await nameEntryPO2.assertSwitchedToGame();
+    it(`should show all joined players when a new player joins`, async () => {
+        var nameEntryPO1 = await newBrowser();
+        var nameEntryPO2 = await newBrowser();
+
+        await nameEntryPO1.enterName('test player 1');
+        await nameEntryPO1.selectColor('blue');
+        await nameEntryPO1.clickJoin();
+
+        await nameEntryPO2.enterName('test player 2');
+        await nameEntryPO2.selectColor('red');
+        await nameEntryPO2.clickJoin();
+
+        var nameEntryPO3 = await newBrowser();
+        await nameEntryPO3.assertHasPlayer('test player 1');
+        await nameEntryPO3.assertHasPlayer('test player 2');
+    });
+
+    describe('with two player started game', () => {
+
+        let gamePO1: GameDisplayPageObject;
+        let gamePO2: GameDisplayPageObject;
+
+        beforeEach(async () => {
+            var nameEntryPO1 = await newBrowser();
+            var nameEntryPO2 = await newBrowser();
+
+            await nameEntryPO1.enterName('test player 1');
+            await nameEntryPO1.selectColor('blue');
+            await nameEntryPO1.clickJoin();
+
+            await nameEntryPO2.enterName('test player 2');
+            await nameEntryPO2.selectColor('red');
+            await nameEntryPO2.clickJoin();
+
+            gamePO1 = await nameEntryPO1.clickStart();
+            gamePO2 = await nameEntryPO2.assertSwitchedToGame();
+        });
+
+        it('should allow the game to be stopped', async () => {
+            let settingsPO1 = await gamePO1.openSettings();
+            let secondNameEntryPO1 = await settingsPO1.endGame();
+            let secondNameEntryPO2 = await gamePO2.assertSwitchedToGame();
+
+            // After stopping, the players should still be joined.
+            await secondNameEntryPO1.assertHasPlayer('test player 1');
+            await secondNameEntryPO1.assertHasPlayer('test player 2');
+            await secondNameEntryPO2.assertHasPlayer('test player 1');
+            await secondNameEntryPO2.assertHasPlayer('test player 2');
+        });
+
+        it('should join the game for player players after stopping and starting', async () => {
+            let settingsPO1 = await gamePO1.openSettings();
+            let secondNameEntryPO1 = await settingsPO1.endGame();
+            let secondNameEntryPO2 = await gamePO2.assertSwitchedToGame();
+
+            // Starting the game again should start it for both players, without rejoining.
+            let secondGamePO1 = await secondNameEntryPO1.clickStart();
+            let secondGamePO2 = await secondNameEntryPO2.assertSwitchedToGame();
+        });
     });
 });
