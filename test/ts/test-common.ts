@@ -43,7 +43,7 @@ export class TestCommon {
     async startServer() {
         this.serverProcess = spawn(
             'npx',
-            ['ts-node', 'server.ts', '--port', '0', '--randomSeed', 'test'],
+            ['ts-node', 'ts/server.ts', '--port', '0', '--randomSeed', 'test'],
             {
                 cwd: '../server',
                 shell: true,

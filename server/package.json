@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Sequence Server",
   "scripts": {
-    "start": "ts-node server.ts"
+    "start": "ts-node ts/server.ts"
   },
   "author": "Jezzamon",
   "license": "UNLICENSED",

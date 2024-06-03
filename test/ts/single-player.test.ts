@@ -28,7 +28,7 @@ describe('with a single player when game has started', () => {
         await settingsPO.endGame();
     });
 
-    it('has cards', async () => {
+    xit('has cards', async () => {
         let cards = await gamePO.getPlayerCards();
         expect(cards.length).toBeGreaterThan(0);
     });

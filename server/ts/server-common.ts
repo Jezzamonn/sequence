@@ -1,4 +1,4 @@
-import { CommandResult } from "../common/ts/interface/interface";
+import { CommandResult } from "../../common/ts/interface/interface";
 
 export function logIfError(result: CommandResult): CommandResult {
     if (result.error != undefined) {

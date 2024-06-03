@@ -1,14 +1,14 @@
 import { Server } from 'socket.io';
-import { PlayerOrAI } from '../common/ts/ai/ai-interface';
-import { BlockingAI } from '../common/ts/ai/blocking';
-import { PreferMiddleAI } from '../common/ts/ai/prefer-middle';
-import { allColors } from '../common/ts/board';
-import { Card, cardToDescription } from '../common/ts/cards';
-import { GameManager } from '../common/ts/game';
-import { ServerCommand } from '../common/ts/interface/interface';
-import { Player } from '../common/ts/players';
-import { Point, Points } from '../common/ts/point';
-import { choose, seededRandom, wait } from '../common/ts/util';
+import { PlayerOrAI } from '../../common/ts/ai/ai-interface';
+import { BlockingAI } from '../../common/ts/ai/blocking';
+import { PreferMiddleAI } from '../../common/ts/ai/prefer-middle';
+import { allColors } from '../../common/ts/board';
+import { Card, cardToDescription } from '../../common/ts/cards';
+import { GameManager } from '../../common/ts/game';
+import { ServerCommand } from '../../common/ts/interface/interface';
+import { Player } from '../../common/ts/players';
+import { Point, Points } from '../../common/ts/point';
+import { choose, seededRandom, wait } from '../../common/ts/util';
 
 export class ServerGameManager {
     io: Server;

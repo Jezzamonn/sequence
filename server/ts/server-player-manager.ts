@@ -1,13 +1,13 @@
 import { Server, Socket } from 'socket.io';
-import { Card } from '../common/ts/cards';
+import { Card } from '../../common/ts/cards';
 import {
     ClientCommand,
     CommandCallback,
     CommandResult,
     ServerCommand,
-} from '../common/ts/interface/interface';
-import { Player, validatePlayerColors } from '../common/ts/players';
-import { Point } from '../common/ts/point';
+} from '../../common/ts/interface/interface';
+import { Player, validatePlayerColors } from '../../common/ts/players';
+import { Point } from '../../common/ts/point';
 import { logIfError } from './server-common';
 
 export class ServerPlayerManager {
