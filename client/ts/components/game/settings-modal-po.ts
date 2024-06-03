@@ -14,6 +14,7 @@ export class SettingsModalPageObject {
 
     async endGame(): Promise<NameEntryPageObject> {
         await this.page.click('::-p-text(End game for all players)');
+        await this.page.waitForNetworkIdle();
         const nameEntryPO = new NameEntryPageObject(this.page);
         await nameEntryPO.ensureLoaded();
         return nameEntryPO;

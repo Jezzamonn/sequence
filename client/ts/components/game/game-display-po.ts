@@ -21,6 +21,7 @@ export class GameDisplayPageObject {
     }
 
     async assertSwitchedToGame(): Promise<NameEntryPageObject> {
+        await this.page.waitForNetworkIdle();
         const nameEntryPO = new NameEntryPageObject(this.page);
         await nameEntryPO.ensureLoaded();
         return nameEntryPO;
