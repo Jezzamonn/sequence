@@ -131,12 +131,12 @@ export class NameEntry extends LitElement {
                 id="name-input"
                 class="input"
                 type="text"
-                .disabled=${this.joined}
                 .value=${this.name}
                 @input=${(event: Event) => {
                     const input = event.target as HTMLInputElement;
                     this.name = input.value;
                     this.saveToLocalStorage();
+                    this.updateIfJoined();
                 }}
             />
             <label class="label" for="quest-input">What is your quest:</label>
