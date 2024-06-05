@@ -235,6 +235,7 @@ export class NameEntry extends LitElement {
                                 name=${player.name}
                                 quest=${player.quest}
                                 color=${player.color}
+                                canRemove
                             ></joined-player>
                         `
                     )}

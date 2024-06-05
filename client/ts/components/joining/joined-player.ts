@@ -90,15 +90,27 @@ export class JoinedPlayer extends LitElement {
                 <h3>${this.name}</h3>
                 <p class=${questClass}>Quest: ${this.questOrDefault}</p>
             </div>
-            <button class="remove-button" @click=${() => {
-                this.dispatchEvent(new CustomEvent<string>('remove-player', {
-                    detail: this.name,
-                    bubbles: true,
-                    composed: true,
-                }));
-            }}>
-                <img class="remove-button-image" src="/img/delete.svg" />
-            </button>
+            ${this.canRemove
+                ? html`
+                      <button
+                          class="remove-button"
+                          @click=${() => {
+                              this.dispatchEvent(
+                                  new CustomEvent<string>('remove-player', {
+                                      detail: this.name,
+                                      bubbles: true,
+                                      composed: true,
+                                  })
+                              );
+                          }}
+                      >
+                          <img
+                              class="remove-button-image"
+                              src="/img/delete.svg"
+                          />
+                      </button>
+                  `
+                : nothing}
         `;
     }
 }
