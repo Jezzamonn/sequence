@@ -5,12 +5,13 @@ import http from 'http';
 import https from 'https';
 import { AddressInfo } from 'net';
 import { Server, Socket } from 'socket.io';
-import { ClientCommand, CommandCallback, ServerCommand } from '../../common/ts/interface/interface';
-import { Player } from '../../common/ts/players';
-import { wait } from '../../common/ts/util';
+import {
+    ClientCommand,
+    CommandCallback,
+    ServerCommand,
+} from '../../common/ts/interface/interface';
 import { logIfError } from './server-common';
-import { ServerGameManager } from './server-game-manager';
-import { ServerPlayerManager } from './server-player-manager';
+import { ServerRoomManager } from './server-room-manager';
 
 console.log('Server <( Hello World! )');
 
@@ -25,8 +26,6 @@ program
     .parse(process.argv);
 
 const options = program.opts();
-
-const minPlayers = parseInt(options.minPlayers);
 
 let port: number | undefined;
 
@@ -66,109 +65,26 @@ const io = new Server(server, {
     },
 });
 
-const playerManager = new ServerPlayerManager();
-let gameManager: ServerGameManager | undefined;
+const roomManager = new ServerRoomManager(
+    "roomio-da-fabio",
+    io,
+    parseInt(options.minPlayers),
+    (options.randomSeed as string) || undefined,
+);
 
 io.on('connection', (socket: Socket) => {
     console.log('A client has connected');
 
-    playerManager.sendPlayersState(socket);
-    socket.emit(ServerCommand.gameState, gameManager?.getBaseGameState());
-
-    // When a client connects, wait for it to send a join command with the player information.
-    // The player manager will add events to the socket to handle the rest of the game.
-    socket.on(ClientCommand.join, (player: Player, callback: CommandCallback) => {
-        const result = playerManager.addOrUpdatePlayer(player, socket);
-        callback(logIfError(result));
-
-        if (result.error != undefined) {
-            return;
+    // Don't do anything with the connection until we receive the subsequent joinRoom command.
+    socket.once(
+        ClientCommand.joinRoom,
+        (roomName: string, playerId: string, callback: CommandCallback) => {
+            // Ignore room name for now as there's only one room.
+            const result = roomManager.addOrUpdatePlayer(playerId, socket);
+            callback(logIfError(result));
         }
-
-        // Notify all players of the current players.
-        playerManager.sendPlayersState(io);
-        gameManager?.sendGameState();
-    });
+    );
 });
-
-playerManager.onStart = (allowAI: boolean) => {
-    if (gameManager != undefined) {
-        console.warn('Replacing existing game.');
-    } else {
-        console.log('Starting new game');
-    }
-
-    try {
-        const players = playerManager.getValidatedPlayers(allowAI);
-        const randomSeed = (options.randomSeed as string) || undefined;
-        gameManager = ServerGameManager.fromPartialPlayers(
-            io,
-            players,
-            allowAI,
-            minPlayers,
-            randomSeed
-        );
-    } catch (e) {
-        if (e instanceof Error) {
-            return { error: e.message };
-        }
-        console.error(e);
-        return { error: 'An unknown error occurred' };
-    }
-
-    wait(0).then(() => {
-        playerManager.sendPlayersState(io);
-    });
-
-    return {};
-};
-
-playerManager.onMakeMove = (playerName, card, position) => {
-    if (gameManager == undefined) {
-        return { error: 'No game has been started' };
-    }
-
-    try {
-        gameManager.makeMove(playerName, card, position);
-    } catch (e) {
-        if (e instanceof Error) {
-            return { error: e.message };
-        }
-        console.error(e);
-        return { error: 'An unknown error occurred' };
-    }
-
-    return {};
-};
-
-playerManager.onEndGame = () => {
-    if (gameManager == undefined) {
-        return { error: 'No game has been started' };
-    }
-
-    io.emit(ServerCommand.gameState, undefined);
-    gameManager = undefined;
-
-    return {};
-};
-
-playerManager.onRemovePlayer = (playerName) => {
-    try {
-        playerManager.removePlayer(playerName);
-    } catch (e) {
-        if (e instanceof Error) {
-            return { error: e.message };
-        }
-        console.error(e);
-        return { error: 'An unknown error occurred' };
-    }
-
-    wait(0).then(() => {
-        playerManager.sendPlayersState(io);
-    });
-
-    return {};
-};
 
 // Watch the build directory for changes and tell clients to refresh when it
 // changes.

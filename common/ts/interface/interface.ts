@@ -4,7 +4,8 @@ export interface CommandResult {
 
 // Sent from client -> server
 export enum ClientCommand {
-    join = 'join',
+    joinRoom = 'joinRoom',
+    joinGame = 'joinGame',
     start = 'start',
     makeMove = 'makeMove',
     endGame = 'endGame',

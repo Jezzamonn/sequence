@@ -20,6 +20,7 @@ export const numSequencesToWin: Map<number, number> = new Map([
 ]);
 
 export interface Player {
+    id: string;
     name: string;
     quest?: string;
     color: Color;

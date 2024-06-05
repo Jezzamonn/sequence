@@ -268,7 +268,7 @@ export class GameManager {
                 hand
             )
         ) {
-            this.log(`Player ${player.name} has no moves, ending turn.`);
+            this.log(`Player ${player.id} has no moves, ending turn.`);
             this.state.nextPlayerIndex =
                 (this.state.nextPlayerIndex + 1) % this.state.players.length;
             this.state.discardedThisTurn = false;

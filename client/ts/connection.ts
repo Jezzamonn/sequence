@@ -1,14 +1,19 @@
 import { Socket, io } from 'socket.io-client';
+import { v4 as uuidv4 } from 'uuid';
 import { Card, cardToDescription } from '../../common/ts/cards';
 import { PlayerVisibleGameState } from '../../common/ts/game';
 import { ClientCommand, CommandResult, ServerCommand } from '../../common/ts/interface/interface';
 import { Player } from '../../common/ts/players';
 import { Point, Points } from '../../common/ts/point';
 
+export const localStoragePrefix = 'sequence';
+
 export class Connection {
     private socket: Socket;
+    id: string;
 
     requestInProgress = false;
+    joinedRoom = false;
 
     onGameState: ((state: PlayerVisibleGameState) => void) | undefined;
     onPlayersState: ((players: Player[]) => void) | undefined;
@@ -16,13 +21,26 @@ export class Connection {
     constructor() {
         this.socket = io(location.origin);
 
+        let id = localStorage.getItem(localStoragePrefix + '-uuid');
+        if (id == undefined) {
+            id = uuidv4();
+            localStorage.setItem(localStoragePrefix + '-uuid', id);
+        }
+        this.id = id;
+
         this.socket.on('connect', () => {
             console.log('Connected to server');
-            // TODO: Send join request again if the player has already joined.
+            // Join room.
+            // Not sure what to do if this fails.
+            this.socket.emitWithAck(ClientCommand.joinRoom, 'room', this.id).then(() => {
+                console.log(`Joined room as ${this.id}`);
+                this.joinedRoom = true;
+            });
         });
 
         this.socket.on('disconnect', () => {
             console.log('Disconnected from server');
+            this.joinedRoom = false;
         });
 
         this.socket.on(ServerCommand.gameState, (state: PlayerVisibleGameState) => {
@@ -39,16 +57,14 @@ export class Connection {
         });
     }
 
-    async join(player: Player): Promise<CommandResult> {
+    async joinGame(player: Player): Promise<CommandResult> {
         console.log(`Joining as ${player.name}`);
         if (this.requestInProgress) {
             return { error: 'Request already in progress' };
         }
 
-        this.requestInProgress = true;
-
         try {
-            const result = await this.socket.emitWithAck(ClientCommand.join, player);
+            const result = await this.socket.emitWithAck(ClientCommand.joinGame, player);
             return result;
         } finally {
             this.requestInProgress = false;

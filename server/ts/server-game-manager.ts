@@ -1,22 +1,20 @@
-import { Server } from 'socket.io';
 import { PlayerOrAI } from '../../common/ts/ai/ai-interface';
 import { BlockingAI } from '../../common/ts/ai/blocking';
 import { PreferMiddleAI } from '../../common/ts/ai/prefer-middle';
 import { allColors } from '../../common/ts/board';
 import { Card, cardToDescription } from '../../common/ts/cards';
 import { GameManager } from '../../common/ts/game';
-import { ServerCommand } from '../../common/ts/interface/interface';
 import { Player } from '../../common/ts/players';
 import { Point, Points } from '../../common/ts/point';
 import { choose, seededRandom, wait } from '../../common/ts/util';
 
 export class ServerGameManager {
-    io: Server;
     players: PlayerOrAI[] = [];
     gameManager: GameManager;
 
-    constructor(io: Server, players: PlayerOrAI[], randomSeed?: string) {
-        this.io = io;
+    onGameStateChange: (() => void) | undefined;
+
+    constructor(players: PlayerOrAI[], randomSeed?: string) {
         this.players = players;
 
         let random: () => number = Math.random;
@@ -30,36 +28,28 @@ export class ServerGameManager {
     }
 
     static fromPartialPlayers(
-        io: Server,
         players: Player[],
         allowAI = false,
         minPlayers: number,
         randomSeed?: string
     ): ServerGameManager {
         return new ServerGameManager(
-            io,
             makeAllPlayersFromPartialPlayers(players, allowAI, minPlayers),
             randomSeed
         );
     }
 
-    makeMove(
-        playerName: string,
-        card: Card,
-        position: Point | undefined
-    ): void {
+    makeMove(playerId: string, card: Card, position: Point | undefined): void {
         console.log(
-            `Player ${playerName} making move: ${cardToDescription(
+            `Player ${playerId} making move: ${cardToDescription(
                 card
             )} at ${Points.toString(position)}`
         );
 
         // Find player index by looking up by their name.
-        const playerIndex = this.players.findIndex(
-            (p) => p.name === playerName
-        );
+        const playerIndex = this.players.findIndex((p) => p.id === playerId);
         if (playerIndex === -1) {
-            throw new Error(`Player ${playerName} not found.`);
+            throw new Error(`Player ${playerId} not found.`);
         }
 
         this.gameManager.makeMove(playerIndex, card, position);
@@ -69,24 +59,18 @@ export class ServerGameManager {
     // Poorly named.
     queueNextAction() {
         wait(0).then(() => {
-            this.sendGameState();
+            this.onGameStateChange?.();
             this.possiblySimulateAIPlayer();
         });
     }
 
-    sendGameState() {
-        console.log('Sending game state');
-        for (let i = 0; i < this.players.length; i++) {
-            const player = this.players[i];
-            const state = this.gameManager.getStateForPlayer(i);
-            console.log(`Sending game state to player ${i}`);
-
-            this.io.to(player.name).emit(ServerCommand.gameState, state);
+    getStateForPlayer(playerId: string) {
+        const playerIndex = this.players.findIndex((p) => p.id === playerId);
+        if (playerIndex === -1) {
+            return this.gameManager.getStateForPlayer();
         }
-    }
 
-    getBaseGameState() {
-        return this.gameManager.getStateForPlayer();
+        return this.gameManager.getStateForPlayer(playerIndex);
     }
 
     async possiblySimulateAIPlayer() {
@@ -102,7 +86,7 @@ export class ServerGameManager {
             return;
         }
 
-        console.log(`Simulating AI player ${player.name}`);
+        console.log(`Simulating AI player ${player.id}`);
 
         await wait(1);
 
@@ -111,7 +95,7 @@ export class ServerGameManager {
         const move = player.ai.makeMove(moves, state);
 
         try {
-            this.makeMove(player.name, move.card, move.position);
+            this.makeMove(player.id, move.card, move.position);
         } catch (e) {
             console.error(`AI Player made problematic move?? ${e}`);
         }
@@ -124,7 +108,7 @@ export function makeAllPlayersFromPartialPlayers(
     minimumPlayers: number
 ): PlayerOrAI[] {
     const players: PlayerOrAI[] = [];
-    const addedHumanPlayerNames = new Set<string>();
+    const addedHumanPlayerIds = new Set<string>();
     // JS sets actually maintain a consistent order, so we can look up the next color from that.
     const colorsInGame = new Set(joinedPlayers.map((p) => p.color));
     if (allowAI && colorsInGame.size == 1) {
@@ -135,14 +119,13 @@ export function makeAllPlayersFromPartialPlayers(
     let aiPlayerCount = 0;
 
     while (
-        addedHumanPlayerNames.size < joinedPlayers.length ||
+        addedHumanPlayerIds.size < joinedPlayers.length ||
         players.length < minimumPlayers
     ) {
         for (const color of colorsInGame) {
             let player: PlayerOrAI = choose(
                 joinedPlayers.filter(
-                    (p) =>
-                        p.color === color && !addedHumanPlayerNames.has(p.name)
+                    (p) => p.color === color && !addedHumanPlayerIds.has(p.id)
                 )
             );
             if (player == undefined) {
@@ -154,13 +137,14 @@ export function makeAllPlayersFromPartialPlayers(
                 }
                 const ai = new BlockingAI(new PreferMiddleAI());
                 player = {
+                    id: `AI ${++aiPlayerCount}`,
                     name: `AI ${++aiPlayerCount}`,
                     quest: 'To robotically win └[ ∵ ]┘',
                     color,
                     ai,
                 };
             } else {
-                addedHumanPlayerNames.add(player.name);
+                addedHumanPlayerIds.add(player.id);
             }
 
             players.push(player);

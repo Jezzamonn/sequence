@@ -2,9 +2,7 @@ import { LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Color, allColors } from '../../../../common/ts/board';
 import { Player } from '../../../../common/ts/players';
-import { connection } from '../../connection';
-
-const localStoragePrefix = 'sequence';
+import { connection, localStoragePrefix } from '../../connection';
 
 @customElement('name-entry')
 export class NameEntry extends LitElement {
@@ -109,6 +107,7 @@ export class NameEntry extends LitElement {
     }
 
     updated() {
+        this.calculateJoinedState();
         if (this.autoJoin && !this.joined && this.inputsValid) {
             this.handleJoinGame();
         }
@@ -118,7 +117,7 @@ export class NameEntry extends LitElement {
         const sections: TemplateResult[] = [];
 
         const nameIsInGame = this.ongoingGamePlayers.some(
-            (player) => player.name === this.name
+            (player) => player.id === this.name
         );
 
         const entry = html`
@@ -231,7 +230,7 @@ export class NameEntry extends LitElement {
                         (player) => html`
                             <joined-player
                                 @remove-player=${() => {
-                                    connection.removePlayer(player.name);
+                                    connection.removePlayer(player.id);
                                 }}
                                 name=${player.name}
                                 quest=${player.quest}
@@ -268,11 +267,19 @@ export class NameEntry extends LitElement {
         } else {
             this.color = undefined;
         }
+
+        this.calculateJoinedState();
     }
 
     validateInput() {
         this._nameValid = this.name.trim() !== '';
         this._colorValid = this.color != undefined;
+    }
+
+    calculateJoinedState() {
+        this.joined = this.joinedPlayers.some(
+            (player) => player.id == connection.id
+        );
     }
 
     async handleJoinGame() {
@@ -281,7 +288,8 @@ export class NameEntry extends LitElement {
             return;
         }
 
-        const result = await connection.join({
+        const result = await connection.joinGame({
+            id: 'Unused',
             name: this.name,
             quest: this.quest.trim() == '' ? undefined : this.quest.trim(),
             color: this.color!,
@@ -295,7 +303,7 @@ export class NameEntry extends LitElement {
             return;
         }
 
-        this.joined = true;
+        this.calculateJoinedState();
     }
 
     async updateIfJoined() {

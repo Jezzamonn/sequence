@@ -7,20 +7,24 @@ describe('GameManager', function () {
         beforeEach(function () {
             gameManager = new GameManager([
                 {
-                    name: "Player 1",
-                    color: "red"
+                    id: 'Player 1',
+                    name: 'Player 1',
+                    color: 'red'
                 },
                 {
-                    name: "Player 2",
-                    color: "blue"
+                    id: 'Player 2',
+                    name: 'Player 2',
+                    color: 'blue'
                 },
                 {
-                    name: "Player 3",
-                    color: "red"
+                    id: 'Player 3',
+                    name: 'Player 3',
+                    color: 'red'
                 },
                 {
-                    name: "Player 4",
-                    color: "blue"
+                    id: 'Player 4',
+                    name: 'Player 4',
+                    color: 'blue'
                 }
             ], () => 0);
         });
