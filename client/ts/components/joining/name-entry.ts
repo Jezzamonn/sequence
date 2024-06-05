@@ -116,12 +116,7 @@ export class NameEntry extends LitElement {
     render() {
         const sections: TemplateResult[] = [];
 
-        const nameIsInGame = this.ongoingGamePlayers.some(
-            (player) => player.id === this.name
-        );
-
-        const entry = html`
-            <h1>Online Sequence</h1>
+        const entry = html` <h1>Online Sequence</h1>
             <label
                 class="label ${this._nameValid ? '' : 'invalid'}"
                 for="name-input"
@@ -194,13 +189,17 @@ export class NameEntry extends LitElement {
                 >
                     <token-marker color="red"></token-marker>
                 </button>
-            </div>
-            <hr />
-            <button class="large-button" @click=${this.handleJoinGame}>
-                ${nameIsInGame ? 'Rejoin' : 'Join'}
-            </button>
-        `;
+            </div>`;
         sections.push(entry);
+        if (!this.joined) {
+            const joinButton = html`
+                <hr />
+                <button class="large-button" @click=${this.handleJoinGame}>
+                    Join
+                </button>
+            `;
+            sections.push(joinButton);
+        }
 
         if (this.ongoingGamePlayers.length > 0) {
             const ongoingGame = html`
@@ -245,7 +244,8 @@ export class NameEntry extends LitElement {
                     .disabled=${!this.joined}
                     @click=${this.handleStartGame}
                 >
-                    Start
+                    Start game with ${this.joinedPlayers.length}
+                    player${this.joinedPlayers.length == 1 ? '' : 's'}
                 </button>
             `;
             sections.push(joinedPlayers);
