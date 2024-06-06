@@ -113,6 +113,9 @@ export class GameDisplay extends LitElement {
     @state()
     private showingSettings = false;
 
+    @state()
+    private playersAreCollapsed = false;
+
     constructor() {
         super();
         this.handleWindowClick = this.handleWindowClick.bind(this);
@@ -166,7 +169,10 @@ export class GameDisplay extends LitElement {
                 .name=${p.name}
                 .quest=${p.quest}
                 .color=${p.color}
-                .canCollapse=${true}
+                .isCollapsed=${this.playersAreCollapsed}
+                @click=${() => {
+                    this.playersAreCollapsed = !this.playersAreCollapsed;
+                }}
             ></joined-player>`;
         });
 

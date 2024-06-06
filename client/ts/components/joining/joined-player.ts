@@ -39,10 +39,8 @@ export class JoinedPlayer extends LitElement {
             font-size: 12px;
         }
 
-        @media (max-aspect-ratio: 1/1) {
-            .quest-collapsible {
-                display: none;
-            }
+        .quest-collapsed {
+            display: none;
         }
 
         .remove-button {
@@ -70,7 +68,7 @@ export class JoinedPlayer extends LitElement {
     accessor color: Color | undefined;
 
     @property({ type: Boolean })
-    accessor canCollapse: boolean = false;
+    accessor isCollapsed: boolean = false;
 
     @property({ type: Boolean })
     accessor canRemove: boolean = false;
@@ -83,7 +81,7 @@ export class JoinedPlayer extends LitElement {
     }
 
     render() {
-        const questClass = this.canCollapse ? 'quest-collapsible' : nothing;
+        const questClass = this.isCollapsed ? 'quest-collapsed' : nothing;
         return html`
             <token-marker .color=${this.color}></token-marker>
             <div class="player-text">
