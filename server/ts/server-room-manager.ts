@@ -83,6 +83,7 @@ export class ServerRoomManager {
                         this.minPlayers,
                         this.randomSeed
                     );
+                    this.game.onGameStateChange = () => this.sendGameState();
                 } catch (e) {
                     handleThrownError(e, callback);
                     return;
@@ -91,8 +92,6 @@ export class ServerRoomManager {
                 callback({});
 
                 this.sendPlayersState();
-                // This didn't get triggered for some reason?
-                this.sendGameState();
             }
         );
 
