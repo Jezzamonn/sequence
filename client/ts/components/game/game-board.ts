@@ -1,14 +1,18 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement, nothing, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
     boardLayout,
     boardSize,
+    Color,
+    getAllSequences,
     MoveAndColor,
-    spiralPositionIndices
+    spiralPositionIndices,
+    Token
 } from '../../../../common/ts/board';
 import { isOneEyedJack } from '../../../../common/ts/cards';
 import { Point } from '../../../../common/ts/point';
 import { BoardClickEventParams } from '../events';
+import { colors } from '../token-marker';
 
 @customElement('game-board')
 export class GameBoardElement extends LitElement {
@@ -77,6 +81,25 @@ export class GameBoardElement extends LitElement {
             .card-with-token-animation {
                 z-index: 1;
             }
+
+            .sequence-lines {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 2;
+
+                pointer-events: none;
+            }
+
+            .sequence-line {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
         `,
     ];
 
@@ -93,9 +116,9 @@ export class GameBoardElement extends LitElement {
     accessor doInitialAnimation: boolean = false;
 
     render() {
-        let cards = [];
+        let cards: TemplateResult[] = [];
         for (let y = 0; y < boardSize; y++) {
-            let rowCards = [];
+            let rowCards: TemplateResult[] = [];
             for (let x = 0; x < boardSize; x++) {
                 const card = boardLayout[y][x];
                 let token = this.placedTokens?.[y]?.[x];
@@ -137,7 +160,39 @@ export class GameBoardElement extends LitElement {
             }
             cards.push(html`<div class="row">${rowCards}</div>`);
         }
-        return cards;
+
+        const sequenceLineElems: TemplateResult[] = [];
+
+        const placedTokens = this.placedTokens;
+        if (placedTokens != undefined) {
+            const sequences = getAllSequences(placedTokens as Token[][]);
+
+            for (const line of sequences) {
+                const startX = (line.start.x + 0.5) * boardSize;
+                const startY = (line.start.y + 0.5) * boardSize;
+                const endX = (line.end.x + 0.5) * boardSize;
+                const endY = (line.end.y + 0.5) * boardSize;
+                sequenceLineElems.push(html`<svg
+                        class="sequence-line"
+                        viewBox="0 0 100 100"
+                        preserveAspectRatio="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <g
+                            stroke="${colors[line.color as Color]}"
+                            stroke-width="3"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M ${startX} ${startY} L ${endX} ${endY} Z" />
+                        </g>
+                    </svg>`);
+            }
+        }
+
+        return html`
+            ${cards}
+            <div class="sequence-lines">${sequenceLineElems}</div>
+        `;
     }
 
     getAnimationDelay(x: number, y: number) {

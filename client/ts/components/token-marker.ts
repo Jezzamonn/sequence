@@ -1,10 +1,16 @@
 import { css, html, LitElement } from 'lit-element';
 import { customElement, property } from 'lit/decorators.js';
-import { Token } from '../../../common/ts/board';
+import { Color, Token } from '../../../common/ts/board';
 
-const blueColor = '#00f';
-const greenColor = '#1a3';
-const redColor = '#f51';
+export const blueColor = '#00f';
+export const greenColor = '#1a3';
+export const redColor = '#f51';
+
+export const colors: { [key in Color]: string } = {
+    blue: blueColor,
+    green: greenColor,
+    red: redColor,
+};
 
 @customElement('token-marker')
 export class TokenMarker extends LitElement {

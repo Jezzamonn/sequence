@@ -28,6 +28,12 @@ export interface Move {
     position: Point | undefined;
 }
 
+export interface Sequence {
+    start: Point;
+    end: Point;
+    color: Color;
+}
+
 export const boardSize = 10;
 
 export const allPositions = Array(boardSize)
@@ -239,9 +245,7 @@ export function getPlacementErrorMessage(
             // position on the board to see if there is a valid move, making
             // this O(n^4) in that context. But I think the board size is small
             // enough for that to be fine.
-            const newSequences = [
-                ...countSequences(placedTokens).values(),
-            ].reduce((a, b) => a + b, 0);
+            const newSequences = getAllSequences(placedTokens).length;
             placedTokens[position.y][position.x] = prevValue;
 
             if (newSequences != sequenceCount) {
@@ -430,13 +434,24 @@ export function* allPossibleSequences(): Generator<Point[], void, undefined> {
 
 export function countSequences(placedTokens: Token[][]): Map<Color, number> {
     // Loop through rows, columns, and diagonals for lines of 5.
-    const sequences: Map<Color, number> = new Map();
+    const sequenceMap: Map<Color, number> = new Map();
+    const sequences = getAllSequences(placedTokens);
+    for (const seq of sequences) {
+        sequenceMap.set(seq.color, (sequenceMap.get(seq.color) ?? 0) + 1);
+    }
+    return sequenceMap;
+}
+
+export function getAllSequences(placedTokens: Token[][]): Sequence[] {
+    // Loop through rows, columns, and diagonals for lines of 5.
+    const sequences: Sequence[] = [];
 
     for (const row of allRows()) {
         let count = 0;
         let lastWasWild = false;
         let lastColor: Token = undefined;
-        for (const p of row) {
+        for (let i = 0; i < row.length; i++) {
+            const p = row[i];
             const { x, y } = p;
             const isWild = isWildPosition(p);
             const color = placedTokens[y][x];
@@ -457,10 +472,11 @@ export function countSequences(placedTokens: Token[][]): Map<Color, number> {
                 }
             }
             if (count == 5) {
-                sequences.set(
-                    lastColor!,
-                    (sequences.get(lastColor!) ?? 0) + 1
-                );
+                sequences.push({
+                    start: row[i - 4],
+                    end: p,
+                    color: lastColor!
+                });
                 // We're allowed to start a new sequence from here,
                 // reusing only one token of the previous sequence.
                 count = 1;
