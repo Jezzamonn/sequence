@@ -18,3 +18,5 @@ export function handleThrownError(e: unknown, callback: CommandCallback): void {
     console.error(e);
     callback({ error: `An unexpected error occurred: ${e}` });
 }
+
+export const buildDir = '../client/build';

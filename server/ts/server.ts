@@ -7,10 +7,10 @@ import { AddressInfo } from 'net';
 import { Server, Socket } from 'socket.io';
 import {
     ClientCommand,
-    CommandCallback,
-    ServerCommand,
+    CommandCallback
 } from '../../common/ts/interface/interface';
 import { logIfError } from './server-common';
+import { ResettableTimeout, shutdownVm, stopServer, watchForChangesToBuildDir } from './server-functions';
 import { ServerRoomManager } from './server-room-manager';
 
 console.log('Server <( Hello World! )');
@@ -72,6 +72,15 @@ const roomManager = new ServerRoomManager(
     (options.randomSeed as string) || undefined,
 );
 
+const shutdownTimeoutDuration = 60 * 60 * 1000;
+const shutdownTimeout: ResettableTimeout = new ResettableTimeout(async () => {
+    console.log('Shutting down server due to inactivity');
+    await stopServer(server);
+    await shutdownVm();
+    // End process
+    process.exit(0);
+}, shutdownTimeoutDuration);
+
 io.on('connection', (socket: Socket) => {
     console.log('A client has connected');
 
@@ -84,29 +93,15 @@ io.on('connection', (socket: Socket) => {
             callback(logIfError(result));
         }
     );
+
+    socket.onAny(() => {
+        // Reset the timer.
+        shutdownTimeout.reset();
+    });
 });
 
-// Watch the build directory for changes and tell clients to refresh when it
-// changes.
-
-// Also want to debounce this so that we don't spam the clients with refreshes
-// and so that we wait for all the building to finish.
 try {
-    let refreshTimeout: NodeJS.Timeout | undefined;
-    const refreshDebounceTimeSec = 1;
-
-    fs.watch(buildDir, { recursive: true }, (event, filename) => {
-        console.log('File change detected:', event, filename);
-        if (refreshTimeout != undefined) {
-            clearTimeout(refreshTimeout);
-        }
-
-        refreshTimeout = setTimeout(() => {
-            console.log('Refreshing clients');
-            io.emit(ServerCommand.refresh);
-            refreshTimeout = undefined;
-        }, refreshDebounceTimeSec * 1000);
-    });
+    watchForChangesToBuildDir(io);
 } catch (e) {
     console.error('Failed to watch build directory for changes:', e);
     console.log('No worries :)');
