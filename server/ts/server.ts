@@ -72,6 +72,7 @@ const roomManager = new ServerRoomManager(
     (options.randomSeed as string) || undefined,
 );
 
+// const shutdownTimeoutDuration = 10 * 1000; // For testing.
 const shutdownTimeoutDuration = 60 * 60 * 1000;
 const shutdownTimeout: ResettableTimeout = new ResettableTimeout(async () => {
     console.log('Shutting down server due to inactivity');
